@@ -4,7 +4,7 @@ using Simulation.Common.constants;
 using Simulation.Database;
 using Simulation.Dto.UAV;
 using Simulation.Mappers;
-using Simulation.Models;
+using Simulation.Models.Uav;
 using Simulation.Ro.UAV;
 
 namespace Simulation.Controllers
@@ -36,7 +36,7 @@ namespace Simulation.Controllers
                 return BadRequest(ModelState);
             }
 
-            var uavModel = dto.toModel();
+            var uavModel = dto.ToModel();
             await _UAVCollection.InsertOneAsync(uavModel);
             return CreatedAtAction(nameof(GetUAVByUAVId),Ok());
         }

@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using Simulation.Common.Enums;
 
-namespace Simulation.Models
+namespace Simulation.Models.Uav
 {
     public class UAV
     {
