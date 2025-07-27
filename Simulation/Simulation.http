@@ -1,6 +1,26 @@
 @Simulation_HostAddress = http://localhost:5023
 
-GET {{Simulation_HostAddress}}/weatherforecast/
+### Save (POST) UAV
+POST {{Simulation_HostAddress}}/api/UAV/create
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test UAV",
+  "uavType": "A1",
+  "telemetryData": {
+    "PositionLatitude": 42.123,
+    "PositionLongitude": -71.456,
+    "EngineRpm": 3200.0
+  },
+  "currentMissionId": "mission-001"
+}
+
+###
+
+### Get UAV by Id
+# Replace <UAV_ID> with the actual Id returned from the POST response
+GET {{Simulation_HostAddress}}/api/UAV/<UAV_ID>
 Accept: application/json
 
 ###

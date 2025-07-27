@@ -10,13 +10,12 @@ namespace Simulation.Models
         [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        public string Name { get; set; }
+        public int WingId { get; set; }
 
         public UAVTypes UAVType { get; set; }
 
-
         public Dictionary<TelemetryFields,double> TelemetryData { get; set; }
 
-        public int CurrentMissionId { get; set; }
+        public string CurrentMissionId { get; set; }
     }
 }
