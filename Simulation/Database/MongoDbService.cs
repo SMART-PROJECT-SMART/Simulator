@@ -1,5 +1,5 @@
 ﻿using MongoDB.Driver;
-using Simulation.constants;
+using Simulation.Common.constants;
 
 namespace Simulation.Database
 {
@@ -8,7 +8,7 @@ namespace Simulation.Database
         private readonly IConfiguration _configuration;
         private readonly IMongoDatabase? _database;
 
-        private MongoDbService(IConfiguration configuration)
+        public MongoDbService(IConfiguration configuration)
         {
             _configuration = configuration;
 
@@ -18,12 +18,6 @@ namespace Simulation.Database
             _database = mongoClient.GetDatabase(mongoUrl.DatabaseName);
         }
 
-        private static MongoDbService _instance;
-
-        public static MongoDbService GetInstance(IConfiguration configuration)
-        {
-            _instance ??= new MongoDbService(configuration);
-            return _instance;
-        }
+        public IMongoDatabase? Database => _database;
     }
 }
