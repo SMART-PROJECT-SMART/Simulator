@@ -13,6 +13,8 @@ namespace Simulation.Models.Mission
 
         public int WingId { get; set; }
 
+        public Mission() { }
+
         public Mission(Location destination, int wingId)
         {
             Destination = destination;

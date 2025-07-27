@@ -9,6 +9,7 @@
         public static class Mongo {
             public static class Schemas {
                 public static string UAV_SCHEMA = "uav";
+                public static string MISSION_SCHEMA = "mission";
             }
         }
     }

@@ -7,6 +7,15 @@ namespace Simulation.Mappers
 {
     public static class UAVMapper
     {
+        public static UAV ToModel(this CreateUAVDto dto) {
+            return new UAV
+            {
+                WingId = dto.WingId,
+                UAVType = dto.UAVType,
+                TelemetryData = dto.TelemetryData ?? new Dictionary<TelemetryFields, double>(),
+                CurrentMissionId = dto.CurrentMissionId ?? string.Empty
+            };
+        }
 
         public static UAVRo ToRo(this UAV uav) {
             return new UAVRo

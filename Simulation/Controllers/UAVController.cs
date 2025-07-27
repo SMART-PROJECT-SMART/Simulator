@@ -25,7 +25,7 @@ namespace Simulation.Controllers
         {
             var filter = Builders<UAV>.Filter.Eq(u => u.WingId, wingId);
             var uav = await _UAVCollection.Find(filter).FirstOrDefaultAsync();
-            return uav is not null ? Ok(uav.toRo()) : NotFound();
+            return uav is not null ? Ok(uav.ToRo()) : NotFound();
         }
 
         [HttpPost("create")]
@@ -38,7 +38,7 @@ namespace Simulation.Controllers
 
             var uavModel = dto.ToModel();
             await _UAVCollection.InsertOneAsync(uavModel);
-            return CreatedAtAction(nameof(GetUAVByUAVId),Ok());
+            return CreatedAtAction(nameof(GetUAVByUAVId), new { wingId = uavModel.WingId }, uavModel.ToRo());
         }
 
         [HttpPatch("update-mission")]
