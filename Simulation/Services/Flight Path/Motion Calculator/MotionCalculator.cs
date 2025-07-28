@@ -1,28 +1,32 @@
 ﻿using Simulation.Models.Mission;
-using Simulation.Services.helpers;
+using Simulation.Services.Flight_Path.helpers;
 
 namespace Simulation.Services.Flight_Path.Motion_Calculator
 {
     public class MotionCalculator : IMotionCalculator
     {
-        public Location CalculateNext(Location current, Location destination, double groundSpeedMps, double pitchDegrees,
-            double deltaSeconds)
+        public Location CalculateNext(
+            Location current,
+            Location destination,
+            double speedKmph,
+            double deltaHours)
         {
-            var remaining = FlightPathMathHelper.CalculateDistance(current, destination);
-            var travel = groundSpeedMps * deltaSeconds;
+            double remainingKm = FlightPathMathHelper.CalculateDistance(current, destination) / 1000.0;
+            double travelKm = speedKmph * deltaHours;
+            if (travelKm >= remainingKm) return destination;
 
-            if (travel >= remaining)
-                return destination;
+            double travelM = travelKm * 1000.0;
+            double bearing = FlightPathMathHelper.CalculateBearing(current, destination);
+            Location horizontal = FlightPathMathHelper.CalculateDestinationLocation(current, bearing, travelM);
 
-            var bearing = FlightPathMathHelper.CalculateBearing(current, destination);
-            var horizontal = FlightPathMathHelper.CalculateDestinationLocation(current, bearing, travel);
 
-            var altitudeDelta = Math.Sin(UnitConversionHelper.ToRadians(pitchDegrees)) * travel;
-
+            double altDiff = destination.Altitude - current.Altitude;
+            double climbRad = Math.Atan2(altDiff, remainingKm * 1000.0);
+            double altDelta = Math.Sin(climbRad) * travelM;
             return new Location(
                 horizontal.Latitude,
                 horizontal.Longitude,
-                horizontal.Altitude + altitudeDelta);
+                current.Altitude + altDelta);
         }
     }
 }

@@ -2,15 +2,26 @@
 using Microsoft.Extensions.Logging;
 using Simulation.Common.Enums;
 using Simulation.Models.Mission;
-using Simulation.Models.Uav;
-using Simulation.Services;
+using Simulation.Services.Flight_Path;
+using Simulation.Services.Flight_Path.Motion_Calculator;
+using Simulation.Services.Flight_Path.Orientation_Calculator;
+using Simulation.Services.Flight_Path.Speed_Controller;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Simulation.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TestFlightController(ILogger<FlightPathService> logger) : ControllerBase
+public class TestFlightController : ControllerBase
 {
+    private readonly ILogger<FlightPathService> _logger;
+
+    public TestFlightController(ILogger<FlightPathService> logger)
+    {
+        _logger = logger;
+    }
+
     [HttpGet("run")]
     public async Task<IActionResult> Run()
     {
@@ -22,9 +33,10 @@ public class TestFlightController(ILogger<FlightPathService> logger) : Controlle
             [TelemetryFields.LocationLatitude] = start.Latitude,
             [TelemetryFields.LocationLongitude] = start.Longitude,
             [TelemetryFields.LocationAltitudeAmsl] = start.Altitude,
-            [TelemetryFields.LocationGroundSpeed] = 1000,
-            [TelemetryFields.LocationYaw] = 270.0,
-            [TelemetryFields.LocationPitch] = 0.0
+            [TelemetryFields.LocationGroundSpeed] = 0.0,
+            [TelemetryFields.LocationYaw] = 0.0,
+            [TelemetryFields.LocationPitch] = 0.0,
+            [TelemetryFields.LocationRoll] = 0.0
         };
 
         var uav = new UAV
@@ -33,21 +45,30 @@ public class TestFlightController(ILogger<FlightPathService> logger) : Controlle
             TelemetryData = telemetry,
             UAVType = UAVTypes.A1,
             WingId = 1,
-            CurrentMissionId = "M-001"
+            CurrentMissionId = "M-001",
+            MaxAcceleration = 5.0,
+            MaxDeceleration = 5.0,
+            MaxCruiseSpeedKmph = 250.0
         };
 
-        var mission = new Mission(dest, 1);
+        var motionCalculator = new MotionCalculator();
+        var speedController = new SpeedController();
+        var orientationCalculator = new OrientationCalculator();
 
-        var service = new FlightPathService(uav, mission, logger);
+        var flightService = new FlightPathService(
+            uav,
+            dest,
+            motionCalculator,
+            speedController,
+            orientationCalculator,
+            _logger);
 
-        var tcs = new TaskCompletionSource();
+        var tcs = new TaskCompletionSource<bool>();
+        flightService.MissionCompleted += () => tcs.TrySetResult(true);
 
-        service.MissionCompleted += () => tcs.SetResult();
-
-        service.StartFlightPath();
-
+        flightService.StartFlightPath();
         await tcs.Task;
 
-        return Ok("Simulation run complete. Check Output window for logs.");
+        return Ok("Simulation run complete. Check your logs for flight path updates.");
     }
 }

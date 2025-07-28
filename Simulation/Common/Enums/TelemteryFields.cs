@@ -38,11 +38,6 @@
         EnvironmentWindDirection,
 
         SystemUptimeSeconds,
-
-        WeaponArmed,
-        WeaponSelectedWeapon,
-        WeaponAmmoAGM114,
-        WeaponAmmo20mm
     }
 }
 

@@ -7,8 +7,7 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
         Location CalculateNext(
             Location current,
             Location destination,
-            double groundSpeedMps,
-            double pitchDegrees,
-            double deltaSeconds);
+            double speedKmph,
+            double deltaHours);
     }
 }

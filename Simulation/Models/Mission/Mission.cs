@@ -5,8 +5,6 @@ namespace Simulation.Models.Mission
 {
     public class Mission
     {
-        [BsonId]
-        [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
         public Location Destination { get; set; }

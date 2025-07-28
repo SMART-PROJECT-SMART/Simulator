@@ -1,6 +1,5 @@
 ﻿using Simulation.Common.Enums;
 using Simulation.Dto.UAV;
-using Simulation.Models.Uav;
 using Simulation.Ro.UAV;
 
 namespace Simulation.Mappers

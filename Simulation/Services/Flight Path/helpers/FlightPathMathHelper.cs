@@ -1,7 +1,8 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Models.Mission;
+using Simulation.Services.helpers;
 
-namespace Simulation.Services.helpers
+namespace Simulation.Services.Flight_Path.helpers
 {
     public class FlightPathMathHelper
     {
@@ -55,6 +56,7 @@ namespace Simulation.Services.helpers
                 origin.Altitude
             );
         }
+
 
     }
 }

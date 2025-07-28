@@ -4,7 +4,6 @@ using Simulation.Common.constants;
 using Simulation.Database;
 using Simulation.Dto.UAV;
 using Simulation.Mappers;
-using Simulation.Models.Uav;
 using Simulation.Ro.UAV;
 
 namespace Simulation.Controllers
