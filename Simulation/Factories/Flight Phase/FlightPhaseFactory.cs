@@ -1,34 +1,42 @@
-﻿// FlightPhaseFactory.cs
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Simulation.Common.Enums;
+﻿using Simulation.Common.Enums;
 using Simulation.Models.Mission;
+using Simulation.Services.Flight_Path.helpers;
+using Simulation.Services.helpers;
 
-namespace Simulation.Factories.Flight_Phase
+namespace Simulation.Factories.Flight_Phase;
+
+public record PhaseDetails(FlightPhase Phase, double TargetAltitude, double PitchDegrees);
+
+public static class FlightPhaseFactory
 {
-    public static class FlightPhaseFactory
-    {
-        private static readonly List<IFlightPhaseStrategy> _strategies = new()
-        {
-            new ClimbPhaseStrategy(),
-            new CruisePhaseStrategy(),
-            new DescentPhaseStrategy()
-        };
+    private const double PitchForClimbDeg = 15.0;
+    private const double PitchForDescentDeg = 15.0;
+    private const double AltitudeTolerance = 0.5;
 
-        public static FlightPhase DeterminePhase(
-            Location current,
-            Location destination,
-            double cruiseAltitude)
+    public static PhaseDetails DeterminePhaseDetails(
+        Location current,
+        Location destination,
+        double cruiseAltitude)
+    {
+        double remainingKm = FlightPathMathHelper.CalculateDistance(current, destination) / 1000.0;
+
+        double altitudeToLoseNowM = current.Altitude - destination.Altitude;
+        double descentKmNeededNow = 0;
+        if (altitudeToLoseNowM > 0)
         {
-            if (current.Altitude < cruiseAltitude - 0.1)
-                return FlightPhase.Climb;
-            if (current.Altitude > destination.Altitude + 0.1)
-                return FlightPhase.Descent;
-            return FlightPhase.Cruise;
+            descentKmNeededNow = (altitudeToLoseNowM / Math.Tan(UnitConversionHelper.ToRadians(PitchForDescentDeg))) / 1000.0;
         }
 
-        public static IFlightPhaseStrategy GetStrategy(FlightPhase phase) =>
-            _strategies.First(s => s.Phase == phase);
+        if (remainingKm <= descentKmNeededNow)
+        {
+            return new PhaseDetails(FlightPhase.Descent, destination.Altitude, -PitchForDescentDeg);
+        }
+
+        if (current.Altitude < cruiseAltitude - AltitudeTolerance)
+        {
+            return new PhaseDetails(FlightPhase.Climb, cruiseAltitude, PitchForClimbDeg);
+        }
+
+        return new PhaseDetails(FlightPhase.Cruise, cruiseAltitude, 0.0);
     }
 }

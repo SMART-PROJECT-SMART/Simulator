@@ -9,25 +9,37 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
         public Location CalculateNext(
             Location current,
             Location destination,
-            double speedKmph,
+            double speedKmph,   
             double deltaHours,
             double pitchDegrees,
-            double targetAltitude)
+            double targetAltitude) 
         {
-            double remainingKm = FlightPathMathHelper.CalculateDistance(current, destination) / 1000.0;
-            double travelKm = speedKmph * deltaHours;
-            if (travelKm >= remainingKm)
-                return new Location(destination.Latitude, destination.Longitude, targetAltitude);
+            double horizontalTravelKm = speedKmph * deltaHours;
+            double horizontalTravelM = horizontalTravelKm * 1000.0;
 
-            double travelM = travelKm * 1000.0;
+            double initialDistanceM = FlightPathMathHelper.CalculateDistance(current, destination);
+            if (horizontalTravelM >= initialDistanceM)
+            {
+                return new Location(destination.Latitude, destination.Longitude, destination.Altitude);
+            }
+
             double bearing = FlightPathMathHelper.CalculateBearing(current, destination);
-            var horizontal = FlightPathMathHelper.CalculateDestinationLocation(current, bearing, travelM);
+            var nextHorizontalLocation = FlightPathMathHelper.CalculateDestinationLocation(current, bearing, horizontalTravelM);
 
             double pitchRad = UnitConversionHelper.ToRadians(pitchDegrees);
-            double altDelta = Math.Sin(pitchRad) * travelM;
-            double newAltitude = current.Altitude + altDelta;
+            double altitudeChangeM = horizontalTravelM * Math.Tan(pitchRad);
+            double newAltitude = current.Altitude + altitudeChangeM;
 
-            return new Location(horizontal.Latitude, horizontal.Longitude, newAltitude);
+            if (altitudeChangeM > 0)
+            {
+                newAltitude = Math.Min(newAltitude, targetAltitude);
+            }
+            else if (altitudeChangeM < 0)
+            {
+                newAltitude = Math.Max(newAltitude, targetAltitude);
+            }
+
+            return new Location(nextHorizontalLocation.Latitude, nextHorizontalLocation.Longitude, newAltitude);
         }
     }
 }
