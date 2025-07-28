@@ -8,6 +8,8 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             Location current,
             Location destination,
             double speedKmph,
-            double deltaHours);
+            double deltaHours,
+            double pitchDegrees,
+            double targetAltitude);
     }
 }

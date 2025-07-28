@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Simulation.Common.Enums;
 using Simulation.Models.Mission;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Simulation.Controllers;
 
@@ -25,8 +22,10 @@ public class TestFlightController : ControllerBase
     [HttpGet("run")]
     public async Task<IActionResult> Run()
     {
-        var start = new Location(40.6413, -73.7781, 13.0);
-        var dest = new Location(40.7306, -73.9352, 15.0);
+        var start = new Location(40.6413, -73.7781, 10.0);
+        var touchdown = new Location(40.6460, -73.7790, 10.0);
+
+        double cruiseAltitude = 400.0;
 
         var telemetry = new Dictionary<TelemetryFields, double>
         {
@@ -48,7 +47,7 @@ public class TestFlightController : ControllerBase
             CurrentMissionId = "M-001",
             MaxAcceleration = 5.0,
             MaxDeceleration = 5.0,
-            MaxCruiseSpeedKmph = 250.0
+            MaxCruiseSpeedKmph = 100.0
         };
 
         var motionCalculator = new MotionCalculator();
@@ -57,18 +56,20 @@ public class TestFlightController : ControllerBase
 
         var flightService = new FlightPathService(
             uav,
-            dest,
+            touchdown,          
+            cruiseAltitude,    
             motionCalculator,
             speedController,
             orientationCalculator,
             _logger);
 
         var tcs = new TaskCompletionSource<bool>();
-        flightService.MissionCompleted += () => tcs.TrySetResult(true);
+        flightService.MissionCompleted += () => tcs.SetResult(true);
 
         flightService.StartFlightPath();
         await tcs.Task;
 
-        return Ok("Simulation run complete. Check your logs for flight path updates.");
+        return Ok("Simulation run complete. Check logs for Climb→Cruise→Descent.");
     }
+
 }
