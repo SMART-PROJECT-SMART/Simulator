@@ -9,5 +9,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             Location current,
             double speedKmph,
             double deltaSec);
+            
+        void Reset();
     }
 }

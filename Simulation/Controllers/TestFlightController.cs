@@ -19,19 +19,14 @@ public class TestFlightController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("run")]
-    public async Task<IActionResult> Run()
+    [HttpPost("calculate")]
+    public async Task<IActionResult> CalculateFlightPath([FromBody] FlightPathRequest request)
     {
-        var start = new Location(40.6413, -73.7781, 10.0);
-        var touchdown = new Location(40.6460, -73.7790, 10.0);
-
-        double cruiseAltitude = 400.0;
-
         var telemetry = new Dictionary<TelemetryFields, double>
         {
-            [TelemetryFields.LocationLatitude] = start.Latitude,
-            [TelemetryFields.LocationLongitude] = start.Longitude,
-            [TelemetryFields.LocationAltitudeAmsl] = start.Altitude,
+            [TelemetryFields.LocationLatitude] = request.StartLocation.Latitude,
+            [TelemetryFields.LocationLongitude] = request.StartLocation.Longitude,
+            [TelemetryFields.LocationAltitudeAmsl] = request.StartLocation.Altitude,
             [TelemetryFields.LocationGroundSpeed] = 0.0,
             [TelemetryFields.LocationYaw] = 0.0,
             [TelemetryFields.LocationPitch] = 0.0,
@@ -50,26 +45,57 @@ public class TestFlightController : ControllerBase
             MaxCruiseSpeedKmph = 100.0
         };
 
-        var motionCalculator = new MotionCalculator();
-        var speedController = new SpeedController();
-        var orientationCalculator = new OrientationCalculator();
-
         var flightService = new FlightPathService(
             uav,
-            touchdown,          
-            cruiseAltitude,    
-            motionCalculator,
-            speedController,
-            orientationCalculator,
+            request.DestinationLocation,          
+            request.CruiseAltitude ?? 400.0,    
+            new MotionCalculator(),
+            new SpeedController(),
+            new OrientationCalculator(),
             _logger);
 
         var tcs = new TaskCompletionSource<bool>();
         flightService.MissionCompleted += () => tcs.SetResult(true);
-
         flightService.StartFlightPath();
         await tcs.Task;
+        flightService.Dispose();
 
-        return Ok("Simulation run complete. Check logs for Climb→Cruise→Descent.");
+        return Ok(new FlightPathResponse
+        {
+            Message = "Simulation completed successfully",
+            StartLocation = request.StartLocation,
+            DestinationLocation = request.DestinationLocation,
+            CruiseAltitude = request.CruiseAltitude ?? 400.0,
+            UavId = uav.Id
+        });
     }
 
+    [HttpGet("run")]
+    public async Task<IActionResult> Run()
+    {
+        var request = new FlightPathRequest
+        {
+            StartLocation = new Location(40.6413, -73.7781, 10.0),
+            DestinationLocation = new Location(40.6460, -73.7790, 100.0),
+            CruiseAltitude = 200.0
+        };
+
+        return await CalculateFlightPath(request);
+    }
+}
+
+public class FlightPathRequest
+{
+    public Location StartLocation { get; set; }
+    public Location DestinationLocation { get; set; }
+    public double? CruiseAltitude { get; set; }
+}
+
+public class FlightPathResponse
+{
+    public string Message { get; set; } = string.Empty;
+    public Location StartLocation { get; set; }
+    public Location DestinationLocation { get; set; }
+    public double CruiseAltitude { get; set; }
+    public string UavId { get; set; } = string.Empty;
 }

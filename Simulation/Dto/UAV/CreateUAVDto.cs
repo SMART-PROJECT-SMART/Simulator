@@ -8,7 +8,7 @@ namespace Simulation.Dto.UAV
         public UAVTypes UAVType { get; set; }
         public Dictionary<TelemetryFields, double> TelemetryData { get; set; }
 
-        public string CurrentMissionId { get; set; }
+        public string CurrentMissionId { get; set; } = string.Empty;
 
         public CreateUAVDto(int wingId, UAVTypes uavType, Dictionary<TelemetryFields, double> telemetryData = null, string currentMissionId = null)
         {

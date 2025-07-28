@@ -1,28 +1,29 @@
-﻿namespace Simulation.Services.Flight_Path.Speed_Controller;
+﻿using Simulation.Common.constants;
+
+namespace Simulation.Services.Flight_Path.Speed_Controller;
 
 public class SpeedController : ISpeedController
 {
     public double ComputeNextSpeed(
         double currentSpeedKmph,
         double remainingKm,
-        double maxAccelMps2,
-        double maxDecelMps2,
-        double deltaSec,
-        double maxCruiseKmph)
+        double maxAcceleration,
+        double maxDeceleration,
+        double deltaSeconds,
+        double maxCruiseSpeedKmph)
     {
-        double speedMps = currentSpeedKmph * 1000.0 / 3600.0;
-        double remainingMeters = remainingKm * 1000.0;
+        double targetSpeedKmph = remainingKm <= SimulationConstants.FlightPath.MIN_DESCENT_DISTANCE_KM
+            ? Math.Max(SimulationConstants.FlightPath.MIN_SPEED_KMH * 2, remainingKm * 100)
+            : maxCruiseSpeedKmph;
 
-        double brakingDistance = (speedMps * speedMps) / (2 * maxDecelMps2);
-        double accelMps2 = remainingMeters <= brakingDistance
-            ? -maxDecelMps2
-            : maxAccelMps2;
+        double speedDifference = targetSpeedKmph - currentSpeedKmph;
+        double maxSpeedChange = (speedDifference > 0 ? maxAcceleration : maxDeceleration) * deltaSeconds * 3.6;
 
-        double newSpeedMps = Math.Max(0.0, speedMps + accelMps2 * deltaSec);
-        double newKmph = newSpeedMps * 3.6;
+        return currentSpeedKmph + Math.Sign(speedDifference) * Math.Min(Math.Abs(speedDifference), maxSpeedChange);
+    }
 
-        return maxCruiseKmph > 0
-            ? Math.Min(newKmph, maxCruiseKmph)
-            : newKmph;
+    private static double CalculateBrakingDistance(double speedMps, double decelMps2)
+    {
+        return (speedMps * speedMps) / (2 * decelMps2);
     }
 }

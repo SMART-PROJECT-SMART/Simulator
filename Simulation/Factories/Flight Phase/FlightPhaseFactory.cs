@@ -1,4 +1,5 @@
-﻿using Simulation.Common.Enums;
+﻿using Simulation.Common.constants;
+using Simulation.Common.Enums;
 using Simulation.Models.Mission;
 using Simulation.Services.Flight_Path.helpers;
 using Simulation.Services.helpers;
@@ -9,34 +10,61 @@ public record PhaseDetails(FlightPhase Phase, double TargetAltitude, double Pitc
 
 public static class FlightPhaseFactory
 {
-    private const double PitchForClimbDeg = 15.0;
-    private const double PitchForDescentDeg = 15.0;
-    private const double AltitudeTolerance = 0.5;
-
     public static PhaseDetails DeterminePhaseDetails(
         Location current,
         Location destination,
         double cruiseAltitude)
     {
         double remainingKm = FlightPathMathHelper.CalculateDistance(current, destination) / 1000.0;
+        double altitudeDiff = destination.Altitude - current.Altitude;
 
-        double altitudeToLoseNowM = current.Altitude - destination.Altitude;
-        double descentKmNeededNow = 0;
-        if (altitudeToLoseNowM > 0)
+        if (remainingKm <= SimulationConstants.FlightPath.MIN_DESCENT_DISTANCE_KM)
         {
-            descentKmNeededNow = (altitudeToLoseNowM / Math.Tan(UnitConversionHelper.ToRadians(PitchForDescentDeg))) / 1000.0;
+            if (altitudeDiff > SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+            {
+                return new PhaseDetails(FlightPhase.Climb, destination.Altitude, SimulationConstants.FlightPath.PITCH_CLIMB_DEG);
+            }
+            else if (altitudeDiff < -SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+            {
+                return new PhaseDetails(FlightPhase.Descent, destination.Altitude, -SimulationConstants.FlightPath.PITCH_DESCENT_DEG);
+            }
+            else
+            {
+                return new PhaseDetails(FlightPhase.Cruise, destination.Altitude, 0.0);
+            }
         }
 
-        if (remainingKm <= descentKmNeededNow)
+        double altitudeToLoseM = current.Altitude - destination.Altitude;
+        double descentKmNeeded = 0;
+        
+        if (altitudeToLoseM > SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
         {
-            return new PhaseDetails(FlightPhase.Descent, destination.Altitude, -PitchForDescentDeg);
+            double descentAngleRad = UnitConversionHelper.ToRadians(SimulationConstants.FlightPath.PITCH_DESCENT_DEG);
+            descentKmNeeded = (altitudeToLoseM / Math.Tan(descentAngleRad)) / 1000.0;
         }
 
-        if (current.Altitude < cruiseAltitude - AltitudeTolerance)
+        if (remainingKm <= descentKmNeeded + SimulationConstants.FlightPath.MIN_DESCENT_DISTANCE_KM && altitudeToLoseM > SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
         {
-            return new PhaseDetails(FlightPhase.Climb, cruiseAltitude, PitchForClimbDeg);
+            return new PhaseDetails(FlightPhase.Descent, destination.Altitude, -SimulationConstants.FlightPath.PITCH_DESCENT_DEG);
+        }
+
+        if (current.Altitude < cruiseAltitude - SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+        {
+            return new PhaseDetails(FlightPhase.Climb, cruiseAltitude, SimulationConstants.FlightPath.PITCH_CLIMB_DEG);
         }
 
         return new PhaseDetails(FlightPhase.Cruise, cruiseAltitude, 0.0);
+    }
+
+    public static double GetOptimalPitchAngle(FlightPhase phase, double currentAltitude, double targetAltitude)
+    {
+        double altitudeDiff = targetAltitude - currentAltitude;
+        
+        return phase switch
+        {
+            FlightPhase.Climb when altitudeDiff > SimulationConstants.FlightPath.ALTITUDE_TOLERANCE => Math.Min(SimulationConstants.FlightPath.PITCH_CLIMB_DEG, SimulationConstants.FlightPath.MAX_PITCH_DEG),
+            FlightPhase.Descent when altitudeDiff < -SimulationConstants.FlightPath.ALTITUDE_TOLERANCE => Math.Max(-SimulationConstants.FlightPath.PITCH_DESCENT_DEG, -SimulationConstants.FlightPath.MAX_PITCH_DEG),
+            _ => 0.0
+        };
     }
 }
