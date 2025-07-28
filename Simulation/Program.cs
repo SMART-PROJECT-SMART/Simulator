@@ -1,8 +1,8 @@
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using Simulation.Database;
 using Simulation.Common.Enums;
 using System.Text.Json.Serialization;
+using MongoDB.Bson.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

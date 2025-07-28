@@ -1,13 +1,10 @@
 ﻿namespace Simulation.Models.Mission
 {
-    public struct Location
+    public struct Location(double latitude, double longitude, double altitude)
     {
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public Location(double latitude, double longitude)
-        {
-            Latitude = latitude;
-            Longitude = longitude;
-        }
+        public double Latitude { get; set; } = latitude;
+        public double Longitude { get; set; } = longitude;
+        public double Altitude { get; set; } = altitude;
     }
+
 }

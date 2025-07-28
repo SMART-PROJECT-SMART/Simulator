@@ -22,7 +22,7 @@ namespace Simulation.Controllers
             _missionCollection = mongoDbService.Database?.GetCollection<Mission>(SimulationConstants.Mongo.Schemas.MISSION_SCHEMA);
         }
 
-        [HttpGet("by-wingid/{wingId}")]
+        [HttpGet("by-wingId/{wingId}")]
         public async Task<ActionResult<MissionRo>> GetMissionByWingId(int wingId)
         {
             var filter = Builders<Mission>.Filter.Eq(m => m.WingId, wingId);
