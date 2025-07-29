@@ -74,7 +74,7 @@ public class FlightPathService : IDisposable
 
     private void UpdateLocation(object? state)
     {
-        if (_isDisposed || !_isRunning || _missionCompleted || _timerDisposed) return;
+        if (_isDisposed || _missionCompleted) return;
 
         var telemetry = _uav.TelemetryData;
 
@@ -116,6 +116,15 @@ public class FlightPathService : IDisposable
         telemetry[TelemetryFields.YawDeg] = axisDegrees.Yaw;
         telemetry[TelemetryFields.PitchDeg] = axisDegrees.Pitch;
         telemetry[TelemetryFields.RollDeg] = axisDegrees.Roll;
+
+        _logger.LogInformation(
+            "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Rem {Rem:F3}km",
+            _uav.TailId,
+            nextLoc.Latitude,
+            nextLoc.Longitude,
+            nextLoc.Altitude,
+            newSpeed,
+            remainingKm);
 
         LocationUpdated?.Invoke(nextLoc);
     }

@@ -32,19 +32,10 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             var nextHoriz = FlightPathMathHelper.CalculateDestinationLocation(current, bearing, horizM);
 
             double newAlt;
-            if (Math.Abs(pitchDeg) < 0.1)
-            {
-                double altDiff = destination.Altitude - current.Altitude;
-                double maxChange = travelM * 0.1;
-                double change = Math.Sign(altDiff) * Math.Min(Math.Abs(altDiff), maxChange);
-                newAlt = current.Altitude + change;
-            }
-            else
-            {
-                newAlt = current.Altitude + travelM * Math.Sin(UnitConversionHelper.ToRadians(pitchDeg));
-                newAlt = Math.Clamp(newAlt, 0, destination.Altitude);
-            }
+            double altChange = travelM * Math.Sin(UnitConversionHelper.ToRadians(pitchDeg));
+            newAlt = current.Altitude + altChange;
 
+            newAlt = Math.Clamp(newAlt, 0, destination.Altitude);
             telemetry[TelemetryFields.Latitude] = nextHoriz.Latitude;
             telemetry[TelemetryFields.longitude] = nextHoriz.Longitude;
             telemetry[TelemetryFields.Altitude] = newAlt;
