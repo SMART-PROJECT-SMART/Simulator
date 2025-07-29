@@ -10,6 +10,8 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
     {
         private double _lastYaw = double.NaN;
 
+
+
         public AxisDegrees ComputeOrientation(
             Dictionary<TelemetryFields, double> telemetry,
             Location previous,
@@ -17,45 +19,14 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             Location destination,
             double deltaSec)
         {
-            double speedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
             double pitch = telemetry.GetValueOrDefault(TelemetryFields.PitchDeg, 0.0);
             double currentYaw = telemetry.GetValueOrDefault(TelemetryFields.YawDeg, 0.0);
 
             double bearing = FlightPathMathHelper.CalculateBearing(current, destination);
-            
-            double targetYaw = bearing;
-            double yawDifference = FlightPathMathHelper.CalculateAngleDifference(currentYaw, targetYaw);
-            
-            double maxTurnRate = 8.0; 
-            double turnProgress = Math.Abs(yawDifference) / 90.0;
-            
-            double turnRateMultiplier = 1.0;
-            if (turnProgress < 0.3)
-            {
-                turnRateMultiplier = turnProgress / 0.3;
-            }
-            else if (turnProgress > 0.7)
-            {
-                turnRateMultiplier = (1.0 - turnProgress) / 0.3;
-            }
-            
-            double effectiveTurnRate = maxTurnRate * turnRateMultiplier;
-            double maxTurnDelta = effectiveTurnRate * deltaSec;
-            
-            double newYaw;
-            if (Math.Abs(yawDifference) <= maxTurnDelta)
-            {
-                newYaw = targetYaw;
-            }
-            else
-            {
-                newYaw = currentYaw + Math.Sign(yawDifference) * maxTurnDelta;
-            }
-            
+            double newYaw = CalculateNewYaw(currentYaw, bearing, deltaSec);
             double roll = CalculatePhysicsBasedRoll(telemetry, previous, current, destination, deltaSec, newYaw, pitch);
 
             _lastYaw = newYaw;
-
             return new AxisDegrees(newYaw, pitch, roll);
         }
 
@@ -96,17 +67,55 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                     roll = Math.Sign(deltaYaw) * Math.Min(bankAngle, SimulationConstants.FlightPath.MAX_ROLL_DEG);
                 }
                 
-                double bearingToDestination = FlightPathMathHelper.CalculateBearing(current, destination);
-                double yawToBearingDiff = FlightPathMathHelper.CalculateAngleDifference(newYaw, bearingToDestination);
-                
-                if (Math.Abs(yawToBearingDiff) > 1.0 && Math.Abs(roll) < 2.0)
-                {
-                    double curveRoll = Math.Sign(yawToBearingDiff) * Math.Min(Math.Abs(yawToBearingDiff) * 0.5, 3.0);
-                    roll = curveRoll;
-                }
+                roll = CalculateCurveRoll(current, destination, newYaw, roll);
             }
 
             return roll;
+        }
+
+        private double CalculateNewYaw(double currentYaw, double targetYaw, double deltaSec)
+        {
+            double yawDifference = FlightPathMathHelper.CalculateAngleDifference(currentYaw, targetYaw);
+            double turnProgress = Math.Abs(yawDifference) / SimulationConstants.FlightPath.TURN_PROGRESS_NORMALIZATION_DEG;
+            double turnRateMultiplier = CalculateTurnRateMultiplier(turnProgress);
+            double effectiveTurnRate = SimulationConstants.FlightPath.MAX_TURN_RATE_DEG_PER_SEC * turnRateMultiplier;
+            double maxTurnDelta = effectiveTurnRate * deltaSec;
+            
+            if (Math.Abs(yawDifference) <= maxTurnDelta)
+            {
+                return targetYaw;
+            }
+            
+            return currentYaw + Math.Sign(yawDifference) * maxTurnDelta;
+        }
+
+        private double CalculateTurnRateMultiplier(double turnProgress)
+        {
+            if (turnProgress < SimulationConstants.FlightPath.TURN_START_PHASE_THRESHOLD)
+            {
+                return turnProgress / SimulationConstants.FlightPath.TURN_START_PHASE_THRESHOLD;
+            }
+            
+            if (turnProgress > SimulationConstants.FlightPath.TURN_END_PHASE_THRESHOLD)
+            {
+                return (1.0 - turnProgress) / (1.0 - SimulationConstants.FlightPath.TURN_END_PHASE_THRESHOLD);
+            }
+            
+            return 1.0;
+        }
+
+        private double CalculateCurveRoll(Location current, Location destination, double newYaw, double currentRoll)
+        {
+            double bearingToDestination = FlightPathMathHelper.CalculateBearing(current, destination);
+            double yawToBearingDiff = FlightPathMathHelper.CalculateAngleDifference(newYaw, bearingToDestination);
+            
+            if (Math.Abs(yawToBearingDiff) > SimulationConstants.FlightPath.CURVE_ROLL_THRESHOLD_DEG && Math.Abs(currentRoll) < SimulationConstants.FlightPath.MIN_ROLL_FOR_CURVE_DEG)
+            {
+                double curveRoll = Math.Sign(yawToBearingDiff) * Math.Min(Math.Abs(yawToBearingDiff) * SimulationConstants.FlightPath.CURVE_ROLL_MULTIPLIER, SimulationConstants.FlightPath.MAX_CURVE_ROLL_DEG);
+                return curveRoll;
+            }
+            
+            return currentRoll;
         }
 
         private double CalculateStraightFlightRoll(Dictionary<TelemetryFields, double> telemetry, double pitch, double speedMps)

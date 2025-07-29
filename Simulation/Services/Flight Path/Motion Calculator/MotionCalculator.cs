@@ -9,6 +9,7 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
 
     public class MotionCalculator : IMotionCalculator
     {
+
         public Location CalculateNext(
             Dictionary<TelemetryFields, double> telemetry,
             Location current,
@@ -34,7 +35,7 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             altChange += liftContribution;
             
             double drag = FlightPhysicsCalculator.CalculateDrag(telemetry);
-            double dragEffect = -drag * deltaSec * 0.1; 
+            double dragEffect = -drag * deltaSec * SimulationConstants.FlightPath.DRAG_EFFECT_ON_ALTITUDE; 
             altChange += dragEffect;
             
             double newAlt = current.Altitude + altChange;

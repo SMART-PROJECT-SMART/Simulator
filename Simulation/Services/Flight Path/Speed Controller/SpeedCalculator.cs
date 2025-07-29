@@ -6,6 +6,7 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
 {
     public class SpeedCalculator : ISpeedController
     {
+
         public double ComputeNextSpeed(
             Dictionary<TelemetryFields, double> telemetry,
             double remainingKm,
@@ -19,17 +20,7 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
             double acceleration = Math.Min(physicsAcceleration, maxAcceleration);
             
             double speedProgress = currentSpeed / cruiseSpeed; 
-            
-            double accelerationMultiplier = 1.0;
-            if (speedProgress > 0.7)
-            {
-                accelerationMultiplier = 1.0 - ((speedProgress - 0.7) / 0.3) * 0.5;
-            }
-            else if (speedProgress < 0.3)
-            {
-                accelerationMultiplier = 0.7 + (speedProgress / 0.3) * 0.3;
-            }
-            
+            double accelerationMultiplier = CalculateAccelerationMultiplier(speedProgress);
             acceleration *= accelerationMultiplier;
             
             double deltaSpeedKmh = acceleration * deltaSeconds * SimulationConstants.Mathematical.FROM_MPS_TO_KMH;
@@ -40,6 +31,24 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
             telemetry[TelemetryFields.CurrentSpeedKmph] = newSpeed;
 
             return newSpeed;
+        }
+
+        private double CalculateAccelerationMultiplier(double speedProgress)
+        {
+            if (speedProgress > SimulationConstants.FlightPath.SPEED_PROGRESS_HIGH_THRESHOLD)
+            {
+                double decelerationRange = 1.0 - SimulationConstants.FlightPath.SPEED_PROGRESS_HIGH_THRESHOLD;
+                double decelerationProgress = (speedProgress - SimulationConstants.FlightPath.SPEED_PROGRESS_HIGH_THRESHOLD) / decelerationRange;
+                return 1.0 - (decelerationProgress * SimulationConstants.FlightPath.HIGH_SPEED_DECELERATION_FACTOR);
+            }
+            
+            if (speedProgress < SimulationConstants.FlightPath.SPEED_PROGRESS_LOW_THRESHOLD)
+            {
+                double accelerationProgress = speedProgress / SimulationConstants.FlightPath.SPEED_PROGRESS_LOW_THRESHOLD;
+                return SimulationConstants.FlightPath.LOW_SPEED_ACCELERATION_FACTOR + (accelerationProgress * SimulationConstants.FlightPath.LOW_SPEED_ACCELERATION_RANGE);
+            }
+            
+            return 1.0;
         }
     }
 }
