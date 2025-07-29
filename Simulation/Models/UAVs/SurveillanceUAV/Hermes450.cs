@@ -25,10 +25,6 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             double dataStorageCapacityGb = SimulationConstants.Hermes450_Constants.DataStorageCapacityGB
         ) : base(
             startLocation,
-            SimulationConstants.Hermes450_Constants.FuelTankSize,
-            SimulationConstants.Hermes450_Constants.MaxCruiseSpeedKmph,
-            SimulationConstants.Hermes450_Constants.MaxAcceleration,
-            SimulationConstants.Hermes450_Constants.MaxDeceleration,
             tailId,
           DefaultSensorsStatus,
             dataStorageCapacityGb

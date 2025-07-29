@@ -5,6 +5,5 @@
         Climb,
         Cruise,
         Descent,
-        Completed
     }
 }

@@ -19,7 +19,7 @@ namespace Simulation.Models.UAVs.ArmedUav
             Dictionary<WeaponType, int> weaponsAmmo,
             bool isWeaponSystemArmed = false,
             double weaponSystemStatus = SimulationConstants.UAV_Constants.ONE_HUNDRED_PRECENT
-        ) : base(startLocation, fuelTankSize, maxCruiseSpeed, maxAcceleration, maxDeceleration, tailId)
+        ) : base(startLocation, tailId)
         {
             WeaponsAmmo = weaponsAmmo;
             IsWeaponSystemArmed = isWeaponSystemArmed;
