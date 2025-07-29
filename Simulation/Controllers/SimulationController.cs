@@ -67,35 +67,27 @@ public class SimulationController : ControllerBase
     {
         var startLocation = new Location(40.6413, -73.7781, 10.0);
 
-        var initialTelemetry = new Dictionary<TelemetryFields, double>
-        {
-            [TelemetryFields.Mass] = 73500 + (23860.0 / 1.25),
-            [TelemetryFields.FrontalSurface] = 12.6,
-            [TelemetryFields.WingsSurface] = 122.6,
-            [TelemetryFields.DragCoefficient] = 0.095,
-            [TelemetryFields.LiftCoefficient] = 0.9,
-            [TelemetryFields.ThrustMax] = 120000 * 2,
-            [TelemetryFields.MaxCruiseSpeedKmph] = 250.0,
-            [TelemetryFields.MaxAccelerationMps2] = 3.0,
-            [TelemetryFields.MaxDecelerationMps2] = -2.0,
-            [TelemetryFields.CruiseAltitude] = 100.0,
-            [TelemetryFields.CurrentSpeedKmph] = SimulationConstants.FlightPath.MIN_SPEED_KMH,
-            [TelemetryFields.Latitude] = startLocation.Latitude,
-            [TelemetryFields.Longitude] = startLocation.Longitude,
-            [TelemetryFields.Altitude] = startLocation.Altitude,
-            [TelemetryFields.Horizontal_Acceleration] = SimulationConstants.FlightPath.MIN_SPEED_KMH / SimulationConstants.Mathematical.FROM_KMH_TO_MPS,
-            [TelemetryFields.Vertical_Acceleration] = 0.0,
-            [TelemetryFields.ThrustAfterInfluence] = 120000 * 2,
-            [TelemetryFields.YawDeg] = 0.0,
-            [TelemetryFields.PitchDeg] = 0.0,
-            [TelemetryFields.RollDeg] = 0.0,
-            [TelemetryFields.AngleBetweenPlaneAndGround] = 0.0,
-        };
-
+        // Create Searcher UAV - it will set its own telemetry fields from constants
         var uav = new Searcher(
             tailId: 1,
-            startLocation: startLocation,
-            initialTelemetry: initialTelemetry);
+            startLocation: startLocation);
+
+        var destination = new Location(40.6460, -73.7790, 100.0);
+
+        var request = new SimulateDto(uav, destination);
+
+        return await CalculateFlightPath(request);
+    }
+
+    [HttpGet("run-hermes450")]
+    public async Task<IActionResult> RunHermes450()
+    {
+        var startLocation = new Location(40.6413, -73.7781, 10.0);
+
+        // Create Hermes450 UAV - it will set its own telemetry fields from constants
+        var uav = new Hermes450(
+            tailId: 2,
+            startLocation: startLocation);
 
         var destination = new Location(40.6460, -73.7790, 100.0);
 

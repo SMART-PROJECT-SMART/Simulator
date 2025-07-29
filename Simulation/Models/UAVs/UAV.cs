@@ -1,28 +1,20 @@
 ﻿using Simulation.Common.Enums;
+using Simulation.Common.constants;
+using Simulation.Services.helpers;
 
 namespace Simulation.Models.UAVs;
 
 public abstract class UAV
 {
     public int TailId { get; set; }
-    public Dictionary<TelemetryFields,double> TelemetryData { get; set; }
+    public Dictionary<TelemetryFields, double> TelemetryData { get; set; }
     public string CurrentMissionId { get; set; }
 
-    public UAV(Location startLocation,int tailId) 
+    public UAV(Location startLocation, int tailId) 
     {
         TailId = tailId;
-        SetTelemetryFields(startLocation);
-    }
-
-    private void SetTelemetryFields(Location startLocation)
-    {
-        TelemetryData = new Dictionary<TelemetryFields, double>();
-        foreach (TelemetryFields field in Enum.GetValues(typeof(TelemetryFields)))
-        {
-            TelemetryData[field] = 0.0;
-        }
-        TelemetryData[TelemetryFields.Latitude] = startLocation.Latitude;
-        TelemetryData[TelemetryFields.Longitude] = startLocation.Longitude;
-        TelemetryData[TelemetryFields.Altitude] = startLocation.Altitude;
+        CurrentMissionId = string.Empty;
+        TelemetryData = TelemetryFieldsHelper.FlightOnly();
+        TelemetryData.SetLocation(startLocation);
     }
 }

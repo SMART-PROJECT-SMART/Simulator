@@ -16,6 +16,16 @@ namespace Simulation.Common.constants
             public const double MaxCruiseSpeedKmph = 220;
             public const double CruiseAltitude = 900;
             public const double FuelTankSize = 350;
+            public const double Mass = 1100.0;
+            public const double FrontalSurface = 4.8;
+            public const double WingsSurface = 15.2;
+            public const double DragCoefficient = 0.022;
+            public const double LiftCoefficient = 0.85;
+            public const double ThrustMax = 120.0;
+            public const double ThrustAfterInfluence = 120.0;
+            public const double HellfireAmmo = 2.0;
+            public const double SpikeNLOSAmmo = 2.0;
+            public const double GriffinAmmo = 1.0;
         }
 
         public static class HeronTP_Constants
@@ -25,6 +35,16 @@ namespace Simulation.Common.constants
             public const double MaxCruiseSpeedKmph = 220;
             public const double CruiseAltitude = 135;
             public const double FuelTankSize = 450;
+            public const double Mass = 4650.0;
+            public const double FrontalSurface = 8.2;
+            public const double WingsSurface = 26.0;
+            public const double DragCoefficient = 0.018;
+            public const double LiftCoefficient = 0.9;
+            public const double ThrustMax = 1200.0;
+            public const double ThrustAfterInfluence = 1200.0;
+            public const double HellfireAmmo = 4.0;
+            public const double GriffinAmmo = 2.0;
+            public const double JDAMAmmo = 1.0;
         }
 
         public static class Hermes450_Constants
@@ -35,6 +55,13 @@ namespace Simulation.Common.constants
             public const double CruiseAltitude = 550;
             public const double FuelTankSize = 180;
             public const double DataStorageCapacityGB = 500;
+            public const double Mass = 450.0;
+            public const double FrontalSurface = 2.5;
+            public const double WingsSurface = 8.5;
+            public const double DragCoefficient = 0.025;
+            public const double LiftCoefficient = 0.8;
+            public const double ThrustMax = 52.0;
+            public const double ThrustAfterInfluence = 52.0;
         }
 
         public static class Searcher_Constants
@@ -45,6 +72,13 @@ namespace Simulation.Common.constants
             public const double CruiseAltitude = 600;
             public const double FuelTankSize = 120;
             public const double DataStorageCapacityGB = 250;
+            public const double Mass = 120.0;
+            public const double FrontalSurface = 1.2;
+            public const double WingsSurface = 4.8;
+            public const double DragCoefficient = 0.03;
+            public const double LiftCoefficient = 0.75;
+            public const double ThrustMax = 15.0;
+            public const double ThrustAfterInfluence = 15.0;
         }
 
         public static class FlightPath
