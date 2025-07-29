@@ -1,5 +1,6 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
+using Simulation.Services.Flight_Path.helpers;
 
 namespace Simulation.Services.Flight_Path.Speed_Controller
 {
@@ -11,30 +12,18 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
             double deltaSeconds)
         {
             double currentSpeed = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
-            double maxAccel = telemetry.GetValueOrDefault(TelemetryFields.MaxAccelerationMps2, 0.0);
-            double maxDecel = telemetry.GetValueOrDefault(TelemetryFields.MaxDecelerationMps2, 0.0);
+
+            double acceleration = FlightPhysicsCalculator.CalculateAcceleration(telemetry);
+
+            double deltaSpeedKmh = acceleration * deltaSeconds * SimulationConstants.Mathematical.FROM_MPS_TO_KMH;
+            double newSpeed = currentSpeed + deltaSpeedKmh;
+
             double cruiseSpeed = telemetry.GetValueOrDefault(TelemetryFields.MaxCruiseSpeedKmph, 0.0);
+            newSpeed = Math.Clamp(newSpeed, 1.0, cruiseSpeed);
 
-            double targetSpeed = cruiseSpeed;
-            double diff = targetSpeed - currentSpeed;
+            telemetry[TelemetryFields.CurrentSpeedKmph] = newSpeed;
 
-            double accelPerSec = maxAccel * SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
-            double decelPerSec = Math.Abs(maxDecel) * SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
-            double maxDelta = diff > 0 ? accelPerSec * deltaSeconds
-                                           : decelPerSec * deltaSeconds;
-
-            double actualDelta = Math.Sign(diff) * Math.Min(Math.Abs(diff), Math.Abs(maxDelta));
-
-            double newSpeed = currentSpeed + actualDelta;
-            telemetry[TelemetryFields.CurrentSpeedKmph] = Math.Max(1.0, newSpeed);
-
-            if (Math.Abs(actualDelta) > 0.1)
-            {
-                Console.WriteLine(
-                    $"Speed: {currentSpeed:F1}→{newSpeed:F1} km/h (Δ{actualDelta:F1}, Rem:{remainingKm * 1000:F0}m)");
-            }
-
-            return telemetry[TelemetryFields.CurrentSpeedKmph];
+            return newSpeed;
         }
     }
 }

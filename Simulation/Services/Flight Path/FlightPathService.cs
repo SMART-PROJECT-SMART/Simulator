@@ -6,6 +6,7 @@ using Simulation.Services.Flight_Path.helpers;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
+using Simulation.Services.helpers;
 
 namespace Simulation.Services.Flight_Path;
 
@@ -47,12 +48,12 @@ public class FlightPathService : IDisposable
 
         var t = _uav.TelemetryData;
         _uav.TelemetryData.TryGetValue(TelemetryFields.Latitude, out double lat);
-        _uav.TelemetryData.TryGetValue(TelemetryFields.longitude, out double lon);
+        _uav.TelemetryData.TryGetValue(TelemetryFields.Longitude, out double lon);
         _uav.TelemetryData.TryGetValue(TelemetryFields.Altitude, out double alt);
         _uav.TelemetryData.TryGetValue(TelemetryFields.CurrentSpeedKmph, out double spd);
 
         _uav.TelemetryData[TelemetryFields.Latitude] = lat;
-        _uav.TelemetryData[TelemetryFields.longitude] = lon;
+        _uav.TelemetryData[TelemetryFields.Longitude] = lon;
         _uav.TelemetryData[TelemetryFields.Altitude] = alt;
         _uav.TelemetryData[TelemetryFields.CurrentSpeedKmph] = Math.Max(
             SimulationConstants.FlightPath.MIN_SPEED_MPS,
@@ -74,27 +75,28 @@ public class FlightPathService : IDisposable
 
     private void UpdateLocation(object? state)
     {
-        if (_isDisposed || _missionCompleted) return;
-
         var telemetry = _uav.TelemetryData;
-
         var currentLoc = new Location(
             telemetry[TelemetryFields.Latitude],
-            telemetry[TelemetryFields.longitude],
+            telemetry[TelemetryFields.Longitude],
             telemetry[TelemetryFields.Altitude]);
-        double remainingKm =
-            FlightPathMathHelper.CalculateDistance(currentLoc, _destination) / 1000.0;
+        double remainingMeters = FlightPathMathHelper.CalculateDistance(currentLoc, _destination);
 
-        if (remainingKm <= SimulationConstants.FlightPath.LOCATION_PRECISION_KM
-            && Math.Abs(currentLoc.Altitude - _destination.Altitude) <= SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+        if (remainingMeters <= SimulationConstants.FlightPath.LOCATION_PRECISION_KM * 1000 &&
+            Math.Abs(currentLoc.Altitude - _destination.Altitude) <= SimulationConstants.FlightPath.Location_PRECISION_M)
         {
             CompleteMission(currentLoc);
             return;
         }
 
+        double altDiff = _destination.Altitude - currentLoc.Altitude;
+        double desiredPitchRad = Math.Atan2(altDiff, remainingMeters);
+        double desiredPitchDeg = UnitConversionHelper.ToDegrees(desiredPitchRad);
+        telemetry[TelemetryFields.PitchDeg] = desiredPitchDeg;
+
         double newSpeed = _speedController.ComputeNextSpeed(
             telemetry,
-            remainingKm,
+            remainingMeters / 1000.0,
             SimulationConstants.FlightPath.DELTA_SECONDS);
         telemetry[TelemetryFields.CurrentSpeedKmph] = newSpeed;
 
@@ -104,18 +106,19 @@ public class FlightPathService : IDisposable
             _destination,
             SimulationConstants.FlightPath.DELTA_SECONDS);
 
-        AxisDegrees axisDegrees = _orientationCalculator.ComputeOrientation(
+        AxisDegrees axis = _orientationCalculator.ComputeOrientation(
             telemetry,
             currentLoc,
             nextLoc,
             SimulationConstants.FlightPath.DELTA_SECONDS);
+        axis = new AxisDegrees(axis.Yaw, desiredPitchDeg, axis.Roll);
 
         telemetry[TelemetryFields.Latitude] = nextLoc.Latitude;
-        telemetry[TelemetryFields.longitude] = nextLoc.Longitude;
+        telemetry[TelemetryFields.Longitude] = nextLoc.Longitude;
         telemetry[TelemetryFields.Altitude] = nextLoc.Altitude;
-        telemetry[TelemetryFields.YawDeg] = axisDegrees.Yaw;
-        telemetry[TelemetryFields.PitchDeg] = axisDegrees.Pitch;
-        telemetry[TelemetryFields.RollDeg] = axisDegrees.Roll;
+        telemetry[TelemetryFields.YawDeg] = axis.Yaw;
+        telemetry[TelemetryFields.PitchDeg] = axis.Pitch;
+        telemetry[TelemetryFields.RollDeg] = axis.Roll;
 
         _logger.LogInformation(
             "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Rem {Rem:F3}km",
@@ -124,10 +127,12 @@ public class FlightPathService : IDisposable
             nextLoc.Longitude,
             nextLoc.Altitude,
             newSpeed,
-            remainingKm);
+            remainingMeters / 1000.0);
 
         LocationUpdated?.Invoke(nextLoc);
     }
+
+
 
     private void CompleteMission(Location loc)
     {

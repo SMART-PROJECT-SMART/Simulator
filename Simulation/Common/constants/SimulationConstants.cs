@@ -50,7 +50,8 @@ namespace Simulation.Common.constants
         public static class FlightPath
         {
             public static double EARTH_RADIUS_METERS = 6371000.0;
-            public static double LOCATION_PRECISION_KM = 0.001;
+            public static double LOCATION_PRECISION_KM = 0.01;
+            public static double Location_PRECISION_M = 10;
             public static double MIN_SPEED_KMH = 5.0;
             public static double MAX_PITCH_DEG = 30.0;
             public static double MIN_DISTANCE_M = 0.1;
@@ -75,6 +76,8 @@ namespace Simulation.Common.constants
             public static double MAXIMAL_KINETIC_ENERGY_FOR_LANDING = 1323000;
             public static double SPEED_OF_SOUND = 343.2;
             public static double FROM_KMH_TO_MPS = 3.6;
+            public static double FROM_MPS_TO_KMH = 3.6;
+            public static double FROM_M_TO_KM = 0.0001;
         }
     }
 }

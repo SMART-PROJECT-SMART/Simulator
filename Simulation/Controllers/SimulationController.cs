@@ -81,8 +81,15 @@ public class SimulationController : ControllerBase
             [TelemetryFields.CruiseAltitude] = 100.0,
             [TelemetryFields.CurrentSpeedKmph] = SimulationConstants.FlightPath.MIN_SPEED_KMH,
             [TelemetryFields.Latitude] = startLocation.Latitude,
-            [TelemetryFields.longitude] = startLocation.Longitude,
-            [TelemetryFields.Altitude] = startLocation.Altitude
+            [TelemetryFields.Longitude] = startLocation.Longitude,
+            [TelemetryFields.Altitude] = startLocation.Altitude,
+            [TelemetryFields.Horizontal_Acceleration] = SimulationConstants.FlightPath.MIN_SPEED_KMH / SimulationConstants.Mathematical.FROM_KMH_TO_MPS,
+            [TelemetryFields.Vertical_Acceleration] = 0.0,
+            [TelemetryFields.ThrustAfterInfluence] = 120000 * 2,
+            [TelemetryFields.YawDeg] = 0.0,
+            [TelemetryFields.PitchDeg] = 0.0,
+            [TelemetryFields.RollDeg] = 0.0,
+            [TelemetryFields.AngleBetweenPlaneAndGround] = 0.0,
         };
 
         var uav = new Searcher(

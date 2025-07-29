@@ -14,7 +14,7 @@
         CruiseAltitude,
 
         Latitude,
-        longitude,
+        Longitude,
         Altitude,
 
         CurrentSpeedKmph,
@@ -27,6 +27,5 @@
         AngleBetweenPlaneAndGround,
 
         ThrustAfterInfluence,
-        MachNumber
     }
 }

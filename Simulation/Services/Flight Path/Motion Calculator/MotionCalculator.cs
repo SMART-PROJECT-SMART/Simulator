@@ -15,29 +15,27 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             Location destination,
             double deltaSec)
         {
-            double speedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
-            double pitchDeg = telemetry.GetValueOrDefault(TelemetryFields.PitchDeg, 0.0);
+            var speedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+            var pitchDeg = telemetry.GetValueOrDefault(TelemetryFields.PitchDeg, 0.0);
 
             double dist = FlightPathMathHelper.CalculateDistance(current, destination);
             double speedMps = speedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
             double travelM = speedMps * deltaSec;
 
-            if (dist < SimulationConstants.FlightPath.CLOSE_DISTANCE_M)
-                return new Location(destination.Latitude, destination.Longitude, destination.Altitude);
-
             double horizM = travelM * Math.Cos(UnitConversionHelper.ToRadians(pitchDeg));
             if (horizM >= dist) horizM = dist;
-
             double bearing = FlightPathMathHelper.CalculateBearing(current, destination);
             var nextHoriz = FlightPathMathHelper.CalculateDestinationLocation(current, bearing, horizM);
 
-            double newAlt;
             double altChange = travelM * Math.Sin(UnitConversionHelper.ToRadians(pitchDeg));
-            newAlt = current.Altitude + altChange;
+            double lift = FlightPhysicsCalculator.CalculateLift(telemetry);
+            altChange += lift * deltaSec * SimulationConstants.Mathematical.FROM_M_TO_KM;
 
-            newAlt = Math.Clamp(newAlt, 0, destination.Altitude);
+            double newAlt = Math.Min(destination.Altitude, current.Altitude + altChange);
+            newAlt = Math.Max(0.0, newAlt);
+
             telemetry[TelemetryFields.Latitude] = nextHoriz.Latitude;
-            telemetry[TelemetryFields.longitude] = nextHoriz.Longitude;
+            telemetry[TelemetryFields.Longitude] = nextHoriz.Longitude;
             telemetry[TelemetryFields.Altitude] = newAlt;
 
             return new Location(nextHoriz.Latitude, nextHoriz.Longitude, newAlt);

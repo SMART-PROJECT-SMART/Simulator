@@ -22,7 +22,7 @@ public abstract class UAV
             TelemetryData[field] = 0.0;
         }
         TelemetryData[TelemetryFields.Latitude] = startLocation.Latitude;
-        TelemetryData[TelemetryFields.longitude] = startLocation.Longitude;
+        TelemetryData[TelemetryFields.Longitude] = startLocation.Longitude;
         TelemetryData[TelemetryFields.Altitude] = startLocation.Altitude;
     }
 }

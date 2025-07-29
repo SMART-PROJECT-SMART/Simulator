@@ -27,11 +27,6 @@ public static class FlightPhysicsCalculator
         return telemetry.GetValueOrDefault(TelemetryFields.ThrustAfterInfluence, 0.0);
     }
 
-    public static double CalculateMach(Dictionary<TelemetryFields, double> telemetry)
-    {
-        double horizontalSpeed = telemetry.GetValueOrDefault(TelemetryFields.Horizontal_Acceleration, 0.0);
-        return horizontalSpeed / SimulationConstants.Mathematical.SPEED_OF_SOUND;
-    }
 
     public static double CalculateAcceleration(Dictionary<TelemetryFields, double> telemetry)
     {
