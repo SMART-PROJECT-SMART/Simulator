@@ -1,13 +1,10 @@
-using MongoDB.Bson.Serialization.Serializers;
-using Simulation.Database;
-using Simulation.Common.Enums;
 using System.Text.Json.Serialization;
-using MongoDB.Bson.Serialization;
+using Simulation.Services.Flight_Path.Motion_Calculator;
+using Simulation.Services.Flight_Path.Orientation_Calculator;
+using Simulation.Services.Flight_Path.Speed_Controller;
 
 var builder = WebApplication.CreateBuilder(args);
 
-BsonSerializer.RegisterSerializer(typeof(TelemetryFields), new EnumSerializer<TelemetryFields>(MongoDB.Bson.BsonType.String));
-BsonSerializer.RegisterSerializer(typeof(UAVTypes), new EnumSerializer<UAVTypes>(MongoDB.Bson.BsonType.String));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -17,7 +14,9 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddOpenApi();
-builder.Services.AddSingleton<MongoDbService>();
+builder.Services.AddSingleton<IMotionCalculator, MotionCalculator>();
+builder.Services.AddSingleton<ISpeedController, SpeedController>();
+builder.Services.AddSingleton<IOrientationCalculator, OrientationCalculator>();
 
 var app = builder.Build();
 

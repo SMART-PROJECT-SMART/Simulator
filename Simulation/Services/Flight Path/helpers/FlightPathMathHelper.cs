@@ -1,5 +1,5 @@
 ﻿using Simulation.Common.constants;
-using Simulation.Models.Mission;
+using Simulation.Models;
 using Simulation.Services.helpers;
 
 namespace Simulation.Services.Flight_Path.helpers

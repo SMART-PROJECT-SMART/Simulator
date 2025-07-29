@@ -1,5 +1,6 @@
 ﻿using Simulation.Common.Enums;
-using Simulation.Models.Mission;
+using Simulation.Models;
+using Simulation.Models.UAVs;
 
 namespace Simulation.Factories.Flight_Phase
 {

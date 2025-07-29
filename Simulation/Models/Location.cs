@@ -1,4 +1,4 @@
-﻿namespace Simulation.Models.Mission
+﻿namespace Simulation.Models
 {
     public struct Location(double latitude, double longitude, double altitude)
     {

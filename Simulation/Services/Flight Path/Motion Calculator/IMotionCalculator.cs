@@ -1,4 +1,4 @@
-﻿using Simulation.Models.Mission;
+﻿using Simulation.Models;
 
 namespace Simulation.Services.Flight_Path.Motion_Calculator
 {

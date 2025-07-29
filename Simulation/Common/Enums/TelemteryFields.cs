@@ -15,9 +15,6 @@
         LocationDistanceFromHome,
         LocationDistanceToWaypoint,
         LocationWaypointIndex,
-        VelocityX,
-        VelocityY,
-        VelocityZ,
 
         EngineRpm,
         EngineThrottlePercent,

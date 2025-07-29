@@ -1,5 +1,6 @@
 ﻿using Simulation.Common.Enums;
-using Simulation.Models.Mission;
+using Simulation.Models;
+using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.helpers;
 

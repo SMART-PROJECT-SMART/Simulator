@@ -1,7 +1,8 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Factories.Flight_Phase;
-using Simulation.Models.Mission;
+using Simulation.Models;
+using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path.helpers;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
@@ -71,12 +72,12 @@ public class FlightPathService : IDisposable
 
         if (_isRunning)
         {
-            _logger.LogWarning("Flight path is already running for UAV {UavId}", _uav.Id);
+            _logger.LogWarning("Flight path is already running for UAV {UavId}", _uav.TailId);
             return;
         }
 
         _logger.LogInformation("Starting flight for UAV {UavId} from ({Lat:F6}, {Lon:F6}) to ({DestLat:F6}, {DestLon:F6})", 
-            _uav.Id, _currentLocation.Latitude, _currentLocation.Longitude, _destination.Latitude, _destination.Longitude);
+            _uav.TailId, _currentLocation.Latitude, _currentLocation.Longitude, _destination.Latitude, _destination.Longitude);
         
         _isRunning = true;
         _timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(SimulationConstants.FlightPath.DELTA_SECONDS));
@@ -148,7 +149,7 @@ public class FlightPathService : IDisposable
         _logger.LogInformation(
             "[{Time:HH:mm:ss}] UAV {UavId} | Phase {Phase} | Lat {Lat:F6}° | Lon {Lon:F6}° | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Pitch {Pitch:F1}° | Rem {Rem:F3}km",
             DateTime.Now,
-            _uav.Id,
+            _uav.TailId,
             phaseDetails.Phase,
             location.Latitude,
             location.Longitude,
@@ -174,7 +175,7 @@ public class FlightPathService : IDisposable
         
         _logger.LogInformation(
             "MISSION COMPLETED for UAV {UavId} at Lat {Lat:F6}, Lon {Lon:F6}, Alt {Alt:F1}, Final Distance: {Distance:F6}km",
-            _uav.Id,
+            _uav.TailId,
             finalLocation.Latitude,
             finalLocation.Longitude,
             finalLocation.Altitude,
