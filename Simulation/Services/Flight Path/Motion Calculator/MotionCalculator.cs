@@ -10,36 +10,62 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
         public Location CalculateNext(
             Location current,
             Location destination,
-            double speedKmph,   
+            double speedKmph,
             double deltaHours,
             double pitchDegrees,
-            double targetAltitude) 
+            double targetAltitude)
         {
-            double horizontalTravelKm = speedKmph * deltaHours;
-            double horizontalTravelM = horizontalTravelKm * 1000.0;
             double initialDistanceM = FlightPathMathHelper.CalculateDistance(current, destination);
-            
-            if (horizontalTravelM >= initialDistanceM || initialDistanceM < SimulationConstants.FlightPath.CLOSE_DISTANCE_M)
+
+            if (initialDistanceM < SimulationConstants.FlightPath.CLOSE_DISTANCE_M)
             {
-                return destination;
+                return new Location(destination.Latitude, destination.Longitude, targetAltitude);
+            }
+
+            double speedMps = speedKmph / 3.6;
+            double totalTravelM = speedMps * (deltaHours * 3600.0);
+
+            double horizontalTravelM;
+            if (Math.Abs(pitchDegrees) > 0.1)
+            {
+                double pitchRad = UnitConversionHelper.ToRadians(pitchDegrees);
+                horizontalTravelM = totalTravelM * Math.Cos(pitchRad);
+            }
+            else
+            {
+                horizontalTravelM = totalTravelM;
+            }
+
+            if (horizontalTravelM >= initialDistanceM)
+            {
+                return new Location(destination.Latitude, destination.Longitude, targetAltitude);
             }
 
             double bearing = FlightPathMathHelper.CalculateBearing(current, destination);
             var nextHorizontalLocation = FlightPathMathHelper.CalculateDestinationLocation(current, bearing, horizontalTravelM);
-            double newAltitude = CalculateNewAltitude(current, horizontalTravelM, pitchDegrees, targetAltitude);
+
+            double newAltitude = CalculateNewAltitude(current, totalTravelM, pitchDegrees, targetAltitude, initialDistanceM);
 
             return new Location(nextHorizontalLocation.Latitude, nextHorizontalLocation.Longitude, newAltitude);
         }
 
-        private static double CalculateNewAltitude(Location current, double horizontalTravelM, double pitchDegrees, double targetAltitude)
+        private static double CalculateNewAltitude(Location current, double totalTravelM, double pitchDegrees, double targetAltitude, double remainingDistanceM)
         {
             if (Math.Abs(pitchDegrees) < 0.1)
             {
-                return current.Altitude;
+                double altDiff = targetAltitude - current.Altitude;
+                if (Math.Abs(altDiff) < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+                {
+                    return current.Altitude;
+                }
+
+                double maxAltChange = totalTravelM * 0.1;
+                double altChange = Math.Sign(altDiff) * Math.Min(Math.Abs(altDiff), maxAltChange);
+                return current.Altitude + altChange;
             }
 
             double pitchRad = UnitConversionHelper.ToRadians(pitchDegrees);
-            double altitudeChangeM = horizontalTravelM * Math.Tan(pitchRad);
+            double altitudeChangeM = totalTravelM * Math.Sin(pitchRad);
             double newAltitude = current.Altitude + altitudeChangeM;
 
             if (pitchDegrees > 0)
@@ -51,7 +77,7 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
                 newAltitude = Math.Max(newAltitude, targetAltitude);
             }
 
-            return newAltitude;
+            return Math.Max(0, newAltitude);
         }
     }
 }

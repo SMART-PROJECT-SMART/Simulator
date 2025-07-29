@@ -6,16 +6,16 @@ namespace Simulation.Common.constants
     {
         public static class UAV_Constants
         {
-          public const double ONE_HUNDRED_PRECENT = 100.0;
+            public const double ONE_HUNDRED_PRECENT = 100.0;
         }
 
         public static class Hermes900_Constants
         {
-           public const double MaxAcceleration = 2.0;
-           public const double MaxDeceleration = 2.8;
-           public const double MaxCruiseSpeedKmph = 220;
-           public const double CruiseAltitude = 90;
-           public const double FuelTankSize = 350;
+            public const double MaxAcceleration = 2.0;
+            public const double MaxDeceleration = 2.8;
+            public const double MaxCruiseSpeedKmph = 220;
+            public const double CruiseAltitude = 900;
+            public const double FuelTankSize = 350;
         }
 
         public static class HeronTP_Constants
@@ -32,7 +32,7 @@ namespace Simulation.Common.constants
             public const double MaxAcceleration = 2.5;
             public const double MaxDeceleration = 3.0;
             public const double MaxCruiseSpeedKmph = 220;
-            public const double CruiseAltitude = 55;
+            public const double CruiseAltitude = 550;
             public const double FuelTankSize = 180;
             public const double DataStorageCapacityGB = 500;
         }
@@ -42,7 +42,7 @@ namespace Simulation.Common.constants
             public const double MaxAcceleration = 3.0;
             public const double MaxDeceleration = 3.5;
             public const double MaxCruiseSpeedKmph = 180;
-            public const double CruiseAltitude = 60;
+            public const double CruiseAltitude = 600;
             public const double FuelTankSize = 120;
             public const double DataStorageCapacityGB = 250;
         }
