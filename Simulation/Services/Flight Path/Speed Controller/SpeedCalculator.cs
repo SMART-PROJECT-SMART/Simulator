@@ -37,9 +37,9 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
         {
             if (speedProgress > SimulationConstants.FlightPath.SPEED_PROGRESS_HIGH_THRESHOLD)
             {
-                double decelerationRange = 1.0 - SimulationConstants.FlightPath.SPEED_PROGRESS_HIGH_THRESHOLD;
+                double decelerationRange = SimulationConstants.FlightPath.FULL_DECELERATION_MULTIPLIER - SimulationConstants.FlightPath.SPEED_PROGRESS_HIGH_THRESHOLD;
                 double decelerationProgress = (speedProgress - SimulationConstants.FlightPath.SPEED_PROGRESS_HIGH_THRESHOLD) / decelerationRange;
-                return 1.0 - (decelerationProgress * SimulationConstants.FlightPath.HIGH_SPEED_DECELERATION_FACTOR);
+                return SimulationConstants.FlightPath.FULL_DECELERATION_MULTIPLIER - (decelerationProgress * SimulationConstants.FlightPath.HIGH_SPEED_DECELERATION_FACTOR);
             }
             
             if (speedProgress < SimulationConstants.FlightPath.SPEED_PROGRESS_LOW_THRESHOLD)
@@ -48,7 +48,7 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
                 return SimulationConstants.FlightPath.LOW_SPEED_ACCELERATION_FACTOR + (accelerationProgress * SimulationConstants.FlightPath.LOW_SPEED_ACCELERATION_RANGE);
             }
             
-            return 1.0;
+            return SimulationConstants.FlightPath.NORMAL_ACCELERATION_MULTIPLIER;
         }
     }
 }

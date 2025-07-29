@@ -121,6 +121,9 @@ namespace Simulation.Common.constants
             public static double HIGH_SPEED_DECELERATION_FACTOR = 0.5;
             public static double LOW_SPEED_ACCELERATION_FACTOR = 0.7;
             public static double LOW_SPEED_ACCELERATION_RANGE = 0.3;
+            public static double NORMAL_ACCELERATION_MULTIPLIER = 1.0;
+            public static double FULL_ACCELERATION_MULTIPLIER = 1.0;
+            public static double FULL_DECELERATION_MULTIPLIER = 1.0;
             
             public static double DRAG_EFFECT_ON_ALTITUDE = 0.1;
         }
