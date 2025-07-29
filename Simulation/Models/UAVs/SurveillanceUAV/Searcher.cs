@@ -22,18 +22,16 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
         public Searcher(
             int tailId,
             Location startLocation,
-            double dataStorageCapacityGb = SimulationConstants.Searcher_Constants.DataStorageCapacityGB
+            Dictionary<TelemetryFields,double> initialTelemetry = null,
+        double dataStorageCapacityGb = SimulationConstants.Searcher_Constants.DataStorageCapacityGB
         ) : base(
             startLocation,
-            SimulationConstants.Searcher_Constants.FuelTankSize,
-            SimulationConstants.Searcher_Constants.MaxCruiseSpeedKmph,
-            SimulationConstants.Searcher_Constants.MaxAcceleration,
-            SimulationConstants.Searcher_Constants.MaxDeceleration,
             tailId,
             DefaultSensorsStatus,
             dataStorageCapacityGb
         )
         {
+            TelemetryData = initialTelemetry;
             CurrentMissionId = string.Empty;
         }
     }

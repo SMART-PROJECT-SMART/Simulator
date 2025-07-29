@@ -65,5 +65,16 @@ namespace Simulation.Common.constants
             public static double MIN_YAW_RATE = 0.001;
             public static double MIN_SPEED_MPS = 1.0;
         }
+
+        public static class Mathematical
+        {
+            public static double GRAVITY = 9.81;
+            public static double EPSILON = 1e-10;
+            public static double RHO = 1.225;
+            public static double CRITICAL_MACH_NUMBER = 0.78;
+            public static double MAXIMAL_KINETIC_ENERGY_FOR_LANDING = 1323000;
+            public static double SPEED_OF_SOUND = 343.2;
+            public static double FROM_KMH_TO_MPS = 3.6;
+        }
     }
 }

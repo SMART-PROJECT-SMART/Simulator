@@ -10,14 +10,10 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
 
         protected SurveillanceUAV(
             Location startLocation,
-            double fuelTankSize,
-            double maxCruiseSpeed,
-            double maxAcceleration,
-            double maxDeceleration,
             int tailId,
             Dictionary<SensorType, bool> sensorsStatus,
             double dataStorageCapacityGb
-        ) : base(startLocation, fuelTankSize, maxCruiseSpeed, maxAcceleration, maxDeceleration, tailId)
+        ) : base(startLocation,tailId)
         {
             SensorsStatus = sensorsStatus;
             DataStorageCapacityGB = dataStorageCapacityGb;

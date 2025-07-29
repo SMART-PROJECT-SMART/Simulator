@@ -15,7 +15,7 @@ namespace Simulation.Services.Flight_Path.helpers
             double y = Math.Sin(deltaLonRad) * Math.Cos(toLatRad);
             double x = Math.Cos(fromLatRad) * Math.Sin(toLatRad)
                        - Math.Sin(fromLatRad) * Math.Cos(toLatRad) * Math.Cos(deltaLonRad);
-            
+
             if (Math.Abs(x) < 1e-10 && Math.Abs(y) < 1e-10)
                 return 0.0;
 
@@ -26,7 +26,7 @@ namespace Simulation.Services.Flight_Path.helpers
 
         public static double CalculateDistance(Location a, Location b)
         {
-            if (Math.Abs(a.Latitude - b.Latitude) < 1e-10 && 
+            if (Math.Abs(a.Latitude - b.Latitude) < 1e-10 &&
                 Math.Abs(a.Longitude - b.Longitude) < 1e-10)
                 return 0.0;
 
@@ -38,8 +38,8 @@ namespace Simulation.Services.Flight_Path.helpers
             double sinDeltaLat = Math.Sin(deltaLatRad / 2);
             double sinDeltaLon = Math.Sin(deltaLonRad / 2);
             double haversine = sinDeltaLat * sinDeltaLat
-                          + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
-            
+                               + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
+
             if (haversine >= 1.0)
                 return Math.PI * SimulationConstants.FlightPath.EARTH_RADIUS_METERS;
 
@@ -74,6 +74,19 @@ namespace Simulation.Services.Flight_Path.helpers
             while (destLon < -180) destLon += 360;
 
             return new Location(destLat, destLon, origin.Altitude);
+        }
+
+        public static double NormalizeAngle(double angle)
+        {
+            while (angle < 0)
+            {
+                angle += 360;
+            }
+            while (angle >= 360)
+            {
+                angle -= 360;
+            }
+            return angle;
         }
     }
 }

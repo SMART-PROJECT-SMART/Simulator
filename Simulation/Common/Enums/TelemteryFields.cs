@@ -2,39 +2,31 @@
 {
     public enum TelemetryFields
     {
-        LocationLatitude,
-        LocationLongitude,
-        LocationAltitudeAmsl,
-        LocationAltitudeAgl,
-        LocationGroundSpeed,
-        LocationVerticalSpeed,
-        LocationYaw,
-        LocationPitch,
-        LocationRoll,
-        LocationClimbRate,
-        LocationDistanceFromHome,
-        LocationDistanceToWaypoint,
-        LocationWaypointIndex,
+        Mass,
+        FrontalSurface,
+        WingsSurface,
+        DragCoefficient,
+        LiftCoefficient,
+        ThrustMax,
+        MaxCruiseSpeedKmph,
+        MaxAccelerationMps2,
+        MaxDecelerationMps2,
+        CruiseAltitude,
 
-        EngineRpm,
-        EngineThrottlePercent,
-        EngineFuelLevelPercent,
-        EngineFuelConsumptionRate,
-        EngineBatteryVoltage,
-        EngineBatteryCurrent,
-        EngineBatteryPercent,
-        EngineMotorTemperature,
-        EngineEscTemperature,
-        EnginePowerDraw,
+        Latitude,
+        longitude,
+        Altitude,
 
-        EnvironmentAirspeed,
-        EnvironmentAirTemperature,
-        EnvironmentBarometricPressure,
-        EnvironmentHumidity,
-        EnvironmentWindSpeed,
-        EnvironmentWindDirection,
+        CurrentSpeedKmph,
+        Horizontal_Acceleration,
+        Vertical_Acceleration,
 
-        SystemUptimeSeconds,
+        YawDeg,
+        PitchDeg,
+        RollDeg,
+        AngleBetweenPlaneAndGround,
+
+        ThrustAfterInfluence,
+        MachNumber
     }
 }
-

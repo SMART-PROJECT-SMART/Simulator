@@ -1,13 +1,12 @@
-﻿namespace Simulation.Services.Flight_Path.Speed_Controller
+﻿using Simulation.Common.Enums;
+
+namespace Simulation.Services.Flight_Path.Speed_Controller
 {
     public interface ISpeedController
     {
         double ComputeNextSpeed(
-            double currentSpeedKmph,
+            Dictionary<TelemetryFields, double> telemetry,
             double remainingKm,
-            double maxAccelMps2,
-            double maxDecelMps2,
-            double deltaSec,
-            double maxCruiseKmph);
+            double deltaSeconds);
     }
 }
