@@ -67,10 +67,11 @@ public class SimulationController : ControllerBase
     {
         var startLocation = new Location(40.6413, -73.7781, 10.0);
 
-        // Create Searcher UAV - it will set its own telemetry fields from constants
         var uav = new Searcher(
             tailId: 1,
             startLocation: startLocation);
+
+        uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
 
         var destination = new Location(40.6460, -73.7790, 100.0);
 
@@ -84,7 +85,6 @@ public class SimulationController : ControllerBase
     {
         var startLocation = new Location(40.6413, -73.7781, 10.0);
 
-        // Create Hermes450 UAV - it will set its own telemetry fields from constants
         var uav = new Hermes450(
             tailId: 2,
             startLocation: startLocation);
