@@ -9,7 +9,8 @@ public static class FlightPhysicsCalculator
     {
         double frontalSurface = telemetry.GetValueOrDefault(TelemetryFields.FrontalSurface, 1.0);
         double dragCoefficient = telemetry.GetValueOrDefault(TelemetryFields.DragCoefficient, 0.1);
-        double horizontalSpeed = telemetry.GetValueOrDefault(TelemetryFields.Horizontal_Acceleration, 0.0);
+        double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+        double horizontalSpeed = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
 
         return 0.5 * SimulationConstants.Mathematical.RHO * frontalSurface * dragCoefficient * Math.Pow(horizontalSpeed, 2);
     }
@@ -18,8 +19,9 @@ public static class FlightPhysicsCalculator
     {
         double wingsSurface = telemetry.GetValueOrDefault(TelemetryFields.WingsSurface, 1.0);
         double liftCoefficient = telemetry.GetValueOrDefault(TelemetryFields.LiftCoefficient, 0.1);
-        double verticalSpeed = telemetry.GetValueOrDefault(TelemetryFields.Vertical_Acceleration, 0.0); 
-        return 0.5 * SimulationConstants.Mathematical.RHO * wingsSurface * liftCoefficient * Math.Pow(verticalSpeed, 2);
+        double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+        double horizontalSpeed = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+        return 0.5 * SimulationConstants.Mathematical.RHO * wingsSurface * liftCoefficient * Math.Pow(horizontalSpeed, 2);
     }
 
     public static double CalculateThrust(Dictionary<TelemetryFields, double> telemetry)

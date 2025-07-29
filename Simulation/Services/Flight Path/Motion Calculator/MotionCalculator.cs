@@ -34,10 +34,6 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             double newAlt = Math.Min(destination.Altitude, current.Altitude + altChange);
             newAlt = Math.Max(0.0, newAlt);
 
-            telemetry[TelemetryFields.Latitude] = nextHoriz.Latitude;
-            telemetry[TelemetryFields.Longitude] = nextHoriz.Longitude;
-            telemetry[TelemetryFields.Altitude] = newAlt;
-
             return new Location(nextHoriz.Latitude, nextHoriz.Longitude, newAlt);
         }
     }

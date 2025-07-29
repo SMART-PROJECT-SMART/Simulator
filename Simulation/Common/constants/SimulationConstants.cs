@@ -98,7 +98,7 @@ namespace Simulation.Common.constants
             public static double DELTA_SECONDS = 1.0;
             public static double MAX_ROLL_DEG = 45.0;
             public static double GRAVITY_MPS2 = 9.81;
-            public static double MIN_YAW_RATE = 0.001;
+            public static double MIN_YAW_RATE = 0.1;
             public static double MIN_SPEED_MPS = 1.0;
 
             public static double MAX_CLIMB_RATE_MPS = 10.0;    

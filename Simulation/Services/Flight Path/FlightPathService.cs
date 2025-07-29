@@ -56,7 +56,7 @@ public class FlightPathService : IDisposable
         _uav.TelemetryData[TelemetryFields.Longitude] = lon;
         _uav.TelemetryData[TelemetryFields.Altitude] = alt;
         _uav.TelemetryData[TelemetryFields.CurrentSpeedKmph] = Math.Max(
-            SimulationConstants.FlightPath.MIN_SPEED_MPS,
+            SimulationConstants.FlightPath.MIN_SPEED_KMH,
             spd);
 
         _logger.LogInformation(
@@ -96,6 +96,7 @@ public class FlightPathService : IDisposable
             pitchDeg = -SimulationConstants.FlightPath.MAX_DESCENT_DEG;
         else
             pitchDeg = 0;
+
         telemetry[TelemetryFields.PitchDeg] = pitchDeg;
 
         double newSpeed = _speedController.ComputeNextSpeed(
@@ -123,8 +124,9 @@ public class FlightPathService : IDisposable
             telemetry,
             currentLoc,
             nextLoc,
+            _destination,
             SimulationConstants.FlightPath.DELTA_SECONDS);
-        axis = new AxisDegrees(axis.Yaw, pitchDeg, axis.Roll);
+        axis = new AxisDegrees(axis.Yaw, axis.Pitch, axis.Roll);
 
         telemetry[TelemetryFields.Latitude] = nextLoc.Latitude;
         telemetry[TelemetryFields.Longitude] = nextLoc.Longitude;
@@ -134,12 +136,15 @@ public class FlightPathService : IDisposable
         telemetry[TelemetryFields.RollDeg] = axis.Roll;
 
         _logger.LogInformation(
-            "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Rem {Rem:F3}m",
+            "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F3}m",
             _uav.TailId,
             nextLoc.Latitude,
             nextLoc.Longitude,
             nextLoc.Altitude,
             newSpeed,
+            axis.Yaw,
+            axis.Pitch,
+            axis.Roll,
             remainingMeters);
 
         LocationUpdated?.Invoke(nextLoc);
