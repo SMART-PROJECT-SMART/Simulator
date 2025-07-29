@@ -28,10 +28,17 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             var nextHoriz = FlightPathMathHelper.CalculateDestinationLocation(current, bearing, horizM);
 
             double altChange = travelM * Math.Sin(UnitConversionHelper.ToRadians(pitchDeg));
+            
             double lift = FlightPhysicsCalculator.CalculateLift(telemetry);
-            altChange += lift * deltaSec * SimulationConstants.Mathematical.FROM_M_TO_KM;
-
-            double newAlt = Math.Min(destination.Altitude, current.Altitude + altChange);
+            double liftContribution = lift * deltaSec * SimulationConstants.Mathematical.FROM_M_TO_KM;
+            altChange += liftContribution;
+            
+            double drag = FlightPhysicsCalculator.CalculateDrag(telemetry);
+            double dragEffect = -drag * deltaSec * 0.1; 
+            altChange += dragEffect;
+            
+            double newAlt = current.Altitude + altChange;
+            newAlt = Math.Min(destination.Altitude, newAlt);
             newAlt = Math.Max(0.0, newAlt);
 
             return new Location(nextHoriz.Latitude, nextHoriz.Longitude, newAlt);

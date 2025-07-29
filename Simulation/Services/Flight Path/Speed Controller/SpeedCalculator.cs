@@ -18,6 +18,20 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
             double physicsAcceleration = FlightPhysicsCalculator.CalculateAcceleration(telemetry);
             double acceleration = Math.Min(physicsAcceleration, maxAcceleration);
             
+            double speedProgress = currentSpeed / cruiseSpeed; 
+            
+            double accelerationMultiplier = 1.0;
+            if (speedProgress > 0.7)
+            {
+                accelerationMultiplier = 1.0 - ((speedProgress - 0.7) / 0.3) * 0.5;
+            }
+            else if (speedProgress < 0.3)
+            {
+                accelerationMultiplier = 0.7 + (speedProgress / 0.3) * 0.3;
+            }
+            
+            acceleration *= accelerationMultiplier;
+            
             double deltaSpeedKmh = acceleration * deltaSeconds * SimulationConstants.Mathematical.FROM_MPS_TO_KMH;
             double newSpeed = currentSpeed + deltaSpeedKmh;
 
