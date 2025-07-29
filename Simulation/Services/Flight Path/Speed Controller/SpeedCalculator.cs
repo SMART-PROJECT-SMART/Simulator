@@ -15,9 +15,8 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
             double maxAcceleration = telemetry.GetValueOrDefault(TelemetryFields.MaxAccelerationMps2, 2.0);
             double cruiseSpeed = telemetry.GetValueOrDefault(TelemetryFields.MaxCruiseSpeedKmph, 180.0);
 
-            double acceleration = maxAcceleration;
-            
-            Console.WriteLine($"DEBUG: CurrentSpeed={currentSpeed:F1}km/h, MaxAccel={maxAcceleration:F1}m/s², UsedAccel={acceleration:F3}m/s²");
+            double physicsAcceleration = FlightPhysicsCalculator.CalculateAcceleration(telemetry);
+            double acceleration = Math.Min(physicsAcceleration, maxAcceleration);
             
             double deltaSpeedKmh = acceleration * deltaSeconds * SimulationConstants.Mathematical.FROM_MPS_TO_KMH;
             double newSpeed = currentSpeed + deltaSpeedKmh;

@@ -24,6 +24,7 @@ public class FlightPathService : IDisposable
     private bool _isRunning;
     private bool _missionCompleted;
     private bool _timerDisposed;
+    private Location _previousLocation;
 
     public event Action<Location>? LocationUpdated;
     public event Action? MissionCompleted;
@@ -58,6 +59,8 @@ public class FlightPathService : IDisposable
         _uav.TelemetryData[TelemetryFields.CurrentSpeedKmph] = Math.Max(
             SimulationConstants.FlightPath.MIN_SPEED_KMH,
             spd);
+
+        _previousLocation = new Location(lat, lon, alt);
 
         _logger.LogInformation(
             "Starting position ({Lat:F6}, {Lon:F6}, {Alt:F1}), Speed {Spd:F1} km/h",
@@ -122,8 +125,8 @@ public class FlightPathService : IDisposable
 
         AxisDegrees axis = _orientationCalculator.ComputeOrientation(
             telemetry,
+            _previousLocation,
             currentLoc,
-            nextLoc,
             _destination,
             SimulationConstants.FlightPath.DELTA_SECONDS);
         axis = new AxisDegrees(axis.Yaw, axis.Pitch, axis.Roll);
@@ -134,6 +137,8 @@ public class FlightPathService : IDisposable
         telemetry[TelemetryFields.YawDeg] = axis.Yaw;
         telemetry[TelemetryFields.PitchDeg] = axis.Pitch;
         telemetry[TelemetryFields.RollDeg] = axis.Roll;
+
+        _previousLocation = currentLoc;
 
         _logger.LogInformation(
             "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F3}m",

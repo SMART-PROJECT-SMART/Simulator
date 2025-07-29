@@ -29,13 +29,22 @@ public static class FlightPhysicsCalculator
         return telemetry.GetValueOrDefault(TelemetryFields.ThrustAfterInfluence, 0.0);
     }
 
-
     public static double CalculateAcceleration(Dictionary<TelemetryFields, double> telemetry)
     {
         double thrust = CalculateThrust(telemetry);
         double drag = CalculateDrag(telemetry);
         double mass = telemetry.GetValueOrDefault(TelemetryFields.Mass, 1.0);
+        double maxAcceleration = telemetry.GetValueOrDefault(TelemetryFields.MaxAccelerationMps2, 2.0);
 
-        return (thrust - drag) / mass;
+        double physicsAcceleration = (thrust - drag) / mass;
+        
+        if (physicsAcceleration < 0.1)
+        {
+            double thrustToWeightRatio = thrust / (mass * SimulationConstants.FlightPath.GRAVITY_MPS2);
+            double realisticAcceleration = maxAcceleration * Math.Min(thrustToWeightRatio * 2.0, 1.0);
+            return Math.Max(realisticAcceleration, 0.5);
+        }
+
+        return Math.Min(physicsAcceleration, maxAcceleration);
     }
 }

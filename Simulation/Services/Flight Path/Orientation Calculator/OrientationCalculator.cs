@@ -18,46 +18,78 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             double deltaSec)
         {
             double speedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+            double pitch = telemetry.GetValueOrDefault(TelemetryFields.PitchDeg, 0.0);
 
             double bearing = FlightPathMathHelper.CalculateBearing(current, destination);
-            double distance = FlightPathMathHelper.CalculateDistance(previous, current);
-            double altDiff = current.Altitude - previous.Altitude;
-            double pitch = distance > 0
-                ? UnitConversionHelper.ToDegrees(Math.Atan2(altDiff, distance))
-                : 0.0;
+            double roll = CalculatePhysicsBasedRoll(telemetry, previous, current, destination, deltaSec, bearing, pitch);
 
-            Console.WriteLine($"DEBUG ANGLES: Bearing={bearing:F1}°, Distance={distance:F1}m, AltDiff={altDiff:F1}m, Pitch={pitch:F1}°, LastYaw={_lastYaw:F1}°");
+            _lastYaw = bearing;
+
+            return new AxisDegrees(bearing, pitch, roll);
+        }
+
+        private double CalculatePhysicsBasedRoll(
+            Dictionary<TelemetryFields, double> telemetry,
+            Location previous,
+            Location current,
+            Location destination,
+            double deltaSec,
+            double bearing,
+            double pitch)
+        {
+            double speedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+            double speedMps = speedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+
+            if (speedMps <= SimulationConstants.FlightPath.MIN_SPEED_MPS)
+                return 0.0;
 
             double roll = 0.0;
+
             if (!double.IsNaN(_lastYaw))
             {
                 double deltaYaw = FlightPathMathHelper.CalculateAngleDifference(_lastYaw, bearing);
                 double yawRate = UnitConversionHelper.ToRadians(deltaYaw) / deltaSec;
-                double speedMps = speedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
 
-                Console.WriteLine($"DEBUG ROLL: DeltaYaw={deltaYaw:F3}°, YawRate={yawRate:F3}rad/s, MinYawRate={SimulationConstants.FlightPath.MIN_YAW_RATE:F3}, SpeedMps={speedMps:F1}, MinSpeed={SimulationConstants.FlightPath.MIN_SPEED_MPS:F1}");
-
-                if (Math.Abs(yawRate) > SimulationConstants.FlightPath.MIN_YAW_RATE
-                    && speedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS)
+                if (Math.Abs(yawRate) > SimulationConstants.FlightPath.MIN_YAW_RATE)
                 {
                     double latAcc = speedMps * yawRate;
                     roll = UnitConversionHelper.ToDegrees(
                         Math.Atan2(latAcc, SimulationConstants.FlightPath.GRAVITY_MPS2));
                     roll = Math.Clamp(roll, -SimulationConstants.FlightPath.MAX_ROLL_DEG, SimulationConstants.FlightPath.MAX_ROLL_DEG);
-                    Console.WriteLine($"DEBUG ROLL: LatAcc={latAcc:F3}m/s², Roll={roll:F1}°");
                 }
-                else
+                else if (Math.Abs(deltaYaw) > 0.1 && Math.Abs(yawRate) > 0.001)
                 {
-                    roll = 0.0;
-                    Console.WriteLine($"DEBUG ROLL: No roll - YawRate too small or speed too low");
+                    double turnRadius = speedMps / Math.Abs(yawRate);
+                    double bankAngle = UnitConversionHelper.ToDegrees(
+                        Math.Atan2(speedMps * speedMps, turnRadius * SimulationConstants.FlightPath.GRAVITY_MPS2));
+                    roll = Math.Sign(deltaYaw) * Math.Min(bankAngle, SimulationConstants.FlightPath.MAX_ROLL_DEG);
                 }
             }
 
+            if (Math.Abs(roll) < 0.1)
+            {
+                roll = CalculateStraightFlightRoll(telemetry, pitch, speedMps);
+            }
 
+            return roll;
+        }
 
-            _lastYaw = bearing;
+        private double CalculateStraightFlightRoll(Dictionary<TelemetryFields, double> telemetry, double pitch, double speedMps)
+        {
+            if (Math.Abs(pitch) > 5.0)
+            {
+                double lift = FlightPhysicsCalculator.CalculateLift(telemetry);
+                double mass = telemetry.GetValueOrDefault(TelemetryFields.Mass, 1.0);
+                double weight = mass * SimulationConstants.FlightPath.GRAVITY_MPS2;
+                
+                double liftDeficit = weight - lift * Math.Cos(UnitConversionHelper.ToRadians(pitch));
+                double rollAngle = UnitConversionHelper.ToDegrees(Math.Atan2(liftDeficit, lift));
+                
+                double maxRollForPitch = Math.Min(Math.Abs(pitch) * 0.5, SimulationConstants.FlightPath.MAX_ROLL_DEG);
+                return Math.Clamp(rollAngle, -maxRollForPitch, maxRollForPitch);
+            }
 
-            return new AxisDegrees(bearing, pitch, roll);
+            return 0.0;
         }
     }
 }

@@ -77,8 +77,8 @@ namespace Simulation.Common.constants
             public const double WingsSurface = 4.8;
             public const double DragCoefficient = 0.03;
             public const double LiftCoefficient = 0.75;
-            public const double ThrustMax = 15.0;
-            public const double ThrustAfterInfluence = 15.0;
+            public const double ThrustMax = 150.0;
+            public const double ThrustAfterInfluence = 150.0;
         }
 
         public static class FlightPath
@@ -98,7 +98,7 @@ namespace Simulation.Common.constants
             public static double DELTA_SECONDS = 1.0;
             public static double MAX_ROLL_DEG = 45.0;
             public static double GRAVITY_MPS2 = 9.81;
-            public static double MIN_YAW_RATE = 0.1;
+            public static double MIN_YAW_RATE = 0.01;
             public static double MIN_SPEED_MPS = 1.0;
 
             public static double MAX_CLIMB_RATE_MPS = 10.0;    
