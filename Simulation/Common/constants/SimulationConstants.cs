@@ -59,12 +59,18 @@ namespace Simulation.Common.constants
             public static double PITCH_CLIMB_DEG = 15.0;
             public static double PITCH_DESCENT_DEG = 15.0;
             public static double ALTITUDE_TOLERANCE = 0.5;
+            public static double ALTITUDE_PRECISION_M = 1.0; 
             public static double MIN_DESCENT_DISTANCE_KM = 0.1;
             public static double DELTA_SECONDS = 1.0;
             public static double MAX_ROLL_DEG = 45.0;
             public static double GRAVITY_MPS2 = 9.81;
             public static double MIN_YAW_RATE = 0.001;
             public static double MIN_SPEED_MPS = 1.0;
+
+            public static double MAX_CLIMB_RATE_MPS = 10.0;    
+            public static double MAX_DESCENT_RATE_MPS = 10.0;   
+            public static double MAX_CLIMB_DEG = 20.0;          
+            public static double MAX_DESCENT_DEG = 20.0;        
         }
 
         public static class Mathematical

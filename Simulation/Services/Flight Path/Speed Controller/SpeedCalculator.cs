@@ -4,7 +4,7 @@ using Simulation.Services.Flight_Path.helpers;
 
 namespace Simulation.Services.Flight_Path.Speed_Controller
 {
-    public class SpeedController : ISpeedController
+    public class SpeedCalculator : ISpeedController
     {
         public double ComputeNextSpeed(
             Dictionary<TelemetryFields, double> telemetry,

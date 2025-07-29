@@ -15,7 +15,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IMotionCalculator, MotionCalculator>();
-builder.Services.AddSingleton<ISpeedController, SpeedController>();
+builder.Services.AddSingleton<ISpeedController, SpeedCalculator>();
 builder.Services.AddSingleton<IOrientationCalculator, OrientationCalculator>();
 
 var app = builder.Build();

@@ -44,7 +44,7 @@ namespace Simulation.Services.Flight_Path.helpers
                 return Math.PI * SimulationConstants.FlightPath.EARTH_RADIUS_METERS;
 
             double angularDistance = 2 * Math.Atan2(Math.Sqrt(haversine), Math.Sqrt(1 - haversine));
-            return SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance/1000;
+            return SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
         }
 
         public static Location CalculateDestinationLocation(Location origin, double bearing, double distance)
