@@ -118,11 +118,18 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
 
             double thrustToWeight = thrust / weight;
 
+            double pitchRadians = UnitConversionHelper.ToRadians(Math.Abs(basicPitch));
+            double minLiftToWeight = Math.Cos(pitchRadians);
+
+            double liftToWeight = lift / weight;
+            if (liftToWeight < minLiftToWeight)
+            {
+                basicPitch *= Math.Max(0.5, liftToWeight / minLiftToWeight);
+            }
+
             if (altitudeDifference > SimulationConstants.FlightPath.ALTITUDE_PRECISION_M)
             {
-                double requiredThrustRatio = Math.Sin(
-                    UnitConversionHelper.ToRadians(Math.Abs(basicPitch))
-                );
+                double requiredThrustRatio = Math.Sin(pitchRadians);
 
                 if (thrustToWeight < requiredThrustRatio + 0.1)
                 {
@@ -141,12 +148,6 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                     double energyFactor = Math.Min(1.2, 1.0 + (excessThrust / weight));
                     basicPitch *= energyFactor;
                 }
-            }
-
-            double liftToWeight = lift / weight;
-            if (liftToWeight < 0.8)
-            {
-                basicPitch *= Math.Max(0.5, liftToWeight);
             }
 
             return basicPitch;
