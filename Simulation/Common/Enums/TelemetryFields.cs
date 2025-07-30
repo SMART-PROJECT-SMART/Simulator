@@ -41,6 +41,8 @@ namespace Simulation.Common.Enums
         AngleBetweenPlaneAndGround,
         ThrustAfterInfluence,
         ThrottlePercent,
+        FuelAmount,
+
     }
 
     public enum ArmedTelemetryFields
@@ -126,6 +128,8 @@ namespace Simulation.Common.Enums
 
         [TelemetryCategory(TelemetryCategories.Flight)]
         YawDeg,
+        [TelemetryCategory(TelemetryCategories.Flight)]
+        FuelAmount,
 
         [TelemetryCategory(TelemetryCategories.Flight)]
         PitchDeg,

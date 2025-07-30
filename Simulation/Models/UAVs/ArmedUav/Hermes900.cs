@@ -6,7 +6,12 @@ namespace Simulation.Models.UAVs.ArmedUav
     public class Hermes900 : ArmedUAV
     {
         public Hermes900(int tailId, Location startLocation)
-            : base(startLocation, tailId)
+            : base(
+                startLocation,
+                tailId,
+                SimulationConstants.Hermes900_Constants.FuelTankCapacity,
+                SimulationConstants.Hermes900_Constants.SpecificFuelConsumption
+            )
         {
             TelemetryData[TelemetryFields.Mass] = SimulationConstants.Hermes900_Constants.Mass;
             TelemetryData[TelemetryFields.FrontalSurface] = SimulationConstants

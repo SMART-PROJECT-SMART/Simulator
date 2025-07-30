@@ -75,8 +75,6 @@ public class FlightPathService : IDisposable
 
     public void StartFlightPath()
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(FlightPathService));
         if (_isRunning)
             return;
 

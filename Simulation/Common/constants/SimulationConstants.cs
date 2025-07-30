@@ -9,8 +9,9 @@ namespace Simulation.Common.constants
             public const double MaxAcceleration = 2.0;
             public const double MaxDeceleration = 2.8;
             public const double MaxCruiseSpeedKmph = 220;
-            public const double CruiseAltitude = 900;
-            public const double FuelTankSize = 350;
+            public const double CruiseAltitude = 900.0;
+            public const double FuelTankCapacity = 350.0;
+            public const double SpecificFuelConsumption = 1.8e-4;
             public const double Mass = 1100.0;
             public const double FrontalSurface = 4.8;
             public const double WingsSurface = 15.2;
@@ -28,8 +29,9 @@ namespace Simulation.Common.constants
             public const double MaxAcceleration = 1.5;
             public const double MaxDeceleration = 2.0;
             public const double MaxCruiseSpeedKmph = 220;
-            public const double CruiseAltitude = 135;
-            public const double FuelTankSize = 450;
+            public const double CruiseAltitude = 135.0;
+            public const double FuelTankCapacity = 450.0;
+            public const double SpecificFuelConsumption = 2.0e-4;
             public const double Mass = 4650.0;
             public const double FrontalSurface = 8.2;
             public const double WingsSurface = 26.0;
@@ -47,9 +49,10 @@ namespace Simulation.Common.constants
             public const double MaxAcceleration = 2.5;
             public const double MaxDeceleration = 3.0;
             public const double MaxCruiseSpeedKmph = 220;
-            public const double CruiseAltitude = 550;
-            public const double FuelTankSize = 180;
-            public const double DataStorageCapacityGB = 500;
+            public const double CruiseAltitude = 550.0;
+            public const double FuelTankCapacity = 180.0;
+            public const double SpecificFuelConsumption = 1.5e-4;
+            public const double DataStorageCapacityGB = 500.0;
             public const double Mass = 450.0;
             public const double FrontalSurface = 2.5;
             public const double WingsSurface = 8.5;
@@ -64,9 +67,10 @@ namespace Simulation.Common.constants
             public const double MaxAcceleration = 3.0;
             public const double MaxDeceleration = 3.5;
             public const double MaxCruiseSpeedKmph = 180;
-            public const double CruiseAltitude = 600;
-            public const double FuelTankSize = 120;
-            public const double DataStorageCapacityGB = 250;
+            public const double CruiseAltitude = 600.0;
+            public const double FuelTankCapacity = 120.0;
+            public const double SpecificFuelConsumption = 1.2e-4;
+            public const double DataStorageCapacityGB = 250.0;
             public const double Mass = 120.0;
             public const double FrontalSurface = 1.2;
             public const double WingsSurface = 4.8;
@@ -78,71 +82,66 @@ namespace Simulation.Common.constants
 
         public static class FlightPath
         {
-            public static double EARTH_SCALE_HEIGHT = 8450;
-            public static double EARTH_RADIUS_METERS = 6371000.0;
-            public static double LOCATION_PRECISION_KM = 0.01;
-            public static double Location_PRECISION_M = 10;
-            public static double MIN_SPEED_KMH = 5.0;
-            public static double MAX_PITCH_DEG = 30.0;
-            public static double MIN_DISTANCE_M = 0.1;
-            public static double CLOSE_DISTANCE_M = 50.0;
-            public static double PITCH_CLIMB_DEG = 15.0;
-            public static double PITCH_DESCENT_DEG = 15.0;
-            public static double ALTITUDE_TOLERANCE = 0.5;
-            public static double ALTITUDE_PRECISION_M = 1.0;
-            public static double MIN_DESCENT_DISTANCE_KM = 0.1;
-            public static double DELTA_SECONDS = 1.0;
-            public static double MAX_ROLL_DEG = 45.0;
-            public static double GRAVITY_MPS2 = 9.81;
-            public static double MIN_YAW_RATE = 0.001;
-            public static double MIN_SPEED_MPS = 1.0;
-
-            public static double MAX_CLIMB_RATE_MPS = 10.0;
-            public static double MAX_DESCENT_RATE_MPS = 10.0;
-            public static double MAX_CLIMB_DEG = 20.0;
-            public static double MAX_DESCENT_DEG = 20.0;
-
-            public static double MAX_TURN_RATE_DEG_PER_SEC = 8.0;
-            public static double TURN_PROGRESS_NORMALIZATION_DEG = 90.0;
-            public static double TURN_START_PHASE_THRESHOLD = 0.3;
-            public static double TURN_END_PHASE_THRESHOLD = 0.7;
-
-            public static double CURVE_ROLL_THRESHOLD_DEG = 1.0;
-            public static double CURVE_ROLL_MULTIPLIER = 0.5;
-            public static double MAX_CURVE_ROLL_DEG = 3.0;
-            public static double MIN_ROLL_FOR_CURVE_DEG = 2.0;
-
-            public static double SPEED_PROGRESS_HIGH_THRESHOLD = 0.7;
-            public static double SPEED_PROGRESS_LOW_THRESHOLD = 0.3;
-            public static double HIGH_SPEED_DECELERATION_FACTOR = 0.5;
-            public static double LOW_SPEED_ACCELERATION_FACTOR = 0.7;
-            public static double LOW_SPEED_ACCELERATION_RANGE = 0.3;
-            public static double NORMAL_ACCELERATION_MULTIPLIER = 1.0;
-            public static double FULL_ACCELERATION_MULTIPLIER = 1.0;
-            public static double FULL_DECELERATION_MULTIPLIER = 1.0;
-
-            public static double DRAG_EFFECT_ON_ALTITUDE = 0.1;
-            public static double MIN_RELEVENT_YAW = 0.1;
-            public static double FULL_TURN = 1.0;
-            public static double MIN_PITCH = 0.2;
+            public const double EARTH_SCALE_HEIGHT = 8450.0;
+            public const double EARTH_RADIUS_METERS = 6371000.0;
+            public const double LOCATION_PRECISION_KM = 0.01;
+            public const double LOCATION_PRECISION_M = 10.0;
+            public const double MIN_SPEED_KMH = 5.0;
+            public const double MAX_PITCH_DEG = 30.0;
+            public const double MIN_DISTANCE_M = 0.1;
+            public const double CLOSE_DISTANCE_M = 50.0;
+            public const double PITCH_CLIMB_DEG = 15.0;
+            public const double PITCH_DESCENT_DEG = 15.0;
+            public const double ALTITUDE_TOLERANCE = 0.5;
+            public const double ALTITUDE_PRECISION_M = 1.0;
+            public const double MIN_DESCENT_DISTANCE_KM = 0.1;
+            public const double DELTA_SECONDS = 1.0;
+            public const double MAX_ROLL_DEG = 45.0;
+            public const double GRAVITY_MPS2 = 9.81;
+            public const double MIN_YAW_RATE = 0.001;
+            public const double MIN_SPEED_MPS = 1.0;
+            public const double MAX_CLIMB_RATE_MPS = 10.0;
+            public const double MAX_DESCENT_RATE_MPS = 10.0;
+            public const double MAX_CLIMB_DEG = 20.0;
+            public const double MAX_DESCENT_DEG = 20.0;
+            public const double MAX_TURN_RATE_DEG_PER_SEC = 8.0;
+            public const double TURN_PROGRESS_NORMALIZATION_DEG = 90.0;
+            public const double TURN_START_PHASE_THRESHOLD = 0.3;
+            public const double TURN_END_PHASE_THRESHOLD = 0.7;
+            public const double CURVE_ROLL_THRESHOLD_DEG = 1.0;
+            public const double CURVE_ROLL_MULTIPLIER = 0.5;
+            public const double MAX_CURVE_ROLL_DEG = 3.0;
+            public const double MIN_ROLL_FOR_CURVE_DEG = 2.0;
+            public const double SPEED_PROGRESS_HIGH_THRESHOLD = 0.7;
+            public const double SPEED_PROGRESS_LOW_THRESHOLD = 0.3;
+            public const double HIGH_SPEED_DECELERATION_FACTOR = 0.5;
+            public const double LOW_SPEED_ACCELERATION_FACTOR = 0.7;
+            public const double LOW_SPEED_ACCELERATION_RANGE = 0.3;
+            public const double NORMAL_ACCELERATION_MULTIPLIER = 1.0;
+            public const double FULL_ACCELERATION_MULTIPLIER = 1.0;
+            public const double FULL_DECELERATION_MULTIPLIER = 1.0;
+            public const double DRAG_EFFECT_ON_ALTITUDE = 0.1;
+            public const double MIN_RELEVENT_YAW = 0.1;
+            public const double FULL_TURN = 1.0;
+            public const double MIN_PITCH = 0.2;
         }
 
         public static class Mathematical
         {
-            public static double GRAVITY = 9.81;
-            public static double EPSILON = 1e-10;
-            public static double RHO = 1.225;
-            public static double CRITICAL_MACH_NUMBER = 0.78;
-            public static double MAXIMAL_KINETIC_ENERGY_FOR_LANDING = 1323000;
-            public static double SPEED_OF_SOUND = 343.2;
-            public static double FROM_KMH_TO_MPS = 3.6;
-            public static double FROM_MPS_TO_KMH = 3.6;
-            public static double FROM_M_TO_KM = 0.0001;
-            public static int FULL_TURN_DEGREES = 360;
-            public static int HALF_TURN_DEGREES = 180;
-            public static double MAX_HAVESINE_RANGE = 1.0;
-            public static double MIN_ACCELERATION_FACTOR = 0.1;
-            public static double REALISTIC_STOP_PRECENT = 0.3;
+            public const double GRAVITY = 9.81;
+            public const double EPSILON = 1e-10;
+            public const double RHO = 1.225;
+            public const double CRITICAL_MACH_NUMBER = 0.78;
+            public const double MAXIMAL_KINETIC_ENERGY_FOR_LANDING = 1323000.0;
+            public const double SPEED_OF_SOUND = 343.2;
+            public const double FROM_KMH_TO_MPS = 3.6;
+            public const double FROM_MPS_TO_KMH = 3.6;
+            public const double FROM_M_TO_KM = 0.0001;
+            public const int FULL_TURN_DEGREES = 360;
+            public const int HALF_TURN_DEGREES = 180;
+            public const double MAX_HAVERSINE_RANGE = 1.0;
+            public const double MIN_ACCELERATION_FACTOR = 0.1;
+            public const double REALISTIC_STOP_PERCENT = 0.3;
         }
     }
 }

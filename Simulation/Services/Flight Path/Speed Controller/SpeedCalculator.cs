@@ -32,8 +32,7 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
             double accelerationMultiplier = CalculateAccelerationMultiplier(speedProgress);
             acceleration *= accelerationMultiplier;
 
-            double deltaSpeedKmh =
-                acceleration * deltaSeconds * SimulationConstants.Mathematical.FROM_MPS_TO_KMH;
+            double deltaSpeedKmh = (acceleration * deltaSeconds).ToMpsFromKmh();
             double newSpeed = currentSpeed + deltaSpeedKmh;
 
             newSpeed = Math.Clamp(

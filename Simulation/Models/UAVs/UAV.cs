@@ -10,11 +10,16 @@ public abstract class UAV
     public Dictionary<TelemetryFields, double> TelemetryData { get; set; }
     public string CurrentMissionId { get; set; }
 
-    public UAV(Location startLocation, int tailId)
+    public double FuelTankCapacity { get; set; }
+    public double FuelConsumption { get; set; }
+
+    public UAV(Location startLocation, int tailId, double fuelTankSize)
     {
         TailId = tailId;
         CurrentMissionId = string.Empty;
         TelemetryData = TelemetryFieldsHelper.FlightOnly();
         TelemetryData.SetLocation(startLocation);
+        FuelTankCapacity = fuelTankSize;
+        TelemetryData[TelemetryFields.FuelAmount] = fuelTankSize;
     }
 }

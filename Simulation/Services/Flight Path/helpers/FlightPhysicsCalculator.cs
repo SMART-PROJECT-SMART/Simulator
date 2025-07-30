@@ -1,5 +1,7 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
+using Simulation.Models;
+using Simulation.Services.helpers;
 
 namespace Simulation.Services.Flight_Path.helpers;
 
@@ -90,4 +92,31 @@ public static class FlightPhysicsCalculator
         double throttlePercent = 100.0 * Math.Clamp(speedError / cruiseSpeed, 0.0, 1.0);
         telemetry[TelemetryFields.ThrottlePercent] = throttlePercent;
     }
+
+    public static double CalculateAltitudeChange(
+        double travelM,
+        double pitchDeg,
+        double deltaSec,
+        Dictionary<TelemetryFields, double> telemetry,
+        double altitude
+    )
+    {
+        double altChange = travelM * Math.Sin(UnitConversionHelper.ToRadians(pitchDeg));
+
+        double lift = CalculateLift(telemetry);
+        double liftContribution = CalculateLiftContribution(lift, deltaSec);
+        altChange += liftContribution;
+
+        double drag = CalculateDrag(telemetry);
+        double dragEffect = CalculateDragEffect(drag, deltaSec);
+        altChange += dragEffect;
+
+        return altitude + altChange;
+    }
+
+    private static double CalculateLiftContribution(double lift, double deltaSec) =>
+        (lift * deltaSec).FromMToKm();
+
+    private static double CalculateDragEffect(double drag, double deltaSec) =>
+        -drag * deltaSec * SimulationConstants.FlightPath.DRAG_EFFECT_ON_ALTITUDE;
 }

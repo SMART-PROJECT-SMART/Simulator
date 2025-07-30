@@ -6,7 +6,8 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
     public class Searcher : SurveillanceUAV
     {
         public Searcher(int tailId, Location startLocation)
-            : base(startLocation, tailId)
+            : base(startLocation, tailId,
+                SimulationConstants.Searcher_Constants.FuelTankCapacity,SimulationConstants.Searcher_Constants.SpecificFuelConsumption)
         {
             TelemetryData[TelemetryFields.Mass] = SimulationConstants.Searcher_Constants.Mass;
             TelemetryData[TelemetryFields.FrontalSurface] = SimulationConstants

@@ -135,5 +135,10 @@ namespace Simulation.Services.Flight_Path.helpers
         {
             return speedMps * SimulationConstants.Mathematical.FROM_MPS_TO_KMH;
         }
+
+        public static double FromMToKm(this double meters)
+        {
+            return meters * SimulationConstants.Mathematical.FROM_M_TO_KM;
+        }
     }
 }

@@ -23,7 +23,6 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             double travelM = speedMps * deltaSec;
 
             double horizM = travelM * Math.Cos(UnitConversionHelper.ToRadians(pitchDeg));
-
             if (horizM >= distToDestination)
                 horizM = distToDestination;
 
@@ -34,19 +33,13 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
                 horizM
             );
 
-            double altChange = travelM * Math.Sin(UnitConversionHelper.ToRadians(pitchDeg));
-
-            double lift = FlightPhysicsCalculator.CalculateLift(telemetry);
-            double liftContribution =
-                lift * deltaSec * SimulationConstants.Mathematical.FROM_M_TO_KM;
-            altChange += liftContribution;
-
-            double drag = FlightPhysicsCalculator.CalculateDrag(telemetry);
-            double dragEffect =
-                -drag * deltaSec * SimulationConstants.FlightPath.DRAG_EFFECT_ON_ALTITUDE;
-            altChange += dragEffect;
-
-            double newAlt = current.Altitude + altChange;
+            double newAlt = FlightPhysicsCalculator.CalculateAltitudeChange(
+                travelM,
+                pitchDeg,
+                deltaSec,
+                telemetry,
+                current.Altitude
+            );
             newAlt = Math.Min(destination.Altitude, newAlt);
             newAlt = Math.Max(0.0, newAlt);
 
