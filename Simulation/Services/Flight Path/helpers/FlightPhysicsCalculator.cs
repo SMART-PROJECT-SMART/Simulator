@@ -109,16 +109,17 @@ public static class FlightPhysicsCalculator
         
         double altChange = verticalVelocityMps * deltaSec;
 
-        if (Math.Abs(pitchDeg) > SimulationConstants.Mathematical.EPSILON)
-        {
-            double lift = CalculateLift(telemetry);
-            double liftContribution = CalculateLiftContribution(lift, deltaSec);
-            altChange += liftContribution;
+        // Temporarily disabled lift/drag effects to fix altitude control issues
+        // if (Math.Abs(pitchDeg) > SimulationConstants.Mathematical.EPSILON && Math.Abs(altChange) > 0.1)
+        // {
+        //     double lift = CalculateLift(telemetry);
+        //     double liftContribution = CalculateLiftContribution(lift, deltaSec);
+        //     altChange += liftContribution;
 
-            double drag = CalculateDrag(telemetry);
-            double dragEffect = CalculateDragEffect(drag, deltaSec);
-            altChange += dragEffect;
-        }
+        //     double drag = CalculateDrag(telemetry);
+        //     double dragEffect = CalculateDragEffect(drag, deltaSec);
+        //     altChange += dragEffect;
+        // }
 
         return altitude + altChange;
     }

@@ -52,7 +52,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 return 0.0;
 
             double remainingDistance = FlightPathMathHelper.CalculateDistance(current, destination);
-            if (remainingDistance <= 0.0)
+            if (remainingDistance <= 0.0 && Math.Abs(altitudeDifference) < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
                 return 0.0;
             
             double pitch;
@@ -62,9 +62,10 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
                 double horizontalSpeedMps = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
                 
-                if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS && remainingDistance > 0.0)
+                if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 {
-                    double timeToReachTarget = remainingDistance / horizontalSpeedMps;
+                    double effectiveDistance = Math.Max(remainingDistance, SimulationConstants.FlightPath.MIN_DISTANCE_M);
+                    double timeToReachTarget = Math.Max(effectiveDistance / horizontalSpeedMps, 2.0);
                     double requiredVerticalSpeedMps = altitudeDifference / timeToReachTarget;
                     
                     double requiredPitchRad = Math.Atan2(requiredVerticalSpeedMps, horizontalSpeedMps);
@@ -82,9 +83,10 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
                 double horizontalSpeedMps = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
                 
-                if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS && remainingDistance > 0.0)
+                if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 {
-                    double timeToReachTarget = remainingDistance / horizontalSpeedMps;
+                    double effectiveDistance = Math.Max(remainingDistance, SimulationConstants.FlightPath.MIN_DISTANCE_M);
+                    double timeToReachTarget = Math.Max(effectiveDistance / horizontalSpeedMps, 2.0);
                     double requiredVerticalSpeedMps = altitudeDifference / timeToReachTarget;
                     
                     double requiredPitchRad = Math.Atan2(requiredVerticalSpeedMps, horizontalSpeedMps);

@@ -40,8 +40,11 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
                 telemetry,
                 current.Altitude
             );
-            newAlt = Math.Min(destination.Altitude, newAlt);
-            newAlt = Math.Max(0.0, newAlt);
+            
+            if (Math.Abs(newAlt - destination.Altitude) < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+                newAlt = destination.Altitude;
+            else
+                newAlt = Math.Clamp(newAlt, 0.0, Math.Max(current.Altitude, destination.Altitude));
 
             nextHoriz.Longitude = nextHoriz.Longitude.NormalizeAngle();
 

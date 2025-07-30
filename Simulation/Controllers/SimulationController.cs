@@ -74,7 +74,7 @@ public class SimulationController : ControllerBase
 
         uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
 
-        var destination = new Location(40.6460, -73.77850, 120.0);
+        var destination = new Location(40.6460, -73.77850, 100.0);
 
         var request = new SimulateDto(uav, destination);
 
