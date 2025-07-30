@@ -4,11 +4,6 @@ namespace Simulation.Common.constants
 {
     public static class SimulationConstants
     {
-        public static class UAV_Constants
-        {
-            public const double ONE_HUNDRED_PRECENT = 100.0;
-        }
-
         public static class Hermes900_Constants
         {
             public const double MaxAcceleration = 2.0;
@@ -83,6 +78,7 @@ namespace Simulation.Common.constants
 
         public static class FlightPath
         {
+            public static double EARTH_SCALE_HEIGHT = 8450;
             public static double EARTH_RADIUS_METERS = 6371000.0;
             public static double LOCATION_PRECISION_KM = 0.01;
             public static double Location_PRECISION_M = 10;
@@ -128,6 +124,7 @@ namespace Simulation.Common.constants
             public static double DRAG_EFFECT_ON_ALTITUDE = 0.1;
             public static double MIN_RELEVENT_YAW = 0.1;
             public static double FULL_TURN = 1.0;
+            public static double MIN_PITCH = 0.2;
         }
 
         public static class Mathematical
@@ -144,6 +141,8 @@ namespace Simulation.Common.constants
             public static int FULL_TURN_DEGREES = 360;
             public static int HALF_TURN_DEGREES = 180;
             public static double MAX_HAVESINE_RANGE = 1.0;
+            public static double MIN_ACCELERATION_FACTOR = 0.1;
+            public static double REALISTIC_STOP_PRECENT = 0.3;
         }
     }
 }

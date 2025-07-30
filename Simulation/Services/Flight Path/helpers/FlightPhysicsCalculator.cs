@@ -13,8 +13,7 @@ public static class FlightPhysicsCalculator
             TelemetryFields.CurrentSpeedKmph,
             0.0
         );
-        double horizontalSpeed =
-            currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+        double horizontalSpeed = currentSpeedKmph.ToKmhFromMps();
 
         return 0.5
             * SimulationConstants.Mathematical.RHO
@@ -31,8 +30,7 @@ public static class FlightPhysicsCalculator
             TelemetryFields.CurrentSpeedKmph,
             0.0
         );
-        double horizontalSpeed =
-            currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+        double horizontalSpeed = currentSpeedKmph.ToKmhFromMps();
         return 0.5
             * SimulationConstants.Mathematical.RHO
             * wingsSurface
@@ -42,7 +40,21 @@ public static class FlightPhysicsCalculator
 
     public static double CalculateThrust(Dictionary<TelemetryFields, double> telemetry)
     {
-        return telemetry.GetValueOrDefault(TelemetryFields.ThrustAfterInfluence, 0.0);
+        CalculateThrottle(telemetry);
+
+        double throttle = telemetry.GetValueOrDefault(TelemetryFields.ThrottlePercent, 0.0) / 100;
+        double thrustMax = telemetry.GetValueOrDefault(TelemetryFields.ThrustMax, 0.0);
+        double thrustAfterInfluence = telemetry.GetValueOrDefault(
+            TelemetryFields.ThrustAfterInfluence,
+            thrustMax
+        );
+        double altitude = telemetry.GetValueOrDefault(TelemetryFields.Altitude, 0.0);
+        double rawThrust = Math.Min(thrustMax * throttle, thrustAfterInfluence);
+        double densityRatio = Math.Exp(
+            -altitude / SimulationConstants.FlightPath.EARTH_SCALE_HEIGHT
+        );
+
+        return rawThrust * densityRatio;
     }
 
     public static double CalculateAcceleration(Dictionary<TelemetryFields, double> telemetry)
@@ -57,7 +69,7 @@ public static class FlightPhysicsCalculator
 
         double physicsAcceleration = (thrust - drag) / mass;
 
-        if (physicsAcceleration < 0.1)
+        if (physicsAcceleration < SimulationConstants.Mathematical.MIN_ACCELERATION_FACTOR)
         {
             double thrustToWeightRatio =
                 thrust / (mass * SimulationConstants.FlightPath.GRAVITY_MPS2);
@@ -67,5 +79,15 @@ public static class FlightPhysicsCalculator
         }
 
         return Math.Min(physicsAcceleration, maxAcceleration);
+    }
+
+    private static void CalculateThrottle(Dictionary<TelemetryFields, double> telemetry)
+    {
+        double currentSpeed = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+        double cruiseSpeed = telemetry.GetValueOrDefault(TelemetryFields.MaxCruiseSpeedKmph, 0.0);
+
+        double speedError = cruiseSpeed - currentSpeed;
+        double throttlePercent = 100.0 * Math.Clamp(speedError / cruiseSpeed, 0.0, 1.0);
+        telemetry[TelemetryFields.ThrottlePercent] = throttlePercent;
     }
 }

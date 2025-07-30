@@ -114,13 +114,26 @@ namespace Simulation.Services.Flight_Path.helpers
             return diff;
         }
 
-        public static double NormalizeAngle(double angle)
+        public static double NormalizeAngle(this double angle)
         {
-            while (angle > SimulationConstants.Mathematical.HALF_TURN_DEGREES)
-                angle -= SimulationConstants.Mathematical.FULL_TURN_DEGREES;
-            while (angle < -SimulationConstants.Mathematical.HALF_TURN_DEGREES)
+            angle =
+                (angle + SimulationConstants.Mathematical.HALF_TURN_DEGREES)
+                % SimulationConstants.Mathematical.FULL_TURN_DEGREES;
+            if (angle < 0)
+            {
                 angle += SimulationConstants.Mathematical.FULL_TURN_DEGREES;
-            return angle;
+            }
+            return angle - SimulationConstants.Mathematical.HALF_TURN_DEGREES;
+        }
+
+        public static double ToKmhFromMps(this double speedKmh)
+        {
+            return speedKmh / SimulationConstants.Mathematical.FROM_MPS_TO_KMH;
+        }
+
+        public static double ToMpsFromKmh(this double speedMps)
+        {
+            return speedMps * SimulationConstants.Mathematical.FROM_MPS_TO_KMH;
         }
     }
 }

@@ -74,21 +74,7 @@ public class SimulationController : ControllerBase
 
         uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
 
-        var destination = new Location(40.6460, -73.7790, 100.0);
-
-        var request = new SimulateDto(uav, destination);
-
-        return await CalculateFlightPath(request);
-    }
-
-    [HttpGet("run-hermes450")]
-    public async Task<IActionResult> RunHermes450()
-    {
-        var startLocation = new Location(40.6413, -73.7781, 10.0);
-
-        var uav = new Hermes450(tailId: 2, startLocation: startLocation);
-
-        var destination = new Location(40.6460, -73.7790, 100.0);
+        var destination = new Location(40.6460, -73.77850, 120.0);
 
         var request = new SimulateDto(uav, destination);
 
