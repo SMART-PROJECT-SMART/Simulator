@@ -24,7 +24,8 @@ public class SimulationController : ControllerBase
         ILogger<FlightPathService> logger,
         IMotionCalculator motionCalculator,
         ISpeedController speedController,
-        IOrientationCalculator orientationCalculator)
+        IOrientationCalculator orientationCalculator
+    )
     {
         _logger = logger;
         _motionCalculator = motionCalculator;
@@ -40,7 +41,8 @@ public class SimulationController : ControllerBase
             return BadRequest("TelemetryData is required on the UAV.");
         double cruiseAlt = telemetry.GetValueOrDefault(
             TelemetryFields.CruiseAltitude,
-            dto.Destination.Altitude);
+            dto.Destination.Altitude
+        );
 
         var flightService = new FlightPathService(
             dto.UAV,
@@ -49,7 +51,8 @@ public class SimulationController : ControllerBase
             _motionCalculator,
             _speedController,
             _orientationCalculator,
-            _logger);
+            _logger
+        );
 
         flightService.StartFlightPath();
 
@@ -67,9 +70,7 @@ public class SimulationController : ControllerBase
     {
         var startLocation = new Location(40.6413, -73.7781, 10.0);
 
-        var uav = new Searcher(
-            tailId: 1,
-            startLocation: startLocation);
+        var uav = new Searcher(tailId: 1, startLocation: startLocation);
 
         uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
 
@@ -85,9 +86,7 @@ public class SimulationController : ControllerBase
     {
         var startLocation = new Location(40.6413, -73.7781, 10.0);
 
-        var uav = new Hermes450(
-            tailId: 2,
-            startLocation: startLocation);
+        var uav = new Hermes450(tailId: 2, startLocation: startLocation);
 
         var destination = new Location(40.6460, -73.7790, 100.0);
 

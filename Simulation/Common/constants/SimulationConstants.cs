@@ -93,7 +93,7 @@ namespace Simulation.Common.constants
             public static double PITCH_CLIMB_DEG = 15.0;
             public static double PITCH_DESCENT_DEG = 15.0;
             public static double ALTITUDE_TOLERANCE = 0.5;
-            public static double ALTITUDE_PRECISION_M = 1.0; 
+            public static double ALTITUDE_PRECISION_M = 1.0;
             public static double MIN_DESCENT_DISTANCE_KM = 0.1;
             public static double DELTA_SECONDS = 1.0;
             public static double MAX_ROLL_DEG = 45.0;
@@ -101,21 +101,21 @@ namespace Simulation.Common.constants
             public static double MIN_YAW_RATE = 0.001;
             public static double MIN_SPEED_MPS = 1.0;
 
-            public static double MAX_CLIMB_RATE_MPS = 10.0;    
-            public static double MAX_DESCENT_RATE_MPS = 10.0;   
-            public static double MAX_CLIMB_DEG = 20.0;          
-            public static double MAX_DESCENT_DEG = 20.0;        
-            
+            public static double MAX_CLIMB_RATE_MPS = 10.0;
+            public static double MAX_DESCENT_RATE_MPS = 10.0;
+            public static double MAX_CLIMB_DEG = 20.0;
+            public static double MAX_DESCENT_DEG = 20.0;
+
             public static double MAX_TURN_RATE_DEG_PER_SEC = 8.0;
             public static double TURN_PROGRESS_NORMALIZATION_DEG = 90.0;
             public static double TURN_START_PHASE_THRESHOLD = 0.3;
             public static double TURN_END_PHASE_THRESHOLD = 0.7;
-            
+
             public static double CURVE_ROLL_THRESHOLD_DEG = 1.0;
             public static double CURVE_ROLL_MULTIPLIER = 0.5;
             public static double MAX_CURVE_ROLL_DEG = 3.0;
             public static double MIN_ROLL_FOR_CURVE_DEG = 2.0;
-            
+
             public static double SPEED_PROGRESS_HIGH_THRESHOLD = 0.7;
             public static double SPEED_PROGRESS_LOW_THRESHOLD = 0.3;
             public static double HIGH_SPEED_DECELERATION_FACTOR = 0.5;
@@ -124,7 +124,7 @@ namespace Simulation.Common.constants
             public static double NORMAL_ACCELERATION_MULTIPLIER = 1.0;
             public static double FULL_ACCELERATION_MULTIPLIER = 1.0;
             public static double FULL_DECELERATION_MULTIPLIER = 1.0;
-            
+
             public static double DRAG_EFFECT_ON_ALTITUDE = 0.1;
             public static double MIN_RELEVENT_YAW = 0.1;
             public static double FULL_TURN = 1.0;

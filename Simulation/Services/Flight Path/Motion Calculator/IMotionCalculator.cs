@@ -9,6 +9,7 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             Dictionary<TelemetryFields, double> telemetry,
             Location current,
             Location destination,
-            double deltaSec);
+            double deltaSec
+        );
     }
 }

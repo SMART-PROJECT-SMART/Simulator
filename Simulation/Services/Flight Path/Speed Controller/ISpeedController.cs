@@ -7,6 +7,7 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
         double ComputeNextSpeed(
             Dictionary<TelemetryFields, double> telemetry,
             double remainingKm,
-            double deltaSeconds);
+            double deltaSeconds
+        );
     }
 }

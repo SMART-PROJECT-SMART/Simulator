@@ -13,23 +13,28 @@ namespace Simulation.Services.Flight_Path.helpers
             double deltaLonRad = UnitConversionHelper.ToRadians(to.Longitude - from.Longitude);
 
             double y = Math.Sin(deltaLonRad) * Math.Cos(toLatRad);
-            double x = Math.Cos(fromLatRad) * Math.Sin(toLatRad)
-                       - Math.Sin(fromLatRad) * Math.Cos(toLatRad) * Math.Cos(deltaLonRad);
+            double x =
+                Math.Cos(fromLatRad) * Math.Sin(toLatRad)
+                - Math.Sin(fromLatRad) * Math.Cos(toLatRad) * Math.Cos(deltaLonRad);
 
-            if (Math.Abs(x) < SimulationConstants.Mathematical.EPSILON && Math.Abs(y) < 
-                SimulationConstants.Mathematical.EPSILON)
+            if (
+                Math.Abs(x) < SimulationConstants.Mathematical.EPSILON
+                && Math.Abs(y) < SimulationConstants.Mathematical.EPSILON
+            )
                 return 0.0;
 
             double bearingRadians = Math.Atan2(y, x);
             double bearingDegrees = UnitConversionHelper.ToDegrees(bearingRadians);
-            return (bearingDegrees + SimulationConstants.Mathematical.FULL_TURN_DEGREES) %
-                   SimulationConstants.Mathematical.FULL_TURN_DEGREES;
+            return (bearingDegrees + SimulationConstants.Mathematical.FULL_TURN_DEGREES)
+                % SimulationConstants.Mathematical.FULL_TURN_DEGREES;
         }
 
         public static double CalculateDistance(Location a, Location b)
         {
-            if (Math.Abs(a.Latitude - b.Latitude) < SimulationConstants.Mathematical.EPSILON &&
-                Math.Abs(a.Longitude - b.Longitude) < SimulationConstants.Mathematical.EPSILON)
+            if (
+                Math.Abs(a.Latitude - b.Latitude) < SimulationConstants.Mathematical.EPSILON
+                && Math.Abs(a.Longitude - b.Longitude) < SimulationConstants.Mathematical.EPSILON
+            )
                 return 0.0;
 
             double lat1Rad = UnitConversionHelper.ToRadians(a.Latitude);
@@ -39,18 +44,27 @@ namespace Simulation.Services.Flight_Path.helpers
 
             double sinDeltaLat = Math.Sin(deltaLatRad / 2);
             double sinDeltaLon = Math.Sin(deltaLonRad / 2);
-            double haversine = sinDeltaLat * sinDeltaLat
-                               + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
+            double haversine =
+                sinDeltaLat * sinDeltaLat
+                + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
 
             if (haversine >= SimulationConstants.Mathematical.MAX_HAVESINE_RANGE)
                 return Math.PI * SimulationConstants.FlightPath.EARTH_RADIUS_METERS;
 
-            double angularDistance = 2 * Math.Atan2(Math.Sqrt(haversine),
-                Math.Sqrt(SimulationConstants.Mathematical.MAX_HAVESINE_RANGE - haversine));
+            double angularDistance =
+                2
+                * Math.Atan2(
+                    Math.Sqrt(haversine),
+                    Math.Sqrt(SimulationConstants.Mathematical.MAX_HAVESINE_RANGE - haversine)
+                );
             return SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
         }
 
-        public static Location CalculateDestinationLocation(Location origin, double bearing, double distance)
+        public static Location CalculateDestinationLocation(
+            Location origin,
+            double bearing,
+            double distance
+        )
         {
             if (distance < SimulationConstants.FlightPath.MIN_DISTANCE_M)
                 return origin;
@@ -62,24 +76,27 @@ namespace Simulation.Services.Flight_Path.helpers
 
             double destLatRad = Math.Asin(
                 Math.Sin(originLatRad) * Math.Cos(angularDistance)
-                + Math.Cos(originLatRad) * Math.Sin(angularDistance) * Math.Cos(bearingRad)
+                    + Math.Cos(originLatRad) * Math.Sin(angularDistance) * Math.Cos(bearingRad)
             );
 
-            double destLonRad = originLonRad + Math.Atan2(
-                Math.Sin(bearingRad) * Math.Sin(angularDistance) * Math.Cos(originLatRad),
-                Math.Cos(angularDistance) - Math.Sin(originLatRad) * Math.Sin(destLatRad)
-            );
+            double destLonRad =
+                originLonRad
+                + Math.Atan2(
+                    Math.Sin(bearingRad) * Math.Sin(angularDistance) * Math.Cos(originLatRad),
+                    Math.Cos(angularDistance) - Math.Sin(originLatRad) * Math.Sin(destLatRad)
+                );
 
             double destLat = UnitConversionHelper.ToDegrees(destLatRad);
             double destLon = UnitConversionHelper.ToDegrees(destLonRad);
 
-            destLon = ((destLon % SimulationConstants.Mathematical.FULL_TURN_DEGREES) +
-                       SimulationConstants.Mathematical.FULL_TURN_DEGREES) % 
-                      SimulationConstants.Mathematical.FULL_TURN_DEGREES;
+            destLon =
+                (
+                    (destLon % SimulationConstants.Mathematical.FULL_TURN_DEGREES)
+                    + SimulationConstants.Mathematical.FULL_TURN_DEGREES
+                ) % SimulationConstants.Mathematical.FULL_TURN_DEGREES;
 
             return new Location(destLat, destLon, origin.Altitude);
         }
-
 
         public static double CalculateAngleDifference(double angle1, double angle2)
         {

@@ -1,7 +1,7 @@
 using System.Reflection;
+using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
-using Simulation.Common.constants;
 
 namespace Simulation.Services.helpers
 {
@@ -10,8 +10,7 @@ namespace Simulation.Services.helpers
         public static Dictionary<TelemetryFields, double> Initialize(params string[] categories)
         {
             var dict = new Dictionary<TelemetryFields, double>();
-            var all = Enum.GetValues(typeof(TelemetryFields))
-                          .Cast<TelemetryFields>();
+            var all = Enum.GetValues(typeof(TelemetryFields)).Cast<TelemetryFields>();
             foreach (var field in all)
             {
                 var catAttr = typeof(TelemetryFields)
@@ -25,24 +24,28 @@ namespace Simulation.Services.helpers
             return dict;
         }
 
-        public static Dictionary<TelemetryFields, double> FlightOnly()  
-            => Initialize(TelemetryCategories.Flight);
-        
-        public static Dictionary<TelemetryFields, double> ArmedOnly()   
-            => Initialize(TelemetryCategories.Armed);
-        
-        public static Dictionary<TelemetryFields, double> SurveillanceOnly() 
-            => Initialize(TelemetryCategories.Surveillance);
-        
-        public static Dictionary<TelemetryFields, double> All()        
-            => Initialize(); 
+        public static Dictionary<TelemetryFields, double> FlightOnly() =>
+            Initialize(TelemetryCategories.Flight);
 
-        public static void SetLocation(this Dictionary<TelemetryFields, double> telemetry, Location loc)
+        public static Dictionary<TelemetryFields, double> ArmedOnly() =>
+            Initialize(TelemetryCategories.Armed);
+
+        public static Dictionary<TelemetryFields, double> SurveillanceOnly() =>
+            Initialize(TelemetryCategories.Surveillance);
+
+        public static Dictionary<TelemetryFields, double> All() => Initialize();
+
+        public static void SetLocation(
+            this Dictionary<TelemetryFields, double> telemetry,
+            Location loc
+        )
         {
             telemetry[TelemetryFields.Latitude] = loc.Latitude;
             telemetry[TelemetryFields.Longitude] = loc.Longitude;
             telemetry[TelemetryFields.Altitude] = loc.Altitude;
-            telemetry[TelemetryFields.CurrentSpeedKmph] = SimulationConstants.FlightPath.MIN_SPEED_KMH;
+            telemetry[TelemetryFields.CurrentSpeedKmph] = SimulationConstants
+                .FlightPath
+                .MIN_SPEED_KMH;
         }
     }
-} 
+}

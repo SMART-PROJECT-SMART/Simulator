@@ -9,6 +9,6 @@
         PythonAir,
         JDAM,
         SDB,
-        Brimstone
+        Brimstone,
     }
 }

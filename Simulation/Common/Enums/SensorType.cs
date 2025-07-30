@@ -11,6 +11,6 @@
         LaserDesignator,
         MultiSpectralImaging,
         HyperspectralImaging,
-        CommunicationsRelay
+        CommunicationsRelay,
     }
 }

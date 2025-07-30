@@ -36,7 +36,8 @@ public class FlightPathService : IDisposable
         IMotionCalculator motionCalculator,
         ISpeedController speedController,
         IOrientationCalculator orientationCalculator,
-        ILogger<FlightPathService> logger)
+        ILogger<FlightPathService> logger
+    )
     {
         _uav = uav;
         _destination = destination;
@@ -58,22 +59,32 @@ public class FlightPathService : IDisposable
         _uav.TelemetryData[TelemetryFields.Altitude] = alt;
         _uav.TelemetryData[TelemetryFields.CurrentSpeedKmph] = Math.Max(
             SimulationConstants.FlightPath.MIN_SPEED_KMH,
-            spd);
+            spd
+        );
 
         _previousLocation = new Location(lat, lon, alt);
 
         _logger.LogInformation(
             "Starting position ({Lat:F6}, {Lon:F6}, {Alt:F1}), Speed {Spd:F1} km/h",
-            lat, lon, alt, spd);
+            lat,
+            lon,
+            alt,
+            spd
+        );
     }
 
     public void StartFlightPath()
     {
-        if (_isDisposed) throw new ObjectDisposedException(nameof(FlightPathService));
-        if (_isRunning) return;
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(FlightPathService));
+        if (_isRunning)
+            return;
 
         _isRunning = true;
-        _timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(SimulationConstants.FlightPath.DELTA_SECONDS));
+        _timer.Change(
+            TimeSpan.Zero,
+            TimeSpan.FromSeconds(SimulationConstants.FlightPath.DELTA_SECONDS)
+        );
     }
 
     private void UpdateLocation(object? state)
@@ -82,20 +93,30 @@ public class FlightPathService : IDisposable
         var currentLoc = new Location(
             telemetry[TelemetryFields.Latitude],
             telemetry[TelemetryFields.Longitude],
-            telemetry[TelemetryFields.Altitude]);
+            telemetry[TelemetryFields.Altitude]
+        );
         double remainingMeters = FlightPathMathHelper.CalculateDistance(currentLoc, _destination);
 
-        if (remainingMeters <= SimulationConstants.FlightPath.Location_PRECISION_M &&
-            Math.Abs(currentLoc.Altitude - _destination.Altitude) <= SimulationConstants.FlightPath.ALTITUDE_PRECISION_M)
+        if (
+            remainingMeters <= SimulationConstants.FlightPath.Location_PRECISION_M
+            && Math.Abs(currentLoc.Altitude - _destination.Altitude)
+                <= SimulationConstants.FlightPath.ALTITUDE_PRECISION_M
+        )
         {
             CompleteMission(currentLoc);
             return;
         }
 
         double pitchDeg;
-        if (currentLoc.Altitude + SimulationConstants.FlightPath.ALTITUDE_PRECISION_M < _cruiseAltitude)
+        if (
+            currentLoc.Altitude + SimulationConstants.FlightPath.ALTITUDE_PRECISION_M
+            < _cruiseAltitude
+        )
             pitchDeg = SimulationConstants.FlightPath.MAX_CLIMB_DEG;
-        else if (currentLoc.Altitude - SimulationConstants.FlightPath.ALTITUDE_PRECISION_M > _destination.Altitude)
+        else if (
+            currentLoc.Altitude - SimulationConstants.FlightPath.ALTITUDE_PRECISION_M
+            > _destination.Altitude
+        )
             pitchDeg = -SimulationConstants.FlightPath.MAX_DESCENT_DEG;
         else
             pitchDeg = 0;
@@ -105,30 +126,35 @@ public class FlightPathService : IDisposable
         double newSpeed = _speedController.ComputeNextSpeed(
             telemetry,
             remainingMeters,
-            SimulationConstants.FlightPath.DELTA_SECONDS);
+            SimulationConstants.FlightPath.DELTA_SECONDS
+        );
         telemetry[TelemetryFields.CurrentSpeedKmph] = newSpeed;
 
         var nextLocRaw = _motionCalculator.CalculateNext(
             telemetry,
             currentLoc,
             _destination,
-            SimulationConstants.FlightPath.DELTA_SECONDS);
+            SimulationConstants.FlightPath.DELTA_SECONDS
+        );
 
-        double maxVert = SimulationConstants.FlightPath.MAX_CLIMB_RATE_MPS
-                       * SimulationConstants.FlightPath.DELTA_SECONDS;
+        double maxVert =
+            SimulationConstants.FlightPath.MAX_CLIMB_RATE_MPS
+            * SimulationConstants.FlightPath.DELTA_SECONDS;
         double vertDelta = nextLocRaw.Altitude - currentLoc.Altitude;
         vertDelta = Math.Clamp(vertDelta, -maxVert, maxVert);
         var nextLoc = new Location(
             nextLocRaw.Latitude,
             nextLocRaw.Longitude,
-            currentLoc.Altitude + vertDelta);
+            currentLoc.Altitude + vertDelta
+        );
 
         AxisDegrees axis = _orientationCalculator.ComputeOrientation(
             telemetry,
             _previousLocation,
             currentLoc,
             _destination,
-            SimulationConstants.FlightPath.DELTA_SECONDS);
+            SimulationConstants.FlightPath.DELTA_SECONDS
+        );
         axis = new AxisDegrees(axis.Yaw, axis.Pitch, axis.Roll);
 
         telemetry[TelemetryFields.Latitude] = nextLoc.Latitude;
@@ -150,13 +176,11 @@ public class FlightPathService : IDisposable
             axis.Yaw,
             axis.Pitch,
             axis.Roll,
-            remainingMeters);
+            remainingMeters
+        );
 
         LocationUpdated?.Invoke(nextLoc);
     }
-
-
-
 
     private void CompleteMission(Location loc)
     {
@@ -167,14 +191,17 @@ public class FlightPathService : IDisposable
 
         _logger.LogInformation(
             "MISSION COMPLETED at ({Lat:F6},{Lon:F6},{Alt:F1}), rem=0",
-            loc.Latitude, loc.Longitude, loc.Altitude);
+            loc.Latitude,
+            loc.Longitude,
+            loc.Altitude
+        );
         MissionCompleted?.Invoke();
     }
 
-
     public void Dispose()
     {
-        if (_timerDisposed) return;
+        if (_timerDisposed)
+            return;
         _timer.Dispose();
         _timerDisposed = true;
         _isDisposed = true;

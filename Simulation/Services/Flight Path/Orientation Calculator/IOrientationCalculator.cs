@@ -10,8 +10,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             Location previous,
             Location current,
             Location destination,
-            double deltaSec);
-
-            
+            double deltaSec
+        );
     }
 }

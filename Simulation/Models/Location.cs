@@ -6,5 +6,4 @@
         public double Longitude { get; set; } = longitude;
         public double Altitude { get; set; } = altitude;
     }
-
 }
