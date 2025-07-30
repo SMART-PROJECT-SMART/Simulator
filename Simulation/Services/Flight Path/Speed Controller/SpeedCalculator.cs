@@ -13,8 +13,8 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
             double deltaSeconds)
         {
             double currentSpeed = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
-            double maxAcceleration = telemetry.GetValueOrDefault(TelemetryFields.MaxAccelerationMps2, 2.0);
-            double cruiseSpeed = telemetry.GetValueOrDefault(TelemetryFields.MaxCruiseSpeedKmph, 180.0);
+            double maxAcceleration = telemetry.GetValueOrDefault(TelemetryFields.MaxAccelerationMps2, 0.0);
+            double cruiseSpeed = telemetry.GetValueOrDefault(TelemetryFields.MaxCruiseSpeedKmph, 0.0);
 
             double physicsAcceleration = FlightPhysicsCalculator.CalculateAcceleration(telemetry);
             double acceleration = Math.Min(physicsAcceleration, maxAcceleration);

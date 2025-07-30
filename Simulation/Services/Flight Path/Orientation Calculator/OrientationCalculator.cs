@@ -59,7 +59,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                         Math.Atan2(latAcc, SimulationConstants.FlightPath.GRAVITY_MPS2));
                     roll = Math.Clamp(roll, -SimulationConstants.FlightPath.MAX_ROLL_DEG, SimulationConstants.FlightPath.MAX_ROLL_DEG);
                 }
-                else if (Math.Abs(deltaYaw) > 0.1 && Math.Abs(yawRate) > 0.001)
+                else if (Math.Abs(deltaYaw) > SimulationConstants.FlightPath.MIN_RELEVENT_YAW && Math.Abs(yawRate) > SimulationConstants.FlightPath.MIN_YAW_RATE)
                 {
                     double turnRadius = speedMps / Math.Abs(yawRate);
                     double bankAngle = UnitConversionHelper.ToDegrees(
@@ -98,10 +98,12 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             
             if (turnProgress > SimulationConstants.FlightPath.TURN_END_PHASE_THRESHOLD)
             {
-                return (1.0 - turnProgress) / (1.0 - SimulationConstants.FlightPath.TURN_END_PHASE_THRESHOLD);
+                return (SimulationConstants.FlightPath.FULL_TURN - turnProgress) /
+                       (SimulationConstants.FlightPath.FULL_TURN - 
+                        SimulationConstants.FlightPath.TURN_END_PHASE_THRESHOLD);
             }
             
-            return 1.0;
+            return SimulationConstants.FlightPath.FULL_TURN;
         }
 
         private double CalculateCurveRoll(Location current, Location destination, double newYaw, double currentRoll)
@@ -109,18 +111,17 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             double bearingToDestination = FlightPathMathHelper.CalculateBearing(current, destination);
             double yawToBearingDiff = FlightPathMathHelper.CalculateAngleDifference(newYaw, bearingToDestination);
             
-            if (Math.Abs(yawToBearingDiff) > SimulationConstants.FlightPath.CURVE_ROLL_THRESHOLD_DEG && Math.Abs(currentRoll) < SimulationConstants.FlightPath.MIN_ROLL_FOR_CURVE_DEG)
+            if (Math.Abs(yawToBearingDiff) > SimulationConstants.FlightPath.CURVE_ROLL_THRESHOLD_DEG && 
+                Math.Abs(currentRoll) < SimulationConstants.FlightPath.MIN_ROLL_FOR_CURVE_DEG)
             {
-                double curveRoll = Math.Sign(yawToBearingDiff) * Math.Min(Math.Abs(yawToBearingDiff) * SimulationConstants.FlightPath.CURVE_ROLL_MULTIPLIER, SimulationConstants.FlightPath.MAX_CURVE_ROLL_DEG);
+                double curveRoll = Math.Sign(yawToBearingDiff) * 
+                                   Math.Min(Math.Abs(yawToBearingDiff) * 
+                                            SimulationConstants.FlightPath.CURVE_ROLL_MULTIPLIER, 
+                                       SimulationConstants.FlightPath.MAX_CURVE_ROLL_DEG);
                 return curveRoll;
             }
             
             return currentRoll;
-        }
-
-        private double CalculateStraightFlightRoll(Dictionary<TelemetryFields, double> telemetry, double pitch, double speedMps)
-        {
-            return 0.0;
         }
     }
 }

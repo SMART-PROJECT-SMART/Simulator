@@ -98,7 +98,7 @@ namespace Simulation.Common.constants
             public static double DELTA_SECONDS = 1.0;
             public static double MAX_ROLL_DEG = 45.0;
             public static double GRAVITY_MPS2 = 9.81;
-            public static double MIN_YAW_RATE = 0.01;
+            public static double MIN_YAW_RATE = 0.001;
             public static double MIN_SPEED_MPS = 1.0;
 
             public static double MAX_CLIMB_RATE_MPS = 10.0;    
@@ -126,6 +126,8 @@ namespace Simulation.Common.constants
             public static double FULL_DECELERATION_MULTIPLIER = 1.0;
             
             public static double DRAG_EFFECT_ON_ALTITUDE = 0.1;
+            public static double MIN_RELEVENT_YAW = 0.1;
+            public static double FULL_TURN = 1.0;
         }
 
         public static class Mathematical
@@ -139,6 +141,9 @@ namespace Simulation.Common.constants
             public static double FROM_KMH_TO_MPS = 3.6;
             public static double FROM_MPS_TO_KMH = 3.6;
             public static double FROM_M_TO_KM = 0.0001;
+            public static int FULL_TURN_DEGREES = 360;
+            public static int HALF_TURN_DEGREES = 180;
+            public static double MAX_HAVESINE_RANGE = 1.0;
         }
     }
 }

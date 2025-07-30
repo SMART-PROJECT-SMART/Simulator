@@ -16,18 +16,20 @@ namespace Simulation.Services.Flight_Path.helpers
             double x = Math.Cos(fromLatRad) * Math.Sin(toLatRad)
                        - Math.Sin(fromLatRad) * Math.Cos(toLatRad) * Math.Cos(deltaLonRad);
 
-            if (Math.Abs(x) < 1e-10 && Math.Abs(y) < 1e-10)
+            if (Math.Abs(x) < SimulationConstants.Mathematical.EPSILON && Math.Abs(y) < 
+                SimulationConstants.Mathematical.EPSILON)
                 return 0.0;
 
             double bearingRadians = Math.Atan2(y, x);
             double bearingDegrees = UnitConversionHelper.ToDegrees(bearingRadians);
-            return (bearingDegrees + 360) % 360;
+            return (bearingDegrees + SimulationConstants.Mathematical.FULL_TURN_DEGREES) %
+                   SimulationConstants.Mathematical.FULL_TURN_DEGREES;
         }
 
         public static double CalculateDistance(Location a, Location b)
         {
-            if (Math.Abs(a.Latitude - b.Latitude) < 1e-10 &&
-                Math.Abs(a.Longitude - b.Longitude) < 1e-10)
+            if (Math.Abs(a.Latitude - b.Latitude) < SimulationConstants.Mathematical.EPSILON &&
+                Math.Abs(a.Longitude - b.Longitude) < SimulationConstants.Mathematical.EPSILON)
                 return 0.0;
 
             double lat1Rad = UnitConversionHelper.ToRadians(a.Latitude);
@@ -40,10 +42,11 @@ namespace Simulation.Services.Flight_Path.helpers
             double haversine = sinDeltaLat * sinDeltaLat
                                + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
 
-            if (haversine >= 1.0)
+            if (haversine >= SimulationConstants.Mathematical.MAX_HAVESINE_RANGE)
                 return Math.PI * SimulationConstants.FlightPath.EARTH_RADIUS_METERS;
 
-            double angularDistance = 2 * Math.Atan2(Math.Sqrt(haversine), Math.Sqrt(1 - haversine));
+            double angularDistance = 2 * Math.Atan2(Math.Sqrt(haversine),
+                Math.Sqrt(SimulationConstants.Mathematical.MAX_HAVESINE_RANGE - haversine));
             return SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
         }
 
@@ -70,38 +73,27 @@ namespace Simulation.Services.Flight_Path.helpers
             double destLat = UnitConversionHelper.ToDegrees(destLatRad);
             double destLon = UnitConversionHelper.ToDegrees(destLonRad);
 
-            while (destLon > 180) destLon -= 360;
-            while (destLon < -180) destLon += 360;
+            destLon = ((destLon % SimulationConstants.Mathematical.FULL_TURN_DEGREES) +
+                       SimulationConstants.Mathematical.FULL_TURN_DEGREES) % 
+                      SimulationConstants.Mathematical.FULL_TURN_DEGREES;
 
             return new Location(destLat, destLon, origin.Altitude);
         }
 
-        public static double NormalizeAngle(double angle)
-        {
-            while (angle < 0)
-            {
-                angle += 360;
-            }
-            while (angle >= 360)
-            {
-                angle -= 360;
-            }
-            return angle;
-        }
 
         public static double CalculateAngleDifference(double angle1, double angle2)
         {
             double diff = angle2 - angle1;
-            
-            while (diff > 180)
+
+            while (diff > SimulationConstants.Mathematical.HALF_TURN_DEGREES)
             {
-                diff -= 360;
+                diff -= SimulationConstants.Mathematical.FULL_TURN_DEGREES;
             }
-            while (diff < -180)
+            while (diff < -SimulationConstants.Mathematical.HALF_TURN_DEGREES)
             {
-                diff += 360;
+                diff += SimulationConstants.Mathematical.FULL_TURN_DEGREES;
             }
-            
+
             return diff;
         }
     }

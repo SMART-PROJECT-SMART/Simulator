@@ -104,7 +104,7 @@ public class FlightPathService : IDisposable
 
         double newSpeed = _speedController.ComputeNextSpeed(
             telemetry,
-            remainingMeters/1000,
+            remainingMeters,
             SimulationConstants.FlightPath.DELTA_SECONDS);
         telemetry[TelemetryFields.CurrentSpeedKmph] = newSpeed;
 
