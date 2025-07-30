@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace Simulation.Common.Enums
 {
     public static class TelemetryCategories
@@ -13,64 +11,7 @@ namespace Simulation.Common.Enums
     public class TelemetryCategoryAttribute : Attribute
     {
         public string Category { get; }
-
         public TelemetryCategoryAttribute(string category) => Category = category;
-    }
-
-    public enum FlightTelemetryFields
-    {
-        Mass,
-        FrontalSurface,
-        WingsSurface,
-        DragCoefficient,
-        LiftCoefficient,
-        ThrustMax,
-        MaxCruiseSpeedKmph,
-        MaxAccelerationMps2,
-        MaxDecelerationMps2,
-        CruiseAltitude,
-        Latitude,
-        Longitude,
-        Altitude,
-        CurrentSpeedKmph,
-        Horizontal_Acceleration,
-        Vertical_Acceleration,
-        YawDeg,
-        PitchDeg,
-        RollDeg,
-        AngleBetweenPlaneAndGround,
-        ThrustAfterInfluence,
-        ThrottlePercent,
-        FuelAmount,
-
-    }
-
-    public enum ArmedTelemetryFields
-    {
-        WeaponSystemStatus,
-        IsWeaponSystemArmed,
-        HellfireAmmo,
-        GriffinAmmo,
-        SpikeNLOSAmmo,
-        JDAMAmmo,
-        WeaponSystemHealth,
-    }
-
-    public enum SurveillanceTelemetryFields
-    {
-        SensorSystemStatus,
-        DataStorageUsedGB,
-        DataStorageCapacityGB,
-        ElectroOpticalSensorStatus,
-        InfraredImagingSensorStatus,
-        SyntheticApertureRadarStatus,
-        SIGINTSensorStatus,
-        ELINTSensorStatus,
-        WeatherRadarStatus,
-        LaserDesignatorStatus,
-        MultiSpectralImagingStatus,
-        HyperspectralImagingStatus,
-        CommunicationsRelayStatus,
     }
 
     public enum TelemetryFields
@@ -128,8 +69,6 @@ namespace Simulation.Common.Enums
 
         [TelemetryCategory(TelemetryCategories.Flight)]
         YawDeg,
-        [TelemetryCategory(TelemetryCategories.Flight)]
-        FuelAmount,
 
         [TelemetryCategory(TelemetryCategories.Flight)]
         PitchDeg,
@@ -142,6 +81,15 @@ namespace Simulation.Common.Enums
 
         [TelemetryCategory(TelemetryCategories.Flight)]
         ThrustAfterInfluence,
+
+        [TelemetryCategory(TelemetryCategories.Flight)]
+        FuelTankCapacity,
+
+        [TelemetryCategory(TelemetryCategories.Flight)]
+        FuelAmount,
+
+        [TelemetryCategory(TelemetryCategories.Flight)]
+        FuelConsumption,
 
         [TelemetryCategory(TelemetryCategories.Armed)]
         WeaponSystemStatus,

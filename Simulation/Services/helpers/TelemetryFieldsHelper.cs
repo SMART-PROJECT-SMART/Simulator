@@ -1,4 +1,3 @@
-using System.Reflection;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
@@ -13,13 +12,23 @@ namespace Simulation.Services.helpers
             var all = Enum.GetValues(typeof(TelemetryFields)).Cast<TelemetryFields>();
             foreach (var field in all)
             {
-                var catAttr = typeof(TelemetryFields)
+                var attr = typeof(TelemetryFields)
                     .GetField(field.ToString())!
                     .GetCustomAttributes(typeof(TelemetryCategoryAttribute), false)
                     .Cast<TelemetryCategoryAttribute>()
                     .FirstOrDefault();
-                if (categories.Length == 0 || categories.Contains(catAttr?.Category))
-                    dict[field] = 0.0;
+                if (categories.Length == 0 || categories.Contains(attr?.Category))
+                    dict[field] = field switch
+                    {
+                        TelemetryFields.FuelTankCapacity => dict.ContainsKey(TelemetryFields.FuelTankCapacity)
+                            ? dict[TelemetryFields.FuelTankCapacity]
+                            : SimulationConstants.Hermes900_Constants.FuelTankCapacity,
+                        TelemetryFields.FuelAmount => dict.ContainsKey(TelemetryFields.FuelTankCapacity)
+                            ? dict[TelemetryFields.FuelTankCapacity]
+                            : SimulationConstants.Hermes900_Constants.FuelTankCapacity,
+                        TelemetryFields.FuelConsumption => SimulationConstants.Hermes900_Constants.FuelConsumption,
+                        _ => 0.0
+                    };
             }
             return dict;
         }
@@ -43,9 +52,7 @@ namespace Simulation.Services.helpers
             telemetry[TelemetryFields.Latitude] = loc.Latitude;
             telemetry[TelemetryFields.Longitude] = loc.Longitude;
             telemetry[TelemetryFields.Altitude] = loc.Altitude;
-            telemetry[TelemetryFields.CurrentSpeedKmph] = SimulationConstants
-                .FlightPath
-                .MIN_SPEED_KMH;
+            telemetry[TelemetryFields.CurrentSpeedKmph] = SimulationConstants.FlightPath.MIN_SPEED_KMH;
         }
     }
 }

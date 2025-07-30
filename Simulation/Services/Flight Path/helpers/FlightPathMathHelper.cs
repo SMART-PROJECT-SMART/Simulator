@@ -48,14 +48,14 @@ namespace Simulation.Services.Flight_Path.helpers
                 sinDeltaLat * sinDeltaLat
                 + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
 
-            if (haversine >= SimulationConstants.Mathematical.MAX_HAVESINE_RANGE)
+            if (haversine >= SimulationConstants.Mathematical.MAX_HAVERSINE_RANGE)
                 return Math.PI * SimulationConstants.FlightPath.EARTH_RADIUS_METERS;
 
             double angularDistance =
                 2
                 * Math.Atan2(
                     Math.Sqrt(haversine),
-                    Math.Sqrt(SimulationConstants.Mathematical.MAX_HAVESINE_RANGE - haversine)
+                    Math.Sqrt(SimulationConstants.Mathematical.MAX_HAVERSINE_RANGE - haversine)
                 );
             return SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
         }

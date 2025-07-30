@@ -11,7 +11,7 @@ namespace Simulation.Common.constants
             public const double MaxCruiseSpeedKmph = 220;
             public const double CruiseAltitude = 900.0;
             public const double FuelTankCapacity = 350.0;
-            public const double SpecificFuelConsumption = 1.8e-4;
+            public const double FuelConsumption = 1.8e-4;
             public const double Mass = 1100.0;
             public const double FrontalSurface = 4.8;
             public const double WingsSurface = 15.2;
@@ -31,7 +31,7 @@ namespace Simulation.Common.constants
             public const double MaxCruiseSpeedKmph = 220;
             public const double CruiseAltitude = 135.0;
             public const double FuelTankCapacity = 450.0;
-            public const double SpecificFuelConsumption = 2.0e-4;
+            public const double FuelConsumption = 2.0e-4;
             public const double Mass = 4650.0;
             public const double FrontalSurface = 8.2;
             public const double WingsSurface = 26.0;
@@ -51,7 +51,7 @@ namespace Simulation.Common.constants
             public const double MaxCruiseSpeedKmph = 220;
             public const double CruiseAltitude = 550.0;
             public const double FuelTankCapacity = 180.0;
-            public const double SpecificFuelConsumption = 1.5e-4;
+            public const double FuelConsumption = 1.5e-4;
             public const double DataStorageCapacityGB = 500.0;
             public const double Mass = 450.0;
             public const double FrontalSurface = 2.5;
@@ -69,7 +69,7 @@ namespace Simulation.Common.constants
             public const double MaxCruiseSpeedKmph = 180;
             public const double CruiseAltitude = 600.0;
             public const double FuelTankCapacity = 120.0;
-            public const double SpecificFuelConsumption = 1.2e-4;
+            public const double FuelConsumption = 1.2e-4;
             public const double DataStorageCapacityGB = 250.0;
             public const double Mass = 120.0;
             public const double FrontalSurface = 1.2;

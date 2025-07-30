@@ -10,7 +10,7 @@ namespace Simulation.Models.UAVs.ArmedUav
                 startLocation,
                 tailId,
                 SimulationConstants.Hermes900_Constants.FuelTankCapacity,
-                SimulationConstants.Hermes900_Constants.SpecificFuelConsumption
+                SimulationConstants.Hermes900_Constants.FuelConsumption
             )
         {
             TelemetryData[TelemetryFields.Mass] = SimulationConstants.Hermes900_Constants.Mass;

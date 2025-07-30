@@ -7,7 +7,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
     {
         public Hermes450(int tailId, Location startLocation)
             : base(startLocation, tailId,
-                SimulationConstants.Hermes450_Constants.FuelTankCapacity,SimulationConstants.Hermes450_Constants.SpecificFuelConsumption)
+                SimulationConstants.Hermes450_Constants.FuelTankCapacity,SimulationConstants.Hermes450_Constants.FuelConsumption)
         {
             TelemetryData[TelemetryFields.Mass] = SimulationConstants.Hermes450_Constants.Mass;
             TelemetryData[TelemetryFields.FrontalSurface] = SimulationConstants

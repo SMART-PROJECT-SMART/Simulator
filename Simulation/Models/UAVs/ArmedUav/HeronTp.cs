@@ -6,7 +6,8 @@ namespace Simulation.Models.UAVs.ArmedUav
     public class HeronTp : ArmedUAV
     {
         public HeronTp(int tailId, Location startLocation)
-            : base(startLocation, tailId)
+            : base(startLocation, tailId,
+                SimulationConstants.HeronTP_Constants.FuelTankCapacity,SimulationConstants.HeronTP_Constants.FuelConsumption)
         {
             TelemetryData[TelemetryFields.Mass] = SimulationConstants.HeronTP_Constants.Mass;
             TelemetryData[TelemetryFields.FrontalSurface] = SimulationConstants
