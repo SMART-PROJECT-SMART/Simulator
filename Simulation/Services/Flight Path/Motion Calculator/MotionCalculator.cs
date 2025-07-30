@@ -42,6 +42,8 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             newAlt = Math.Min(destination.Altitude, newAlt);
             newAlt = Math.Max(0.0, newAlt);
 
+            nextHoriz.Longitude = FlightPathMathHelper.NormalizeAngle(nextHoriz.Longitude);
+
             return new Location(nextHoriz.Latitude, nextHoriz.Longitude, newAlt);
         }
     }

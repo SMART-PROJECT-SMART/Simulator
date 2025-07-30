@@ -96,5 +96,14 @@ namespace Simulation.Services.Flight_Path.helpers
 
             return diff;
         }
+
+        public static double NormalizeAngle(double angle)
+        {
+            while (angle > SimulationConstants.Mathematical.HALF_TURN_DEGREES)
+                angle -= SimulationConstants.Mathematical.FULL_TURN_DEGREES;
+            while (angle < -SimulationConstants.Mathematical.HALF_TURN_DEGREES)
+                angle += SimulationConstants.Mathematical.FULL_TURN_DEGREES;
+            return angle;
+        }
     }
 }
