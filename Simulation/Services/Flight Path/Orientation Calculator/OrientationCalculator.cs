@@ -9,6 +9,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
     public class OrientationCalculator : IOrientationCalculator
     {
         private double _lastYaw = double.NaN;
+        private double _lastRoll = 0.0;
 
         public AxisDegrees ComputeOrientation(
             Dictionary<TelemetryFields, double> telemetry,
@@ -153,7 +154,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             if (speedMps <= SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 return 0.0;
 
-            double roll = 0.0;
+            double targetRoll = 0.0;
             if (!double.IsNaN(_lastYaw))
             {
                 double dYaw = FlightPathMathHelper.CalculateAngleDifference(_lastYaw, newYaw);
@@ -161,18 +162,32 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 if (Math.Abs(yawRate) > SimulationConstants.FlightPath.MIN_YAW_RATE)
                 {
                     double latAcc = speedMps * yawRate;
-                    roll = UnitConversionHelper.ToDegrees(
+                    targetRoll = UnitConversionHelper.ToDegrees(
                         Math.Atan2(latAcc, SimulationConstants.FlightPath.GRAVITY_MPS2)
                     );
-                    roll = Math.Clamp(
-                        roll,
+                    targetRoll = Math.Clamp(
+                        targetRoll,
                         -SimulationConstants.FlightPath.MAX_ROLL_DEG,
                         SimulationConstants.FlightPath.MAX_ROLL_DEG
                     );
                 }
-                roll = CalculateCurveRoll(current, destination, newYaw, roll);
+                targetRoll = CalculateCurveRoll(current, destination, newYaw, targetRoll);
             }
-            return roll;
+
+            double maxRollRate = SimulationConstants.FlightPath.MAX_ROLL_RATE_DEG_PER_SEC;
+            double maxRollDelta = maxRollRate * deltaSec;
+            double rollDiff = targetRoll - _lastRoll;
+            
+            if (Math.Abs(rollDiff) <= maxRollDelta)
+            {
+                _lastRoll = targetRoll;
+            }
+            else
+            {
+                _lastRoll += Math.Sign(rollDiff) * maxRollDelta;
+            }
+            
+            return _lastRoll;
         }
 
         private double CalculateNewYaw(double currentYaw, double targetYaw, double deltaSec)
@@ -196,11 +211,11 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             double diff = FlightPathMathHelper.CalculateAngleDifference(newYaw, bearing);
             if (Math.Abs(diff) > SimulationConstants.FlightPath.CURVE_ROLL_THRESHOLD_DEG)
             {
-                double angle = Math.Min(
+                double curveRoll = Math.Min(
                     Math.Abs(diff) * SimulationConstants.FlightPath.CURVE_ROLL_MULTIPLIER,
                     SimulationConstants.FlightPath.MAX_CURVE_ROLL_DEG
                 );
-                return Math.Sign(diff) * angle;
+                return currentRoll + Math.Sign(diff) * curveRoll;
             }
             return currentRoll;
         }
