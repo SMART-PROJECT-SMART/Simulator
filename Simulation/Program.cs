@@ -1,17 +1,10 @@
-using System.Text.Json.Serialization;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder
-    .Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-    });
+builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IMotionCalculator, MotionCalculator>();

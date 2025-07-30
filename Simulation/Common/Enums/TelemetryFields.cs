@@ -40,6 +40,7 @@ namespace Simulation.Common.Enums
         RollDeg,
         AngleBetweenPlaneAndGround,
         ThrustAfterInfluence,
+        ThrottlePercent,
     }
 
     public enum ArmedTelemetryFields
@@ -86,6 +87,9 @@ namespace Simulation.Common.Enums
 
         [TelemetryCategory(TelemetryCategories.Flight)]
         LiftCoefficient,
+
+        [TelemetryCategory(TelemetryCategories.Flight)]
+        ThrottlePercent,
 
         [TelemetryCategory(TelemetryCategories.Flight)]
         ThrustMax,

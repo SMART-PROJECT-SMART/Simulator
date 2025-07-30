@@ -18,13 +18,15 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             var speedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
             var pitchDeg = telemetry.GetValueOrDefault(TelemetryFields.PitchDeg, 0.0);
 
-            double dist = FlightPathMathHelper.CalculateDistance(current, destination);
-            double speedMps = speedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+            double distToDestination = FlightPathMathHelper.CalculateDistance(current, destination);
+            double speedMps = speedKmph.ToKmhFromMps();
             double travelM = speedMps * deltaSec;
 
             double horizM = travelM * Math.Cos(UnitConversionHelper.ToRadians(pitchDeg));
-            if (horizM >= dist)
-                horizM = dist;
+
+            if (horizM >= distToDestination)
+                horizM = distToDestination;
+
             double bearing = FlightPathMathHelper.CalculateBearing(current, destination);
             var nextHoriz = FlightPathMathHelper.CalculateDestinationLocation(
                 current,
@@ -48,7 +50,7 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             newAlt = Math.Min(destination.Altitude, newAlt);
             newAlt = Math.Max(0.0, newAlt);
 
-            nextHoriz.Longitude = FlightPathMathHelper.NormalizeAngle(nextHoriz.Longitude);
+            nextHoriz.Longitude = nextHoriz.Longitude.NormalizeAngle();
 
             return new Location(nextHoriz.Latitude, nextHoriz.Longitude, newAlt);
         }
