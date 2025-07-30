@@ -101,15 +101,24 @@ public static class FlightPhysicsCalculator
         double altitude
     )
     {
-        double altChange = travelM * Math.Sin(UnitConversionHelper.ToRadians(pitchDeg));
+        double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+        double horizontalSpeedMps = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+        double pitchRad = UnitConversionHelper.ToRadians(pitchDeg);
+        
+        double verticalVelocityMps = horizontalSpeedMps * Math.Tan(pitchRad);
+        
+        double altChange = verticalVelocityMps * deltaSec;
 
-        double lift = CalculateLift(telemetry);
-        double liftContribution = CalculateLiftContribution(lift, deltaSec);
-        altChange += liftContribution;
+        if (Math.Abs(pitchDeg) > SimulationConstants.Mathematical.EPSILON)
+        {
+            double lift = CalculateLift(telemetry);
+            double liftContribution = CalculateLiftContribution(lift, deltaSec);
+            altChange += liftContribution;
 
-        double drag = CalculateDrag(telemetry);
-        double dragEffect = CalculateDragEffect(drag, deltaSec);
-        altChange += dragEffect;
+            double drag = CalculateDrag(telemetry);
+            double dragEffect = CalculateDragEffect(drag, deltaSec);
+            altChange += dragEffect;
+        }
 
         return altitude + altChange;
     }

@@ -40,34 +40,68 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
         )
         {
             double altitudeDifference = destination.Altitude - current.Altitude;
+            
+            if (Math.Abs(altitudeDifference) < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+                return 0.0;
+
             double speedMps = telemetry
                 .GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0)
                 .ToKmhFromMps();
             if (speedMps < SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 return 0.0;
+
             double remainingDistance = FlightPathMathHelper.CalculateDistance(current, destination);
             if (remainingDistance <= 0.0)
                 return 0.0;
+            
+            double pitch;
+            
+            if (altitudeDifference > 0)
+            {
+                double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+                double horizontalSpeedMps = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+                
+                if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS && remainingDistance > 0.0)
+                {
+                    double timeToReachTarget = remainingDistance / horizontalSpeedMps;
+                    double requiredVerticalSpeedMps = altitudeDifference / timeToReachTarget;
+                    
+                    double requiredPitchRad = Math.Atan2(requiredVerticalSpeedMps, horizontalSpeedMps);
+                    pitch = UnitConversionHelper.ToDegrees(requiredPitchRad);
+                    
+                    pitch = Math.Clamp(pitch, 0.0, SimulationConstants.FlightPath.MAX_CLIMB_DEG);
+                }
+                else
+                {
+                    pitch = SimulationConstants.FlightPath.MAX_CLIMB_DEG;
+                }
+            }
+            else if (altitudeDifference < 0)
+            {
+                double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
+                double horizontalSpeedMps = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+                
+                if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS && remainingDistance > 0.0)
+                {
+                    double timeToReachTarget = remainingDistance / horizontalSpeedMps;
+                    double requiredVerticalSpeedMps = altitudeDifference / timeToReachTarget;
+                    
+                    double requiredPitchRad = Math.Atan2(requiredVerticalSpeedMps, horizontalSpeedMps);
+                    pitch = UnitConversionHelper.ToDegrees(requiredPitchRad);
+                    
+                    pitch = Math.Clamp(pitch, -SimulationConstants.FlightPath.MAX_DESCENT_DEG, 0.0);
+                }
+                else
+                {
+                    pitch = -SimulationConstants.FlightPath.MAX_DESCENT_DEG;
+                }
+            }
+            else
+            {
+                pitch = 0.0;
+            }
 
-            double timeToDest = remainingDistance / speedMps;
-            double vReq = altitudeDifference / timeToDest;
-            vReq = Math.Clamp(
-                vReq,
-                -SimulationConstants.FlightPath.MAX_CLIMB_RATE_MPS,
-                SimulationConstants.FlightPath.MAX_CLIMB_RATE_MPS
-            );
-
-            double basicPitch = UnitConversionHelper.ToDegrees(Math.Atan2(vReq, speedMps));
-            double correctedPitch = ApplyPhysicsCorrections(
-                telemetry,
-                basicPitch,
-                altitudeDifference
-            );
-            return Math.Clamp(
-                correctedPitch,
-                -SimulationConstants.FlightPath.MAX_DESCENT_DEG,
-                SimulationConstants.FlightPath.MAX_CLIMB_DEG
-            );
+            return pitch;
         }
 
         private double ApplyPhysicsCorrections(
@@ -81,17 +115,25 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             double thrust = FlightPhysicsCalculator.CalculateThrust(telemetry);
             double drag = FlightPhysicsCalculator.CalculateDrag(telemetry);
 
-            double pitchRad = UnitConversionHelper.ToRadians(Math.Abs(basicPitch));
-            double requiredThrust = Math.Sin(pitchRad) * weight;
-
-            if (altitudeDifference > 0 && thrust < requiredThrust)
+            if (altitudeDifference > 0)
             {
-                double scale = Math.Clamp(thrust / requiredThrust, 0.0, 1.0);
-                basicPitch *= scale;
+                double maxClimbPitch = SimulationConstants.FlightPath.MAX_CLIMB_DEG;
+                double pitchRad = UnitConversionHelper.ToRadians(maxClimbPitch);
+                double requiredThrust = Math.Sin(pitchRad) * weight;
+                
+                if (thrust >= requiredThrust)
+                {
+                    return Math.Min(basicPitch, maxClimbPitch);
+                }
+                else
+                {
+                    double maxPossiblePitch = UnitConversionHelper.ToDegrees(Math.Asin(thrust / weight));
+                    return Math.Min(basicPitch, maxPossiblePitch);
+                }
             }
-            else if (altitudeDifference < 0 && (thrust - drag) > 0)
+            else if (altitudeDifference < 0)
             {
-                basicPitch *= 1 + (thrust - drag) / weight;
+                return Math.Max(basicPitch, -SimulationConstants.FlightPath.MAX_DESCENT_DEG);
             }
 
             return basicPitch;

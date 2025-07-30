@@ -24,6 +24,7 @@ public class FlightPathService : IDisposable
     private readonly Timer _timer;
     private bool _isRunning;
     private bool _timerDisposed;
+    private bool _missionCompleted;
     private Location _previousLocation;
 
     public event Action<Location>? LocationUpdated;
@@ -67,6 +68,9 @@ public class FlightPathService : IDisposable
 
     private void UpdateLocation(object? state)
     {
+        if (_missionCompleted) 
+            return;
+            
         var telemetry = _uav.TelemetryData;
         var currentLoc = new Location(
             telemetry[TelemetryFields.Latitude],
@@ -75,10 +79,17 @@ public class FlightPathService : IDisposable
         );
         double remainingMeters = FlightPathMathHelper.CalculateDistance(currentLoc, _destination);
 
-        if (remainingMeters <= SimulationConstants.FlightPath.LOCATION_PRECISION_M
-            && Math.Abs(currentLoc.Altitude - _destination.Altitude) <= SimulationConstants.FlightPath.ALTITUDE_PRECISION_M)
+        bool horizontalReached = remainingMeters <= SimulationConstants.FlightPath.MISSION_COMPLETION_RADIUS_M;
+        bool altitudeReached = Math.Abs(currentLoc.Altitude - _destination.Altitude) <= SimulationConstants.FlightPath.ALTITUDE_PRECISION_M;
+        
+        if (horizontalReached && altitudeReached)
         {
-            CompleteMission(currentLoc, true);
+            _missionCompleted = true;
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer.Dispose();
+            _logger.LogInformation("MISSION COMPLETED at ({Lat:F6},{Lon:F6},{Alt:F1}), rem=0",
+                currentLoc.Latitude, currentLoc.Longitude, currentLoc.Altitude);
+            MissionCompleted?.Invoke();
             return;
         }
 
@@ -98,41 +109,29 @@ public class FlightPathService : IDisposable
         double fuelLeft = Math.Max(telemetry.GetValueOrDefault(TelemetryFields.FuelAmount, 0.0) - burnKg, 0.0);
         telemetry[TelemetryFields.FuelAmount] = fuelLeft;
 
-        _logger.LogDebug(
-            "Fuel burn debug | Throttle {Throttle:F1}% | Thrust {Thrust:F1} N | SFC {Sfc:E4} kg/(N·s) | Burn {Burn:F4} kg | Remaining {Fuel:F3} kg",
-            throttlePct, thrust, sfc, burnKg, fuelLeft
-        );
-
         if (fuelLeft <= 0.0)
         {
+            _missionCompleted = true;
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer.Dispose();
             _logger.LogInformation("MISSION ABORTED: UAV {UavId} ran out of fuel at ({Lat:F6},{Lon:F6},{Alt:F1})",
                 _uav.TailId, currentLoc.Latitude, currentLoc.Longitude, currentLoc.Altitude);
-            CompleteMission(currentLoc, false);
+            MissionCompleted?.Invoke();
             return;
         }
 
-        double pitchDeg = currentLoc.Altitude + SimulationConstants.FlightPath.ALTITUDE_PRECISION_M < _cruiseAltitude
-            ? SimulationConstants.FlightPath.MAX_CLIMB_DEG
-            : currentLoc.Altitude - SimulationConstants.FlightPath.ALTITUDE_PRECISION_M > _destination.Altitude
-                ? -SimulationConstants.FlightPath.MAX_DESCENT_DEG
-                : 0.0;
-        telemetry[TelemetryFields.PitchDeg] = pitchDeg;
-
-        var nextLocRaw = _motionCalculator.CalculateNext(
-            telemetry, currentLoc, _destination, SimulationConstants.FlightPath.DELTA_SECONDS
-        );
-        double maxVert = SimulationConstants.FlightPath.MAX_CLIMB_RATE_MPS * SimulationConstants.FlightPath.DELTA_SECONDS;
-        double vertDelta = Math.Clamp(nextLocRaw.Altitude - currentLoc.Altitude, -maxVert, maxVert);
-        var nextLoc = new Location(nextLocRaw.Latitude, nextLocRaw.Longitude, currentLoc.Altitude + vertDelta);
-
         var axis = _orientationCalculator.ComputeOrientation(
             telemetry, _previousLocation, currentLoc, _destination, SimulationConstants.FlightPath.DELTA_SECONDS
+        );
+        telemetry[TelemetryFields.PitchDeg] = axis.Pitch;
+
+        var nextLoc = _motionCalculator.CalculateNext(
+            telemetry, currentLoc, _destination, SimulationConstants.FlightPath.DELTA_SECONDS
         );
         telemetry[TelemetryFields.Latitude] = nextLoc.Latitude;
         telemetry[TelemetryFields.Longitude] = nextLoc.Longitude;
         telemetry[TelemetryFields.Altitude] = nextLoc.Altitude;
         telemetry[TelemetryFields.YawDeg] = axis.Yaw;
-        telemetry[TelemetryFields.PitchDeg] = axis.Pitch;
         telemetry[TelemetryFields.RollDeg] = axis.Roll;
         _previousLocation = currentLoc;
 
@@ -153,16 +152,7 @@ public class FlightPathService : IDisposable
         LocationUpdated?.Invoke(nextLoc);
     }
 
-    private void CompleteMission(Location loc, bool wasCompleted)
-    {
-        _timer.Change(Timeout.Infinite, Timeout.Infinite);
-        _timer.Dispose();
-        _timerDisposed = true;
-        string status = wasCompleted ? "COMPLETED" : "ABORTED";
-        _logger.LogInformation("MISSION {Status} at ({Lat:F6},{Lon:F6},{Alt:F1}), rem=0",
-            status, loc.Latitude, loc.Longitude, loc.Altitude);
-        MissionCompleted?.Invoke();
-    }
+
 
     public void Dispose()
     {

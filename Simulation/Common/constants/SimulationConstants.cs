@@ -92,8 +92,8 @@ namespace Simulation.Common.constants
             public const double CLOSE_DISTANCE_M = 50.0;
             public const double PITCH_CLIMB_DEG = 15.0;
             public const double PITCH_DESCENT_DEG = 15.0;
-            public const double ALTITUDE_TOLERANCE = 0.5;
-            public const double ALTITUDE_PRECISION_M = 1.0;
+            public const double ALTITUDE_TOLERANCE = 0.2;
+            public const double ALTITUDE_PRECISION_M = 0.2;
             public const double MIN_DESCENT_DISTANCE_KM = 0.1;
             public const double DELTA_SECONDS = 1.0;
             public const double MAX_ROLL_DEG = 45.0;
@@ -124,6 +124,12 @@ namespace Simulation.Common.constants
             public const double MIN_RELEVENT_YAW = 0.1;
             public const double FULL_TURN = 1.0;
             public const double MIN_PITCH = 0.2;
+                    public const double MIN_PITCH_REDUCTION_FACTOR = 0.6;
+        public const double PITCH_REDUCTION_RATE = 0.3;
+                    public const double ALTITUDE_HOLD_THRESHOLD = 2.0;
+        public const double ALTITUDE_HOLD_GAIN = 8.0;
+            public const double MISSION_COMPLETION_RADIUS_M = 10.0;
+            public const double ALTITUDE_HOLD_TIME_TO_TARGET_SEC = 0.5;
         }
 
         public static class Mathematical
