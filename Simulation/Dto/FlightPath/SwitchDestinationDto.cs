@@ -1,6 +1,12 @@
-﻿namespace Simulation.Dto.FlightPath
+﻿using Simulation.Models;
+
+namespace Simulation.Dto.FlightPath
 {
-    public class SwitchDestinationDto
+    public struct SwitchDestinationDto(int tailId, Location newDestination,string missionId)
     {
+        public int  TailId { get; set; } = tailId;
+        public Location NewDestination { get; set;} = newDestination;
+
+        public string MissionId { get; set; } = missionId;
     }
 }

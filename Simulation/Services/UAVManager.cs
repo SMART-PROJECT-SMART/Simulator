@@ -10,8 +10,7 @@ namespace Simulation.Services
 {
     public class UAVManager
     {
-        private Dictionary<int, UAV> _uavsStatus;
-        private Dictionary<int, FlightPathService> _activeFlights;
+        private Dictionary<UAV, FlightPathService> _uavs;
         private readonly IMotionCalculator _motionCalculator;
         private readonly ISpeedController _speedController;
         private readonly IOrientationCalculator _orientationCalculator;
@@ -23,8 +22,7 @@ namespace Simulation.Services
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger)
         {
-            _uavsStatus = new Dictionary<int, UAV>();
-            _activeFlights = new Dictionary<int, FlightPathService>();
+            _uavs = new Dictionary<UAV, FlightPathService>();
             _motionCalculator = motionCalculator;
             _speedController = speedController;
             _orientationCalculator = orientationCalculator;
@@ -33,30 +31,33 @@ namespace Simulation.Services
 
         public void AddUAV(UAV uav)
         {
-            _uavsStatus[uav.TailId] = uav;
-        }
-
-        public void RemoveUAV(int tailId)
-        {
-            if (_activeFlights.TryGetValue(tailId, out var flightService))
-            {
-                flightService.Dispose();
-                _activeFlights.Remove(tailId);
-            }
-            _uavsStatus.Remove(tailId);
-        }
-
-        public async Task<bool> StartMission(UAV uav, Location destination)
-        {
-            var flightService = new FlightPathService(
+            _uavs[uav] = new FlightPathService(
                 _motionCalculator,
                 _speedController,
                 _orientationCalculator,
                 _logger
             );
+        }
 
-            _activeFlights[uav.TailId] = flightService;
+        public void RemoveUAV(int tailId)
+        {
+            foreach (var pair in _uavs.Where(pair => pair.Key.TailId == tailId))
+            {
+                _uavs[pair.Key].Dispose();
+                break;
+            }
+        }
 
+        public async Task<bool> StartMission(UAV uav, Location destination,string missionId)
+        {
+            uav.CurrentMissionId = missionId;
+
+            if (!_uavs.ContainsKey(uav))
+            {
+                AddUAV(uav);
+            }
+
+            var flightService = _uavs[uav];
             flightService.Initialize(uav, destination);
             flightService.StartFlightPath();
 
@@ -65,19 +66,20 @@ namespace Simulation.Services
             {
                 tcs.SetResult(true);
                 uav.Land();
-                _activeFlights.Remove(uav.TailId);
+                uav.CurrentMissionId = string.Empty;
             };
 
             await tcs.Task;
             flightService.Dispose();
+            _uavs.Remove(uav);
             return true;
         }
 
         public bool SwitchDestination(int tailId, Location newDestination)
         {
-            if (_activeFlights.TryGetValue(tailId, out var flightService))
+            foreach (var pair in _uavs.Where(pair => pair.Key.TailId == tailId))
             {
-                flightService.SwitchDestination(newDestination);
+                pair.Value.SwitchDestination(newDestination);
                 return true;
             }
             return false;

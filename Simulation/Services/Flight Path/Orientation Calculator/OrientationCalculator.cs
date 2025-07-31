@@ -190,9 +190,13 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             double diff = FlightPathMathHelper.CalculateAngleDifference(currentYaw, targetYaw);
             double turnRate = SimulationConstants.FlightPath.MAX_TURN_RATE_DEG_PER_SEC;
             double maxDelta = turnRate * deltaSec;
+            double newYaw;
             if (Math.Abs(diff) <= maxDelta)
-                return targetYaw;
-            return currentYaw + Math.Sign(diff) * maxDelta;
+                newYaw = targetYaw;
+            else
+                newYaw = currentYaw + Math.Sign(diff) * maxDelta;
+            
+            return newYaw.NormalizeAngle();
         }
 
         private double CalculateCurveRoll(

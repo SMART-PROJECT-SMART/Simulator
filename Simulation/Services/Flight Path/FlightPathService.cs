@@ -86,6 +86,15 @@ public class FlightPathService : IDisposable
 
     public void SwitchDestination(Location newDestination)
     {
+        _logger.LogInformation(
+            "Location switched from ({Lat:F6}, {Lon:F6}, {Alt:F1}) to ({NewLat:F6}, {NewLon:F6}, {NewAlt:F1})",
+            _destination.Latitude,
+            _destination.Longitude,
+            _destination.Altitude,
+            newDestination.Latitude,
+            newDestination.Longitude,
+            newDestination.Altitude
+        );
         _destination = newDestination;
     }
 
@@ -199,7 +208,7 @@ public class FlightPathService : IDisposable
         telemetry[TelemetryFields.FlightTimeSec] += SimulationConstants.FlightPath.DELTA_SECONDS;
 
         _logger.LogInformation(
-            "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg",
+            "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg | Destination {lat},{lon},{alt}",
             _uav.TailId,
             nextLoc.Latitude,
             nextLoc.Longitude,
@@ -209,7 +218,10 @@ public class FlightPathService : IDisposable
             axis.Pitch,
             axis.Roll,
             remainingMeters,
-            _uav.TelemetryData[TelemetryFields.FuelAmount]
+            _uav.TelemetryData[TelemetryFields.FuelAmount],
+            _destination.Latitude,
+            _destination.Longitude,
+            _destination.Altitude
         );
         LocationUpdated?.Invoke(nextLoc);
     }

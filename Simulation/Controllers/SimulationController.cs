@@ -24,9 +24,16 @@ namespace Simulation.Controllers
         {
             _uavManager.AddUAV(dto.UAV);
 
-            var success = await _uavManager.StartMission(dto.UAV, dto.Destination);
+            var success = await _uavManager.StartMission(dto.UAV, dto.Destination,dto.MissionId);
 
             return success ? Ok() : BadRequest("Mission failed");
+        }
+
+        [HttpPost("switch")]
+        public async Task<IActionResult> SwitchUAV([FromBody] SwitchDestinationDto dto)
+        {
+            var success =  _uavManager.SwitchDestination(dto.TailId, dto.NewDestination);
+            return success ? Ok() : BadRequest("Switch failed");
         }
 
         [HttpGet("run")]
