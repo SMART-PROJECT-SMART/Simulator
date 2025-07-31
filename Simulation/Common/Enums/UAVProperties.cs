@@ -15,6 +15,6 @@
         DataStorageCapacityGB,
 
         IsWeaponSystemArmed,
-        WeaponSystemHealth
+        WeaponSystemHealth,
     }
 }

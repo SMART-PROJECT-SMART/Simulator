@@ -11,15 +11,10 @@ namespace Simulation.Models.UAVs.ArmedUav
             Location startLocation,
             int tailId,
             double fuelAmount,
-            Dictionary<UAVProperties,double> properties)
-            : base(
-                startLocation,
-                tailId,
-                fuelAmount,
-                properties
-            )
+            Dictionary<UAVProperties, double> properties
+        )
+            : base(startLocation, tailId, fuelAmount, properties)
         {
-
             WeaponAmmo = new Dictionary<WeaponType, int>();
             properties[UAVProperties.IsWeaponSystemArmed] = 0.0;
             properties[UAVProperties.WeaponSystemHealth] = 100.0;

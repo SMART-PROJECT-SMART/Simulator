@@ -5,7 +5,7 @@ namespace Simulation.Models.UAVs
     public abstract class UAV
     {
         public int TailId { get; set; }
-        public Dictionary<UAVProperties,double> Properties { get; set; }
+        public Dictionary<UAVProperties, double> Properties { get; set; }
         public Dictionary<TelemetryFields, double> TelemetryData { get; set; }
         public string CurrentMissionId { get; set; }
 
@@ -13,7 +13,8 @@ namespace Simulation.Models.UAVs
             Location startLocation,
             int tailId,
             double fuelAmount,
-           Dictionary<UAVProperties,double> properties)
+            Dictionary<UAVProperties, double> properties
+        )
         {
             TailId = tailId;
             Properties = properties;
@@ -24,7 +25,7 @@ namespace Simulation.Models.UAVs
             {
                 [TelemetryFields.Latitude] = startLocation.Latitude,
                 [TelemetryFields.Longitude] = startLocation.Longitude,
-                [TelemetryFields.Altitude] = startLocation.Altitude
+                [TelemetryFields.Altitude] = startLocation.Altitude,
             };
 
             TelemetryData[TelemetryFields.FuelAmount] = fuelAmount;

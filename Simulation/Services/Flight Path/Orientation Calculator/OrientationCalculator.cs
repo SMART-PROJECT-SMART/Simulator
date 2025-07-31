@@ -100,8 +100,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                     TelemetryFields.CurrentSpeedKmph,
                     0.0
                 );
-                double horizontalSpeedMps =
-                    currentSpeedKmph;
+                double horizontalSpeedMps = currentSpeedKmph;
 
                 if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 {

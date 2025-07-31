@@ -57,6 +57,5 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
 
             return new Location(nextHoriz.Latitude, nextHoriz.Longitude, newAlt);
         }
-
     }
 }
