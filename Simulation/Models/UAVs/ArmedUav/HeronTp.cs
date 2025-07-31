@@ -23,6 +23,7 @@ namespace Simulation.Models.UAVs.ArmedUav
             : base(
                 startLocation,
                 tailId,
+                SimulationConstants.HeronTP_Constants.FuelTankCapacity,
                 properties
             )
         {

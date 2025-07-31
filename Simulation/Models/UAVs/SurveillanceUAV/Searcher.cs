@@ -24,6 +24,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             : base(
                 startLocation,
                 tailId,
+                SimulationConstants.Searcher_Constants.FuelTankCapacity,
                 properties,
                 dataStorageCapacityGB
             )

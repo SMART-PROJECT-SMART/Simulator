@@ -26,6 +26,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             : base(
                 startLocation,
                 tailId,
+                SimulationConstants.Hermes450_Constants.FuelTankCapacity,
                 properties,
                 dataStorageCapacityGB
             )

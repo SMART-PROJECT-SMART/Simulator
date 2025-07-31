@@ -10,10 +10,12 @@ namespace Simulation.Models.UAVs.ArmedUav
         protected ArmedUAV(
             Location startLocation,
             int tailId,
+            double fuelAmount,
             Dictionary<UAVProperties,double> properties)
             : base(
                 startLocation,
                 tailId,
+                fuelAmount,
                 properties
             )
         {

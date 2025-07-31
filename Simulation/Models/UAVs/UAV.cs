@@ -12,6 +12,7 @@ namespace Simulation.Models.UAVs
         protected UAV(
             Location startLocation,
             int tailId,
+            double fuelAmount,
            Dictionary<UAVProperties,double> properties)
         {
             TailId = tailId;
@@ -26,8 +27,8 @@ namespace Simulation.Models.UAVs
                 [TelemetryFields.Altitude] = startLocation.Altitude
             };
 
-            double maxTank = Properties[UAVProperties.FuelTankCapacity];
-            TelemetryData[TelemetryFields.FuelAmount] = maxTank;
+            TelemetryData[TelemetryFields.FuelAmount] = fuelAmount;
+
             TelemetryData[TelemetryFields.ThrottlePercent] = 0.0;
             TelemetryData[TelemetryFields.CurrentSpeedKmph] = 0.0;
             TelemetryData[TelemetryFields.YawDeg] = 0.0;

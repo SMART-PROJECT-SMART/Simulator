@@ -10,17 +10,18 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
         protected SurveillanceUAV(
             Location startLocation,
             int tailId,
+            double fuelAmount,
            Dictionary<UAVProperties,double> properties,
             double dataStorageCapacityGB
         )
             : base(
                 startLocation,
                 tailId,
+                fuelAmount,
                 properties
                 )
         {
 
-            TelemetryData = TelemetryData;
 
             TelemetryData[TelemetryFields.DataStorageUsedGB] = 0.0;
 

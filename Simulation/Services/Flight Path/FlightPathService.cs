@@ -116,13 +116,13 @@ public class FlightPathService : IDisposable
         double newSpeed = _speedController.ComputeNextSpeed(
             telemetry,
             _uav.Properties[UAVProperties.MaxAcceleration],
-            _uav.Properties[UAVProperties.MaxAcceleration],
+            _uav.Properties[UAVProperties.MaxCruiseSpeed],
             remainingMeters,
             SimulationConstants.FlightPath.DELTA_SECONDS,
             _uav.Properties[UAVProperties.MaxAcceleration],
             _uav.Properties[UAVProperties.MaxAcceleration],
             _uav.Properties[UAVProperties.MaxAcceleration],
-            _uav.Properties[UAVProperties.MaxAcceleration].ToKmhFromMps()
+            _uav.Properties[UAVProperties.MaxCruiseSpeed]
         );
         telemetry[TelemetryFields.CurrentSpeedKmph] = newSpeed;
 
@@ -130,17 +130,9 @@ public class FlightPathService : IDisposable
         double throttlePct = Math.Clamp(newSpeed / maxCruise * 100.0, 0.0, 100.0);
         telemetry[TelemetryFields.ThrottlePercent] = throttlePct;
 
-        double thrustMax = telemetry.GetValueOrDefault(TelemetryFields.ThrustAfterInfluence, 0.0);
-        double thrust = thrustMax * (throttlePct / 100.0);
-        double sfc = _uav.Properties[UAVProperties.MaxAcceleration];
-        double burnKg = thrust * sfc * SimulationConstants.FlightPath.DELTA_SECONDS;
-        double fuelLeft = Math.Max(
-            telemetry.GetValueOrDefault(TelemetryFields.FuelAmount, 0.0) - burnKg,
-            0.0
-        );
-        telemetry[TelemetryFields.FuelAmount] = fuelLeft;
+        _uav.ConsumeFuel(SimulationConstants.FlightPath.DELTA_SECONDS);
 
-        if (fuelLeft <= 0.0)
+        if (_uav.TelemetryData[TelemetryFields.FuelAmount] <= 0.0)
         {
             _missionCompleted = true;
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -191,7 +183,7 @@ public class FlightPathService : IDisposable
             axis.Pitch,
             axis.Roll,
             remainingMeters,
-            fuelLeft
+            _uav.TelemetryData[TelemetryFields.FuelAmount]
         );
 
         LocationUpdated?.Invoke(nextLoc);

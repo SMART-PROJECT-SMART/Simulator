@@ -23,6 +23,7 @@ namespace Simulation.Models.UAVs.ArmedUav
             : base(
                 startLocation,
                 tailId,
+                SimulationConstants.Hermes900_Constants.FuelTankCapacity,
                 properties
             )
         {
