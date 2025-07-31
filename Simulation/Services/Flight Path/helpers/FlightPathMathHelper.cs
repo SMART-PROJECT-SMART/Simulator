@@ -8,9 +8,9 @@ namespace Simulation.Services.Flight_Path.helpers
     {
         public static double CalculateBearing(Location from, Location to)
         {
-            double fromLatRad = UnitConversionHelper.ToRadians(from.Latitude);
-            double toLatRad = UnitConversionHelper.ToRadians(to.Latitude);
-            double deltaLonRad = UnitConversionHelper.ToRadians(to.Longitude - from.Longitude);
+            double fromLatRad = from.Latitude.ToRadians();
+            double toLatRad = to.Latitude.ToRadians();
+            double deltaLonRad = to.Longitude - from.Longitude.ToRadians();
 
             double y = Math.Sin(deltaLonRad) * Math.Cos(toLatRad);
             double x =
@@ -24,18 +24,18 @@ namespace Simulation.Services.Flight_Path.helpers
                 return 0.0;
 
             double bearingRadians = Math.Atan2(y, x);
-            double bearingDegrees = UnitConversionHelper.ToDegrees(bearingRadians);
+            double bearingDegrees = bearingRadians.ToDegrees();
             return (bearingDegrees + SimulationConstants.Mathematical.FULL_TURN_DEGREES)
                 % SimulationConstants.Mathematical.FULL_TURN_DEGREES;
         }
 
         public static double CalculateDistance(Location a, Location b)
         {
-            if (
-                Math.Abs(a.Latitude - b.Latitude) < SimulationConstants.Mathematical.EPSILON
-                && Math.Abs(a.Longitude - b.Longitude) < SimulationConstants.Mathematical.EPSILON
-            )
-                return 0.0;
+            if (Math.Abs(a.Latitude - b.Latitude) < SimulationConstants.Mathematical.EPSILON &&
+                Math.Abs(a.Longitude - b.Longitude) < SimulationConstants.Mathematical.EPSILON)
+            {
+                return Math.Abs(b.Altitude - a.Altitude);
+            }
 
             double lat1Rad = UnitConversionHelper.ToRadians(a.Latitude);
             double lat2Rad = UnitConversionHelper.ToRadians(b.Latitude);
@@ -44,21 +44,17 @@ namespace Simulation.Services.Flight_Path.helpers
 
             double sinDeltaLat = Math.Sin(deltaLatRad / 2);
             double sinDeltaLon = Math.Sin(deltaLonRad / 2);
-            double haversine =
-                sinDeltaLat * sinDeltaLat
-                + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
+            double haversine = sinDeltaLat * sinDeltaLat
+                               + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
+            haversine = Math.Min(1.0, Math.Max(0.0, haversine));
 
-            if (haversine >= SimulationConstants.Mathematical.MAX_HAVERSINE_RANGE)
-                return Math.PI * SimulationConstants.FlightPath.EARTH_RADIUS_METERS;
+            double angularDistance = 2 * Math.Atan2(Math.Sqrt(haversine), Math.Sqrt(1 - haversine));
+            double horizontalDistance = SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
 
-            double angularDistance =
-                2
-                * Math.Atan2(
-                    Math.Sqrt(haversine),
-                    Math.Sqrt(SimulationConstants.Mathematical.MAX_HAVERSINE_RANGE - haversine)
-                );
-            return SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
+            double verticalDistance = b.Altitude - a.Altitude;
+            return Math.Sqrt(horizontalDistance * horizontalDistance + verticalDistance * verticalDistance);
         }
+
 
         public static Location CalculateDestinationLocation(
             Location origin,
@@ -69,9 +65,9 @@ namespace Simulation.Services.Flight_Path.helpers
             if (distance < SimulationConstants.FlightPath.MIN_DISTANCE_M)
                 return origin;
 
-            double originLatRad = UnitConversionHelper.ToRadians(origin.Latitude);
-            double originLonRad = UnitConversionHelper.ToRadians(origin.Longitude);
-            double bearingRad = UnitConversionHelper.ToRadians(bearing);
+            double originLatRad = origin.Latitude.ToRadians();
+            double originLonRad = origin.Longitude.ToRadians();
+            double bearingRad = bearing.ToRadians();
             double angularDistance = distance / SimulationConstants.FlightPath.EARTH_RADIUS_METERS;
 
             double destLatRad = Math.Asin(
@@ -86,8 +82,8 @@ namespace Simulation.Services.Flight_Path.helpers
                     Math.Cos(angularDistance) - Math.Sin(originLatRad) * Math.Sin(destLatRad)
                 );
 
-            double destLat = UnitConversionHelper.ToDegrees(destLatRad);
-            double destLon = UnitConversionHelper.ToDegrees(destLonRad);
+            double destLat = destLatRad.ToDegrees();
+            double destLon = destLonRad.ToDegrees();
 
             destLon =
                 (

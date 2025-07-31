@@ -7,14 +7,10 @@ namespace Simulation.Services.Flight_Path.helpers;
 
 public static class FlightPhysicsCalculator
 {
-    public static double CalculateDrag(Dictionary<TelemetryFields, double> telemetry)
+    public static double CalculateDrag(Dictionary<TelemetryFields, double> telemetry,double frontalSurface)
     {
-        double frontalSurface = telemetry.GetValueOrDefault(TelemetryFields.FrontalSurface, 1.0);
-        double dragCoefficient = telemetry.GetValueOrDefault(TelemetryFields.DragCoefficient, 0.1);
-        double currentSpeedKmph = telemetry.GetValueOrDefault(
-            TelemetryFields.CurrentSpeedKmph,
-            0.0
-        );
+        telemetry.TryGetValue(TelemetryFields.DragCoefficient, out double dragCoefficient);
+        telemetry.TryGetValue(TelemetryFields.CurrentSpeedKmph, out double currentSpeedKmph);
         double horizontalSpeed = currentSpeedKmph.ToKmhFromMps();
 
         return 0.5
@@ -24,10 +20,9 @@ public static class FlightPhysicsCalculator
             * Math.Pow(horizontalSpeed, 2);
     }
 
-    public static double CalculateLift(Dictionary<TelemetryFields, double> telemetry)
+    public static double CalculateLift(Dictionary<TelemetryFields, double> telemetry,double wingSurface)
     {
-        double wingsSurface = telemetry.GetValueOrDefault(TelemetryFields.WingsSurface, 1.0);
-        double liftCoefficient = telemetry.GetValueOrDefault(TelemetryFields.LiftCoefficient, 0.1);
+        telemetry.TryGetValue(TelemetryFields.LiftCoefficient, out double liftCoefficient);
         double currentSpeedKmph = telemetry.GetValueOrDefault(
             TelemetryFields.CurrentSpeedKmph,
             0.0
@@ -35,22 +30,24 @@ public static class FlightPhysicsCalculator
         double horizontalSpeed = currentSpeedKmph.ToKmhFromMps();
         return 0.5
             * SimulationConstants.Mathematical.RHO
-            * wingsSurface
+            * wingSurface
             * liftCoefficient
             * Math.Pow(horizontalSpeed, 2);
     }
 
-    public static double CalculateThrust(Dictionary<TelemetryFields, double> telemetry)
+    public static double CalculateThrust(Dictionary<TelemetryFields,
+        double> telemetry,
+        double thrustMax,
+        double maxCruiseSpeed)
     {
-        CalculateThrottle(telemetry);
+        CalculateThrottle(telemetry,maxCruiseSpeed);
 
         double throttle = telemetry.GetValueOrDefault(TelemetryFields.ThrottlePercent, 0.0) / 100;
-        double thrustMax = telemetry.GetValueOrDefault(TelemetryFields.ThrustMax, 0.0);
         double thrustAfterInfluence = telemetry.GetValueOrDefault(
             TelemetryFields.ThrustAfterInfluence,
             thrustMax
         );
-        double altitude = telemetry.GetValueOrDefault(TelemetryFields.Altitude, 0.0);
+        telemetry.TryGetValue(TelemetryFields.Altitude, out double altitude);
         double rawThrust = Math.Min(thrustMax * throttle, thrustAfterInfluence);
         double densityRatio = Math.Exp(
             -altitude / SimulationConstants.FlightPath.EARTH_SCALE_HEIGHT
@@ -59,15 +56,16 @@ public static class FlightPhysicsCalculator
         return rawThrust * densityRatio;
     }
 
-    public static double CalculateAcceleration(Dictionary<TelemetryFields, double> telemetry)
+    public static double CalculateAcceleration(Dictionary<TelemetryFields,
+        double> telemetry,
+        double thrustMax,
+        double frontalSurface,
+        double mass,
+        double maxAcceleration,
+        double maxCruiseSpeed)
     {
-        double thrust = CalculateThrust(telemetry);
-        double drag = CalculateDrag(telemetry);
-        double mass = telemetry.GetValueOrDefault(TelemetryFields.Mass, 1.0);
-        double maxAcceleration = telemetry.GetValueOrDefault(
-            TelemetryFields.MaxAccelerationMps2,
-            2.0
-        );
+        double thrust = CalculateThrust(telemetry,thrustMax,maxCruiseSpeed);
+        double drag = CalculateDrag(telemetry,frontalSurface);
 
         double physicsAcceleration = (thrust - drag) / mass;
 
@@ -83,13 +81,12 @@ public static class FlightPhysicsCalculator
         return Math.Min(physicsAcceleration, maxAcceleration);
     }
 
-    private static void CalculateThrottle(Dictionary<TelemetryFields, double> telemetry)
+    private static void CalculateThrottle(Dictionary<TelemetryFields, double> telemetry,double maxCruiseSpeed)
     {
         double currentSpeed = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
-        double cruiseSpeed = telemetry.GetValueOrDefault(TelemetryFields.MaxCruiseSpeedKmph, 0.0);
 
-        double speedError = cruiseSpeed - currentSpeed;
-        double throttlePercent = 100.0 * Math.Clamp(speedError / cruiseSpeed, 0.0, 1.0);
+        double speedError = maxCruiseSpeed - currentSpeed;
+        double throttlePercent = 100.0 * Math.Clamp(speedError / maxCruiseSpeed, 0.0, 1.0);
         telemetry[TelemetryFields.ThrottlePercent] = throttlePercent;
     }
 
@@ -98,28 +95,29 @@ public static class FlightPhysicsCalculator
         double pitchDeg,
         double deltaSec,
         Dictionary<TelemetryFields, double> telemetry,
-        double altitude
+        double altitude,
+        double wingSurface,
+        double frontalSurface
     )
     {
         double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
         double horizontalSpeedMps = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
-        double pitchRad = UnitConversionHelper.ToRadians(pitchDeg);
+        double pitchRad = pitchDeg.ToRadians();
         
         double verticalVelocityMps = horizontalSpeedMps * Math.Tan(pitchRad);
         
         double altChange = verticalVelocityMps * deltaSec;
 
-        // Temporarily disabled lift/drag effects to fix altitude control issues
-        // if (Math.Abs(pitchDeg) > SimulationConstants.Mathematical.EPSILON && Math.Abs(altChange) > 0.1)
-        // {
-        //     double lift = CalculateLift(telemetry);
-        //     double liftContribution = CalculateLiftContribution(lift, deltaSec);
-        //     altChange += liftContribution;
+        if (Math.Abs(pitchDeg) > SimulationConstants.Mathematical.EPSILON && Math.Abs(altChange) > 0.1)
+        {
+            double lift = CalculateLift(telemetry,wingSurface);
+            double liftContribution = CalculateLiftContribution(lift, deltaSec);
+            altChange += liftContribution;
 
-        //     double drag = CalculateDrag(telemetry);
-        //     double dragEffect = CalculateDragEffect(drag, deltaSec);
-        //     altChange += dragEffect;
-        // }
+            double drag = CalculateDrag(telemetry, frontalSurface);
+            double dragEffect = CalculateDragEffect(drag, deltaSec);
+            altChange += dragEffect;
+        }
 
         return altitude + altChange;
     }

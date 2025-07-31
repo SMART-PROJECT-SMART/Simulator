@@ -12,7 +12,9 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             Dictionary<TelemetryFields, double> telemetry,
             Location current,
             Location destination,
-            double deltaSec
+            double deltaSec,
+            double wingSurface,
+            double frontalSurface
         )
         {
             var speedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
@@ -38,10 +40,15 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
                 pitchDeg,
                 deltaSec,
                 telemetry,
-                current.Altitude
+                current.Altitude,
+                wingSurface,
+                frontalSurface
             );
-            
-            if (Math.Abs(newAlt - destination.Altitude) < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+
+            if (
+                Math.Abs(newAlt - destination.Altitude)
+                < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE
+            )
                 newAlt = destination.Altitude;
             else
                 newAlt = Math.Clamp(newAlt, 0.0, Math.Max(current.Altitude, destination.Altitude));

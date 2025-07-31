@@ -41,7 +41,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
         )
         {
             double altitudeDifference = destination.Altitude - current.Altitude;
-            
+
             if (Math.Abs(altitudeDifference) < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
                 return 0.0;
 
@@ -52,25 +52,41 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 return 0.0;
 
             double remainingDistance = FlightPathMathHelper.CalculateDistance(current, destination);
-            if (remainingDistance <= 0.0 && Math.Abs(altitudeDifference) < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE)
+            if (
+                remainingDistance <= 0.0
+                && Math.Abs(altitudeDifference) < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE
+            )
                 return 0.0;
-            
+
             double pitch;
-            
+
             if (altitudeDifference > 0)
             {
-                double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
-                double horizontalSpeedMps = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
-                
+                double currentSpeedKmph = telemetry.GetValueOrDefault(
+                    TelemetryFields.CurrentSpeedKmph,
+                    0.0
+                );
+                double horizontalSpeedMps =
+                    currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+
                 if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 {
-                    double effectiveDistance = Math.Max(remainingDistance, SimulationConstants.FlightPath.MIN_DISTANCE_M);
-                    double timeToReachTarget = Math.Max(effectiveDistance / horizontalSpeedMps, 2.0);
+                    double effectiveDistance = Math.Max(
+                        remainingDistance,
+                        SimulationConstants.FlightPath.MIN_DISTANCE_M
+                    );
+                    double timeToReachTarget = Math.Max(
+                        effectiveDistance / horizontalSpeedMps,
+                        2.0
+                    );
                     double requiredVerticalSpeedMps = altitudeDifference / timeToReachTarget;
-                    
-                    double requiredPitchRad = Math.Atan2(requiredVerticalSpeedMps, horizontalSpeedMps);
+
+                    double requiredPitchRad = Math.Atan2(
+                        requiredVerticalSpeedMps,
+                        horizontalSpeedMps
+                    );
                     pitch = UnitConversionHelper.ToDegrees(requiredPitchRad);
-                    
+
                     pitch = Math.Clamp(pitch, 0.0, SimulationConstants.FlightPath.MAX_CLIMB_DEG);
                 }
                 else
@@ -80,18 +96,31 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             }
             else if (altitudeDifference < 0)
             {
-                double currentSpeedKmph = telemetry.GetValueOrDefault(TelemetryFields.CurrentSpeedKmph, 0.0);
-                double horizontalSpeedMps = currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
-                
+                double currentSpeedKmph = telemetry.GetValueOrDefault(
+                    TelemetryFields.CurrentSpeedKmph,
+                    0.0
+                );
+                double horizontalSpeedMps =
+                    currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+
                 if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 {
-                    double effectiveDistance = Math.Max(remainingDistance, SimulationConstants.FlightPath.MIN_DISTANCE_M);
-                    double timeToReachTarget = Math.Max(effectiveDistance / horizontalSpeedMps, 2.0);
+                    double effectiveDistance = Math.Max(
+                        remainingDistance,
+                        SimulationConstants.FlightPath.MIN_DISTANCE_M
+                    );
+                    double timeToReachTarget = Math.Max(
+                        effectiveDistance / horizontalSpeedMps,
+                        2.0
+                    );
                     double requiredVerticalSpeedMps = altitudeDifference / timeToReachTarget;
-                    
-                    double requiredPitchRad = Math.Atan2(requiredVerticalSpeedMps, horizontalSpeedMps);
+
+                    double requiredPitchRad = Math.Atan2(
+                        requiredVerticalSpeedMps,
+                        horizontalSpeedMps
+                    );
                     pitch = UnitConversionHelper.ToDegrees(requiredPitchRad);
-                    
+
                     pitch = Math.Clamp(pitch, -SimulationConstants.FlightPath.MAX_DESCENT_DEG, 0.0);
                 }
                 else
@@ -105,41 +134,6 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             }
 
             return pitch;
-        }
-
-        private double ApplyPhysicsCorrections(
-            Dictionary<TelemetryFields, double> telemetry,
-            double basicPitch,
-            double altitudeDifference
-        )
-        {
-            double mass = telemetry.GetValueOrDefault(TelemetryFields.Mass, 1.0);
-            double weight = mass * SimulationConstants.FlightPath.GRAVITY_MPS2;
-            double thrust = FlightPhysicsCalculator.CalculateThrust(telemetry);
-            double drag = FlightPhysicsCalculator.CalculateDrag(telemetry);
-
-            if (altitudeDifference > 0)
-            {
-                double maxClimbPitch = SimulationConstants.FlightPath.MAX_CLIMB_DEG;
-                double pitchRad = UnitConversionHelper.ToRadians(maxClimbPitch);
-                double requiredThrust = Math.Sin(pitchRad) * weight;
-                
-                if (thrust >= requiredThrust)
-                {
-                    return Math.Min(basicPitch, maxClimbPitch);
-                }
-                else
-                {
-                    double maxPossiblePitch = UnitConversionHelper.ToDegrees(Math.Asin(thrust / weight));
-                    return Math.Min(basicPitch, maxPossiblePitch);
-                }
-            }
-            else if (altitudeDifference < 0)
-            {
-                return Math.Max(basicPitch, -SimulationConstants.FlightPath.MAX_DESCENT_DEG);
-            }
-
-            return basicPitch;
         }
 
         private double CalculatePhysicsBasedRoll(
@@ -179,7 +173,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             double maxRollRate = SimulationConstants.FlightPath.MAX_ROLL_RATE_DEG_PER_SEC;
             double maxRollDelta = maxRollRate * deltaSec;
             double rollDiff = targetRoll - _lastRoll;
-            
+
             if (Math.Abs(rollDiff) <= maxRollDelta)
             {
                 _lastRoll = targetRoll;
@@ -188,7 +182,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             {
                 _lastRoll += Math.Sign(rollDiff) * maxRollDelta;
             }
-            
+
             return _lastRoll;
         }
 

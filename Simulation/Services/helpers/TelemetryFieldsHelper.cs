@@ -1,6 +1,9 @@
-using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Simulation.Services.helpers
 {
@@ -8,51 +11,47 @@ namespace Simulation.Services.helpers
     {
         public static Dictionary<TelemetryFields, double> Initialize(params string[] categories)
         {
-            var dict = new Dictionary<TelemetryFields, double>();
-            var all = Enum.GetValues(typeof(TelemetryFields)).Cast<TelemetryFields>();
-            foreach (var field in all)
+            var telemetryData = new Dictionary<TelemetryFields, double>();
+
+            foreach (TelemetryFields field in Enum.GetValues<TelemetryFields>())
             {
-                var attr = typeof(TelemetryFields)
-                    .GetField(field.ToString())!
-                    .GetCustomAttributes(typeof(TelemetryCategoryAttribute), false)
-                    .Cast<TelemetryCategoryAttribute>()
-                    .FirstOrDefault();
-                if (categories.Length == 0 || categories.Contains(attr?.Category))
-                    dict[field] = field switch
-                    {
-                        TelemetryFields.FuelTankCapacity => dict.ContainsKey(TelemetryFields.FuelTankCapacity)
-                            ? dict[TelemetryFields.FuelTankCapacity]
-                            : SimulationConstants.Hermes900_Constants.FuelTankCapacity,
-                        TelemetryFields.FuelAmount => dict.ContainsKey(TelemetryFields.FuelTankCapacity)
-                            ? dict[TelemetryFields.FuelTankCapacity]
-                            : SimulationConstants.Hermes900_Constants.FuelTankCapacity,
-                        TelemetryFields.FuelConsumption => SimulationConstants.Hermes900_Constants.FuelConsumption,
-                        _ => 0.0
-                    };
+                var attribute = GetTelemetryCategoryAttribute(field);
+                if (attribute != null && categories.Contains(attribute.Category))
+                {
+                    telemetryData[field] = GetDefaultValue(field);
+                }
             }
-            return dict;
+
+            return telemetryData;
         }
 
-        public static Dictionary<TelemetryFields, double> FlightOnly() =>
-            Initialize(TelemetryCategories.Flight);
-
-        public static Dictionary<TelemetryFields, double> ArmedOnly() =>
-            Initialize(TelemetryCategories.Armed);
-
-        public static Dictionary<TelemetryFields, double> SurveillanceOnly() =>
-            Initialize(TelemetryCategories.Surveillance);
-
-        public static Dictionary<TelemetryFields, double> All() => Initialize();
-
-        public static void SetLocation(
-            this Dictionary<TelemetryFields, double> telemetry,
-            Location loc
-        )
+        public static Dictionary<TelemetryFields, double> FlightOnly()
         {
-            telemetry[TelemetryFields.Latitude] = loc.Latitude;
-            telemetry[TelemetryFields.Longitude] = loc.Longitude;
-            telemetry[TelemetryFields.Altitude] = loc.Altitude;
-            telemetry[TelemetryFields.CurrentSpeedKmph] = SimulationConstants.FlightPath.MIN_SPEED_KMH;
+            return Initialize(TelemetryCategories.Flight);
+        }
+
+        public static void SetLocation(this Dictionary<TelemetryFields, double> telemetryData, Location location)
+        {
+            telemetryData[TelemetryFields.Latitude] = location.Latitude;
+            telemetryData[TelemetryFields.Longitude] = location.Longitude;
+            telemetryData[TelemetryFields.Altitude] = location.Altitude;
+        }
+
+        private static TelemetryCategoryAttribute GetTelemetryCategoryAttribute(TelemetryFields field)
+        {
+            var fieldInfo = typeof(TelemetryFields).GetField(field.ToString());
+            return fieldInfo?.GetCustomAttribute<TelemetryCategoryAttribute>();
+        }
+
+        private static double GetDefaultValue(TelemetryFields field)
+        {
+            return field switch
+            {
+
+                TelemetryFields.DataStorageUsedGB => 0.0,
+
+                _ => 0.0
+            };
         }
     }
 }

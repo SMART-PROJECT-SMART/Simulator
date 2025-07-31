@@ -104,9 +104,9 @@ namespace Simulation.Common.constants
             public const double MAX_DESCENT_RATE_MPS = 10.0;
             public const double MAX_CLIMB_DEG = 20.0;
             public const double MAX_DESCENT_DEG = 20.0;
-                    public const double MAX_TURN_RATE_DEG_PER_SEC = 8.0;
-        public const double MAX_ROLL_RATE_DEG_PER_SEC = 8.0;
-        public const double TURN_PROGRESS_NORMALIZATION_DEG = 90.0;
+            public const double MAX_TURN_RATE_DEG_PER_SEC = 8.0;
+            public const double MAX_ROLL_RATE_DEG_PER_SEC = 8.0;
+            public const double TURN_PROGRESS_NORMALIZATION_DEG = 90.0;
             public const double TURN_START_PHASE_THRESHOLD = 0.3;
             public const double TURN_END_PHASE_THRESHOLD = 0.7;
             public const double CURVE_ROLL_THRESHOLD_DEG = 1.0;
@@ -125,10 +125,10 @@ namespace Simulation.Common.constants
             public const double MIN_RELEVENT_YAW = 0.1;
             public const double FULL_TURN = 1.0;
             public const double MIN_PITCH = 0.2;
-                    public const double MIN_PITCH_REDUCTION_FACTOR = 0.6;
-        public const double PITCH_REDUCTION_RATE = 0.3;
-                    public const double ALTITUDE_HOLD_THRESHOLD = 2.0;
-        public const double ALTITUDE_HOLD_GAIN = 8.0;
+            public const double MIN_PITCH_REDUCTION_FACTOR = 0.6;
+            public const double PITCH_REDUCTION_RATE = 0.3;
+            public const double ALTITUDE_HOLD_THRESHOLD = 2.0;
+            public const double ALTITUDE_HOLD_GAIN = 8.0;
             public const double MISSION_COMPLETION_RADIUS_M = 10.0;
             public const double ALTITUDE_HOLD_TIME_TO_TARGET_SEC = 0.5;
         }

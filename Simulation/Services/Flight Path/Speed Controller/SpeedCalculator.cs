@@ -8,27 +8,31 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
     {
         public double ComputeNextSpeed(
             Dictionary<TelemetryFields, double> telemetry,
+            double maxAccelerationMps2,
+            double maxCruiseSpeedKmph,
             double remainingKm,
-            double deltaSeconds
+            double deltaSeconds,
+            double thrustMax,
+            double frontalSurface,
+            double mass,
+            double maxCruiseSpeed
         )
         {
             double currentSpeed = telemetry.GetValueOrDefault(
                 TelemetryFields.CurrentSpeedKmph,
                 0.0
             );
-            double maxAcceleration = telemetry.GetValueOrDefault(
-                TelemetryFields.MaxAccelerationMps2,
-                0.0
-            );
-            double cruiseSpeed = telemetry.GetValueOrDefault(
-                TelemetryFields.MaxCruiseSpeedKmph,
-                0.0
-            );
 
-            double physicsAcceleration = FlightPhysicsCalculator.CalculateAcceleration(telemetry);
-            double acceleration = Math.Min(physicsAcceleration, maxAcceleration);
+            double physicsAcceleration = FlightPhysicsCalculator.CalculateAcceleration(telemetry,
+                thrustMax,
+                frontalSurface,
+                mass,
+                maxAccelerationMps2,
+                maxCruiseSpeed);
 
-            double speedProgress = currentSpeed / cruiseSpeed;
+            double acceleration = Math.Min(physicsAcceleration, maxAccelerationMps2);
+
+            double speedProgress = currentSpeed / maxCruiseSpeedKmph;
             double accelerationMultiplier = CalculateAccelerationMultiplier(speedProgress);
             acceleration *= accelerationMultiplier;
 
@@ -38,7 +42,7 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
             newSpeed = Math.Clamp(
                 newSpeed,
                 SimulationConstants.FlightPath.MIN_SPEED_KMH,
-                cruiseSpeed
+                maxCruiseSpeedKmph
             );
 
             telemetry[TelemetryFields.CurrentSpeedKmph] = newSpeed;

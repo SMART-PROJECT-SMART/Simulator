@@ -9,50 +9,25 @@ namespace Simulation.Models.UAVs.ArmedUav
             : base(
                 startLocation,
                 tailId,
+                SimulationConstants.Hermes900_Constants.Mass,
+                SimulationConstants.Hermes900_Constants.FrontalSurface,
+                SimulationConstants.Hermes900_Constants.WingsSurface,
+                SimulationConstants.Hermes900_Constants.ThrustMax,
+                SimulationConstants.Hermes900_Constants.MaxCruiseSpeedKmph,
+                SimulationConstants.Hermes900_Constants.MaxAcceleration,
+                SimulationConstants.Hermes900_Constants.MaxDeceleration,
                 SimulationConstants.Hermes900_Constants.FuelTankCapacity,
                 SimulationConstants.Hermes900_Constants.FuelConsumption
             )
         {
-            TelemetryData[TelemetryFields.Mass] = SimulationConstants.Hermes900_Constants.Mass;
-            TelemetryData[TelemetryFields.FrontalSurface] = SimulationConstants
-                .Hermes900_Constants
-                .FrontalSurface;
-            TelemetryData[TelemetryFields.WingsSurface] = SimulationConstants
-                .Hermes900_Constants
-                .WingsSurface;
-            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants
-                .Hermes900_Constants
-                .DragCoefficient;
-            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants
-                .Hermes900_Constants
-                .LiftCoefficient;
-            TelemetryData[TelemetryFields.ThrustMax] = SimulationConstants
-                .Hermes900_Constants
-                .ThrustMax;
-            TelemetryData[TelemetryFields.MaxCruiseSpeedKmph] = SimulationConstants
-                .Hermes900_Constants
-                .MaxCruiseSpeedKmph;
-            TelemetryData[TelemetryFields.MaxAccelerationMps2] = SimulationConstants
-                .Hermes900_Constants
-                .MaxAcceleration;
-            TelemetryData[TelemetryFields.MaxDecelerationMps2] = SimulationConstants
-                .Hermes900_Constants
-                .MaxDeceleration;
-            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants
-                .Hermes900_Constants
-                .CruiseAltitude;
-            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
-                .Hermes900_Constants
-                .ThrustAfterInfluence;
-            TelemetryData[TelemetryFields.HellfireAmmo] = SimulationConstants
-                .Hermes900_Constants
-                .HellfireAmmo;
-            TelemetryData[TelemetryFields.SpikeNLOSAmmo] = SimulationConstants
-                .Hermes900_Constants
-                .SpikeNLOSAmmo;
-            TelemetryData[TelemetryFields.GriffinAmmo] = SimulationConstants
-                .Hermes900_Constants
-                .GriffinAmmo;
+            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants.Hermes900_Constants.DragCoefficient;
+            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants.Hermes900_Constants.LiftCoefficient;
+            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants.Hermes900_Constants.CruiseAltitude;
+            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants.Hermes900_Constants.ThrustAfterInfluence;
+
+            WeaponAmmo[WeaponType.Hellfire] = (int)SimulationConstants.Hermes900_Constants.HellfireAmmo;
+            WeaponAmmo[WeaponType.SpikeNLOS] = (int)SimulationConstants.Hermes900_Constants.SpikeNLOSAmmo;
+            WeaponAmmo[WeaponType.Griffin] = (int)SimulationConstants.Hermes900_Constants.GriffinAmmo;
         }
     }
 }
