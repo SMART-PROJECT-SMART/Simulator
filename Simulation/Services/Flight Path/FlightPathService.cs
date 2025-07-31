@@ -84,6 +84,11 @@ public class FlightPathService : IDisposable
         );
     }
 
+    public void SwitchDestination(Location newDestination)
+    {
+        _destination = newDestination;
+    }
+
     private void UpdateLocation(object? state)
     {
         if (_missionCompleted)

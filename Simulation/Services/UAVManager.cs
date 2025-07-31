@@ -1,41 +1,86 @@
-﻿using Simulation.Models;
+﻿
+using Simulation.Models;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
+using Simulation.Services.Flight_Path.Motion_Calculator;
+using Simulation.Services.Flight_Path.Orientation_Calculator;
+using Simulation.Services.Flight_Path.Speed_Controller;
 
 namespace Simulation.Services
 {
     public class UAVManager
     {
-        private Dictionary<UAV, bool> _uavsStatus;
-        private readonly FlightPathService _flightPathService;
+        private Dictionary<int, UAV> _uavsStatus;
+        private Dictionary<int, FlightPathService> _activeFlights;
+        private readonly IMotionCalculator _motionCalculator;
+        private readonly ISpeedController _speedController;
+        private readonly IOrientationCalculator _orientationCalculator;
+        private readonly ILogger<FlightPathService> _logger;
 
-        public UAVManager(FlightPathService flightPathService)
+        public UAVManager(
+            IMotionCalculator motionCalculator,
+            ISpeedController speedController,
+            IOrientationCalculator orientationCalculator,
+            ILogger<FlightPathService> logger)
         {
-            _uavsStatus = new Dictionary<UAV, bool>();
-            _flightPathService = flightPathService;
+            _uavsStatus = new Dictionary<int, UAV>();
+            _activeFlights = new Dictionary<int, FlightPathService>();
+            _motionCalculator = motionCalculator;
+            _speedController = speedController;
+            _orientationCalculator = orientationCalculator;
+            _logger = logger;
         }
 
         public void AddUAV(UAV uav)
         {
-            _uavsStatus[uav] = false;
+            _uavsStatus[uav.TailId] = uav;
+        }
+
+        public void RemoveUAV(int tailId)
+        {
+            if (_activeFlights.TryGetValue(tailId, out var flightService))
+            {
+                flightService.Dispose();
+                _activeFlights.Remove(tailId);
+            }
+            _uavsStatus.Remove(tailId);
         }
 
         public async Task<bool> StartMission(UAV uav, Location destination)
         {
-            _flightPathService.Initialize(uav, destination);
-            _flightPathService.StartFlightPath();
+            var flightService = new FlightPathService(
+                _motionCalculator,
+                _speedController,
+                _orientationCalculator,
+                _logger
+            );
+
+            _activeFlights[uav.TailId] = flightService;
+
+            flightService.Initialize(uav, destination);
+            flightService.StartFlightPath();
 
             var tcs = new TaskCompletionSource<bool>();
-            _flightPathService.MissionCompleted += () =>
+            flightService.MissionCompleted += () =>
             {
                 tcs.SetResult(true);
                 uav.Land();
-                _uavsStatus[uav] = true;
+                _activeFlights.Remove(uav.TailId);
             };
 
             await tcs.Task;
-            _flightPathService.Dispose();
+            flightService.Dispose();
             return true;
+        }
+
+        public bool SwitchDestination(int tailId, Location newDestination)
+        {
+            if (_activeFlights.TryGetValue(tailId, out var flightService))
+            {
+                flightService.SwitchDestination(newDestination);
+                return true;
+            }
+            return false;
         }
     }
 }
