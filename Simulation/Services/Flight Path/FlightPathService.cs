@@ -115,24 +115,24 @@ public class FlightPathService : IDisposable
 
         double newSpeed = _speedController.ComputeNextSpeed(
             telemetry,
-            _uav.MaxAccelerationMps2,
-            _uav.MaxCruiseSpeed,
+            _uav.Properties[UAVProperties.MaxAcceleration],
+            _uav.Properties[UAVProperties.MaxAcceleration],
             remainingMeters,
             SimulationConstants.FlightPath.DELTA_SECONDS,
-            _uav.ThrustMax,
-            _uav.FrontalSurface,
-            _uav.Mass,
-            _uav.MaxAccelerationMps2
+            _uav.Properties[UAVProperties.MaxAcceleration],
+            _uav.Properties[UAVProperties.MaxAcceleration],
+            _uav.Properties[UAVProperties.MaxAcceleration],
+            _uav.Properties[UAVProperties.MaxAcceleration].ToKmhFromMps()
         );
         telemetry[TelemetryFields.CurrentSpeedKmph] = newSpeed;
 
-        double maxCruise = _uav.MaxCruiseSpeed;
+        double maxCruise = _uav.Properties[UAVProperties.MaxAcceleration];
         double throttlePct = Math.Clamp(newSpeed / maxCruise * 100.0, 0.0, 100.0);
         telemetry[TelemetryFields.ThrottlePercent] = throttlePct;
 
         double thrustMax = telemetry.GetValueOrDefault(TelemetryFields.ThrustAfterInfluence, 0.0);
         double thrust = thrustMax * (throttlePct / 100.0);
-        double sfc = _uav.FuelConsumption;
+        double sfc = _uav.Properties[UAVProperties.MaxAcceleration];
         double burnKg = thrust * sfc * SimulationConstants.FlightPath.DELTA_SECONDS;
         double fuelLeft = Math.Max(
             telemetry.GetValueOrDefault(TelemetryFields.FuelAmount, 0.0) - burnKg,
@@ -170,8 +170,8 @@ public class FlightPathService : IDisposable
             currentLoc,
             _destination,
             SimulationConstants.FlightPath.DELTA_SECONDS,
-            _uav.WingsSurface,
-            _uav.FrontalSurface
+            _uav.Properties[UAVProperties.MaxAcceleration],
+            _uav.Properties[UAVProperties.MaxAcceleration]
         );
         telemetry[TelemetryFields.Latitude] = nextLoc.Latitude;
         telemetry[TelemetryFields.Longitude] = nextLoc.Longitude;
