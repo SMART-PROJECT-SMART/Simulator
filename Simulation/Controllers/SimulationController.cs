@@ -47,5 +47,29 @@ namespace Simulation.Controllers
 
             return await CalculateFlightPath(request);
         }
+
+        [HttpGet("run-multi")]
+        public async Task<IActionResult> RunMultipleUAVs()
+        {
+            var uav1StartLocation = new Location(40.6413, -73.7781, 10.0);
+            var uav1 = new Searcher(tailId: 1, startLocation: uav1StartLocation);
+            uav1.TelemetryData[TelemetryFields.YawDeg] = 270.0;
+            var uav1Destination = new Location(40.6450, -73.7750, 120.0);
+
+            var uav2StartLocation = new Location(40.6400, -73.7800, 15.0);
+            var uav2 = new Searcher(tailId: 2, startLocation: uav2StartLocation);
+            uav2.TelemetryData[TelemetryFields.YawDeg] = 90.0;
+            var uav2Destination = new Location(40.6480, -73.7720, 150.0);
+
+            var request1 = new SimulateDto(uav1, uav1Destination);
+            var request2 = new SimulateDto(uav2, uav2Destination);
+
+            var task1 = CalculateFlightPath(request1);
+            var task2 = CalculateFlightPath(request2);
+
+            await Task.WhenAll(task1, task2);
+
+            return Ok("Both UAVs started successfully");
+        }
     }
 }
