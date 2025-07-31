@@ -1,21 +1,23 @@
+using Simulation.Services.Flight_Path.Motion_Calculator;
+using Simulation.Services.Flight_Path.Orientation_Calculator;
+using Simulation.Services.Flight_Path.Speed_Controller;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<IMotionCalculator, MotionCalculator>();
+builder.Services.AddSingleton<ISpeedController, SpeedCalculator>();
+builder.Services.AddSingleton<IOrientationCalculator, OrientationCalculator>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
