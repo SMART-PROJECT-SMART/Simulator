@@ -1,4 +1,6 @@
-﻿using Simulation.Common.Enums;
+﻿using Simulation.Common.constants;
+using Simulation.Common.Enums;
+using Simulation.Ro.FlightPath;
 
 namespace Simulation.Models.UAVs
 {
@@ -35,6 +37,7 @@ namespace Simulation.Models.UAVs
             TelemetryData[TelemetryFields.YawDeg] = 0.0;
             TelemetryData[TelemetryFields.PitchDeg] = 0.0;
             TelemetryData[TelemetryFields.RollDeg] = 0.0;
+            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_DOWN;
         }
 
         public void ConsumeFuel(double deltaSec)
@@ -47,6 +50,23 @@ namespace Simulation.Models.UAVs
             double remainingFuel = TelemetryData[TelemetryFields.FuelAmount];
             remainingFuel = Math.Max(remainingFuel - burnedInKg, 0.0);
             TelemetryData[TelemetryFields.FuelAmount] = remainingFuel;
+            TelemetryData[TelemetryFields.FlightTimeSec] = 0;
+            TelemetryData[TelemetryFields.SignalStrength] = 0;
         }
+
+        public Location GetLocation()
+        {
+            return new Location(TelemetryData[TelemetryFields.Latitude],
+                TelemetryData[TelemetryFields.Longitude],
+                TelemetryData[TelemetryFields.Altitude]);
+        }
+
+
+
+        public void TakeOff() =>
+            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_UP;
+
+        public void Land() =>
+                    TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_DOWN;   
     }
 }

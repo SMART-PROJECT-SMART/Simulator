@@ -11,6 +11,12 @@
         MaxDeceleration,
         FuelTankCapacity,
         FuelConsumption,
+        ReceiveLoss,
+        TransmitLoss,
+        TransmitAntennaGain,
+        ReceiveAntennaGain,
+        TransmitPower,
+        Frequency,
 
         DataStorageCapacityGB,
 

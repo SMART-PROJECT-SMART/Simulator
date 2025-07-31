@@ -15,13 +15,19 @@ namespace Simulation.Common.constants
             public const double Mass = 1100.0;
             public const double FrontalSurface = 4.8;
             public const double WingsSurface = 15.2;
-            public const double DragCoefficient = 0.022;
+            public const double DragCoefficient = 0.002;
             public const double LiftCoefficient = 0.85;
             public const double ThrustMax = 120.0;
             public const double ThrustAfterInfluence = 120.0;
             public const double HellfireAmmo = 2.0;
             public const double SpikeNLOSAmmo = 2.0;
             public const double GriffinAmmo = 1.0;
+            public const double TransmitPowerDbm = 50.0;
+            public const double TransmitAntennaGainDbi = 16.0;
+            public const double ReceiveAntennaGainDbi = 22.0;
+            public const double TransmitLossDb = 1.0;
+            public const double ReceiveLossDb = 1.0;
+            public const double FrequencyHz = 1.3e9;
         }
 
         public static class HeronTP_Constants
@@ -35,13 +41,19 @@ namespace Simulation.Common.constants
             public const double Mass = 4650.0;
             public const double FrontalSurface = 8.2;
             public const double WingsSurface = 26.0;
-            public const double DragCoefficient = 0.018;
+            public const double DragCoefficient = 0.0018;
             public const double LiftCoefficient = 0.9;
             public const double ThrustMax = 1200.0;
             public const double ThrustAfterInfluence = 1200.0;
             public const double HellfireAmmo = 4.0;
             public const double GriffinAmmo = 2.0;
             public const double JDAMAmmo = 1.0;
+            public const double TransmitPowerDbm = 52.0;
+            public const double TransmitAntennaGainDbi = 18.0;
+            public const double ReceiveAntennaGainDbi = 24.0;
+            public const double TransmitLossDb = 1.0;
+            public const double ReceiveLossDb = 1.0;
+            public const double FrequencyHz = 1.3e9;
         }
 
         public static class Hermes450_Constants
@@ -56,10 +68,16 @@ namespace Simulation.Common.constants
             public const double Mass = 450.0;
             public const double FrontalSurface = 2.5;
             public const double WingsSurface = 8.5;
-            public const double DragCoefficient = 0.025;
+            public const double DragCoefficient = 0.0025;
             public const double LiftCoefficient = 0.8;
             public const double ThrustMax = 52.0;
             public const double ThrustAfterInfluence = 52.0;
+            public const double TransmitPowerDbm = 47.0;
+            public const double TransmitAntennaGainDbi = 15.0;
+            public const double ReceiveAntennaGainDbi = 20.0;
+            public const double TransmitLossDb = 1.0;
+            public const double ReceiveLossDb = 1.0;
+            public const double FrequencyHz = 1.3e9;
         }
 
         public static class Searcher_Constants
@@ -74,10 +92,16 @@ namespace Simulation.Common.constants
             public const double Mass = 120.0;
             public const double FrontalSurface = 1.2;
             public const double WingsSurface = 4.8;
-            public const double DragCoefficient = 0.03;
+            public const double DragCoefficient = 0.001;
             public const double LiftCoefficient = 0.75;
             public const double ThrustMax = 150.0;
             public const double ThrustAfterInfluence = 150.0;
+            public const double TransmitPowerDbm = 45.0;
+            public const double TransmitAntennaGainDbi = 14.0;
+            public const double ReceiveAntennaGainDbi = 18.0;
+            public const double TransmitLossDb = 1.5;
+            public const double ReceiveLossDb = 1.5;
+            public const double FrequencyHz = 1.3e9;
         }
 
         public static class FlightPath
@@ -135,20 +159,22 @@ namespace Simulation.Common.constants
 
         public static class Mathematical
         {
-            public const double GRAVITY = 9.81;
+            public const int GIGA = 1000000000;
             public const double EPSILON = 1e-10;
             public const double RHO = 1.225;
-            public const double CRITICAL_MACH_NUMBER = 0.78;
-            public const double MAXIMAL_KINETIC_ENERGY_FOR_LANDING = 1323000.0;
-            public const double SPEED_OF_SOUND = 343.2;
             public const double FROM_KMH_TO_MPS = 3.6;
             public const double FROM_MPS_TO_KMH = 3.6;
             public const double FROM_M_TO_KM = 0.0001;
             public const int FULL_TURN_DEGREES = 360;
             public const int HALF_TURN_DEGREES = 180;
-            public const double MAX_HAVERSINE_RANGE = 1.0;
             public const double MIN_ACCELERATION_FACTOR = 0.1;
-            public const double REALISTIC_STOP_PERCENT = 0.3;
+            public const int SPEED_OF_LIGHT_MPS = 299792458;
+        }
+
+        public static class TelemetryData
+        {
+            public const double WHEELS_UP = 0;
+            public const double WHEELS_DOWN = 1;
         }
     }
 }

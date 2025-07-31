@@ -37,8 +37,6 @@ public class SimulationController : ControllerBase
     public async Task<IActionResult> CalculateFlightPath([FromBody] SimulateDto dto)
     {
         var telemetry = dto.UAV.TelemetryData;
-        if (telemetry == null)
-            return BadRequest("TelemetryData is required on the UAV.");
         double cruiseAlt = telemetry.GetValueOrDefault(
             TelemetryFields.CruiseAltitude,
             dto.Destination.Altitude
@@ -57,7 +55,11 @@ public class SimulationController : ControllerBase
         flightService.StartFlightPath();
 
         var tcs = new TaskCompletionSource<bool>();
-        flightService.MissionCompleted += () => tcs.SetResult(true);
+        flightService.MissionCompleted += () =>
+        {
+            tcs.SetResult(true);
+            dto.UAV.Land();
+        };
 
         await tcs.Task;
         flightService.Dispose();

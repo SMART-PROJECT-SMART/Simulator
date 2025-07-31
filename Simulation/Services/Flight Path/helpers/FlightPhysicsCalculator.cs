@@ -116,29 +116,57 @@ public static class FlightPhysicsCalculator
             0.0
         );
         double horizontalSpeedMps =
-            currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+            currentSpeedKmph.ToKmhFromMps();
         double pitchRad = pitchDeg.ToRadians();
 
         double verticalVelocityMps = horizontalSpeedMps * Math.Tan(pitchRad);
 
         double altChange = verticalVelocityMps * deltaSec;
 
-        //if (
-        //    Math.Abs(pitchDeg) > SimulationConstants.Mathematical.EPSILON
-        //    && Math.Abs(altChange) > 0.1
-        //)
-        //{
-        //    double lift = CalculateLift(telemetry, wingSurface);
-        //    double liftContribution = CalculateLiftContribution(lift, deltaSec);
-        //    altChange += liftContribution;
+        if (
+            Math.Abs(pitchDeg) > SimulationConstants.Mathematical.EPSILON
+            && Math.Abs(altChange) > 0.1
+        )
+        {
+            double lift = CalculateLift(telemetry, wingSurface);
+            double liftContribution = CalculateLiftContribution(lift, deltaSec);
+            altChange += liftContribution;
 
-        //    double drag = CalculateDrag(telemetry, frontalSurface);
-        //    double dragEffect = CalculateDragEffect(drag, deltaSec);
-        //    altChange += dragEffect;
-        //}
+            double drag = CalculateDrag(telemetry, frontalSurface);
+            double dragEffect = CalculateDragEffect(drag, deltaSec);
+            altChange += dragEffect;
+        }
 
         return altitude + altChange;
     }
+
+    public static double CalculateReceivedSignalStrengthDbm(
+        double transmitPowerInDbm,
+        double transmitAntennaGainInDbi,
+        double receiveAntennaGainInDbi,
+        double transmitSystemLossInDb,
+        double receiveSystemLossInDb,
+        double operatingFrequencyInHertz,
+        double separationDistanceInMeters)
+    {
+
+        double pathLossInDb = FrisPathLoss(separationDistanceInMeters, operatingFrequencyInHertz);
+
+        double receivedPowerDbm = transmitPowerInDbm
+                                  + transmitAntennaGainInDbi
+                                  + receiveAntennaGainInDbi
+                                  - transmitSystemLossInDb
+                                  - receiveSystemLossInDb
+                                  - pathLossInDb;
+
+        return receivedPowerDbm;
+    }
+    private static double FrisPathLoss(double separationDistanceInMeters, double operatingFrequencyInHertz)
+    {
+        double wavelengthMeters = SimulationConstants.Mathematical.SPEED_OF_LIGHT_MPS / operatingFrequencyInHertz;
+        return 20 * Math.Log10(4 * Math.PI * separationDistanceInMeters / wavelengthMeters);
+    }
+
 
     private static double CalculateLiftContribution(double lift, double deltaSec) =>
         (lift * deltaSec).FromMToKm();

@@ -67,6 +67,16 @@ namespace Simulation.Models.UAVs.ArmedUav
                 [UAVProperties.FuelConsumption] = SimulationConstants
                     .Hermes900_Constants
                     .FuelConsumption,
+                [UAVProperties.TransmitPower] = SimulationConstants
+                    .Hermes900_Constants
+                    .TransmitPowerDbm,
+                [UAVProperties.TransmitAntennaGain] = SimulationConstants
+                    .Hermes900_Constants
+                    .TransmitAntennaGainDbi,
+                [UAVProperties.ReceiveAntennaGain] = SimulationConstants.Hermes900_Constants.ReceiveAntennaGainDbi,
+                [UAVProperties.TransmitLoss] = SimulationConstants.Hermes900_Constants.TransmitLossDb,
+                [UAVProperties.ReceiveLoss] = SimulationConstants.Hermes900_Constants.ReceiveLossDb,
+                [UAVProperties.Frequency] = SimulationConstants.Hermes900_Constants.FrequencyHz
             };
         }
     }
