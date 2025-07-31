@@ -115,8 +115,7 @@ public static class FlightPhysicsCalculator
             TelemetryFields.CurrentSpeedKmph,
             0.0
         );
-        double horizontalSpeedMps =
-            currentSpeedKmph.ToKmhFromMps();
+        double horizontalSpeedMps = currentSpeedKmph.ToKmhFromMps();
         double pitchRad = pitchDeg.ToRadians();
 
         double verticalVelocityMps = horizontalSpeedMps * Math.Tan(pitchRad);
@@ -147,25 +146,28 @@ public static class FlightPhysicsCalculator
         double transmitSystemLossInDb,
         double receiveSystemLossInDb,
         double operatingFrequencyInHertz,
-        double separationDistanceInMeters)
+        double separationDistanceInMeters
+    )
     {
-
         double pathLossInDb = FrisPathLoss(separationDistanceInMeters, operatingFrequencyInHertz);
 
         return transmitPowerInDbm
-                                  + transmitAntennaGainInDbi
-                                  + receiveAntennaGainInDbi
-                                  - transmitSystemLossInDb
-                                  - receiveSystemLossInDb
-                                  - pathLossInDb;
-
+            + transmitAntennaGainInDbi
+            + receiveAntennaGainInDbi
+            - transmitSystemLossInDb
+            - receiveSystemLossInDb
+            - pathLossInDb;
     }
-    private static double FrisPathLoss(double separationDistanceInMeters, double operatingFrequencyInHertz)
+
+    private static double FrisPathLoss(
+        double separationDistanceInMeters,
+        double operatingFrequencyInHertz
+    )
     {
-        double wavelengthMeters = SimulationConstants.Mathematical.SPEED_OF_LIGHT_MPS / operatingFrequencyInHertz;
+        double wavelengthMeters =
+            SimulationConstants.Mathematical.SPEED_OF_LIGHT_MPS / operatingFrequencyInHertz;
         return 20 * Math.Log10(4 * Math.PI * separationDistanceInMeters / wavelengthMeters);
     }
-
 
     private static double CalculateLiftContribution(double lift, double deltaSec) =>
         (lift * deltaSec).FromMToKm();

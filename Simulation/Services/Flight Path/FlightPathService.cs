@@ -96,7 +96,10 @@ public class FlightPathService : IDisposable
             telemetry[TelemetryFields.Altitude]
         );
         double remainingMeters = FlightPathMathHelper.CalculateDistance(currentLoc, _destination);
-        double distanceFromStart = FlightPathMathHelper.CalculateDistance(_startLocation, currentLoc);
+        double distanceFromStart = FlightPathMathHelper.CalculateDistance(
+            _startLocation,
+            currentLoc
+        );
 
         bool horizontalReached =
             remainingMeters <= SimulationConstants.FlightPath.MISSION_COMPLETION_RADIUS_M;
@@ -145,7 +148,8 @@ public class FlightPathService : IDisposable
                 _uav.Properties[UAVProperties.TransmitLoss],
                 _uav.Properties[UAVProperties.ReceiveLoss],
                 _uav.Properties[UAVProperties.Frequency],
-                distanceFromStart);
+                distanceFromStart
+            );
 
         if (MissionAborted(telemetry))
         {
@@ -216,8 +220,12 @@ public class FlightPathService : IDisposable
 
     public bool MissionAborted(Dictionary<TelemetryFields, double> telemetryData)
     {
-        _logger.LogInformation("signal strength {st}",
-            telemetryData[TelemetryFields.SignalStrength]);
-        return telemetryData[TelemetryFields.FuelAmount] <= 0.0 || telemetryData[TelemetryFields.SignalStrength] < SimulationConstants.TelemetryData.NO_SIGNAL;
+        _logger.LogInformation(
+            "signal strength {st}",
+            telemetryData[TelemetryFields.SignalStrength]
+        );
+        return telemetryData[TelemetryFields.FuelAmount] <= 0.0
+            || telemetryData[TelemetryFields.SignalStrength]
+                < SimulationConstants.TelemetryData.NO_SIGNAL;
     }
 }
