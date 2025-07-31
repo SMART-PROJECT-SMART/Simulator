@@ -22,10 +22,22 @@ namespace Simulation.Models.UAVs.ArmedUav
             double fuelTankCapacity,
             double fuelConsumption
         )
-            : base(startLocation, tailId, mass, frontalSurface, wingsSurface, thrustMax, maxCruiseSpeed, maxAccelerationMps2, maxDecelerationMps2, fuelTankCapacity, fuelConsumption)
+            : base(
+                startLocation,
+                tailId,
+                mass,
+                frontalSurface,
+                wingsSurface,
+                thrustMax,
+                maxCruiseSpeed,
+                maxAccelerationMps2,
+                maxDecelerationMps2,
+                fuelTankCapacity,
+                fuelConsumption
+            )
         {
             WeaponAmmo = new Dictionary<WeaponType, int>();
-            IsWeaponSystemArmed = false; 
+            IsWeaponSystemArmed = false;
             WeaponSystemHealth = 100.0;
         }
     }

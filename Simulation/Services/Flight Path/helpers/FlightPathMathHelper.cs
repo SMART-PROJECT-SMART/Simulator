@@ -10,7 +10,7 @@ namespace Simulation.Services.Flight_Path.helpers
         {
             double fromLatRad = from.Latitude.ToRadians();
             double toLatRad = to.Latitude.ToRadians();
-            double deltaLonRad = to.Longitude - from.Longitude.ToRadians();
+            double deltaLonRad = to.Longitude.ToRadians() - from.Longitude.ToRadians();
 
             double y = Math.Sin(deltaLonRad) * Math.Cos(toLatRad);
             double x =
@@ -31,30 +31,35 @@ namespace Simulation.Services.Flight_Path.helpers
 
         public static double CalculateDistance(Location a, Location b)
         {
-            if (Math.Abs(a.Latitude - b.Latitude) < SimulationConstants.Mathematical.EPSILON &&
-                Math.Abs(a.Longitude - b.Longitude) < SimulationConstants.Mathematical.EPSILON)
+            if (
+                Math.Abs(a.Latitude - b.Latitude) < SimulationConstants.Mathematical.EPSILON
+                && Math.Abs(a.Longitude - b.Longitude) < SimulationConstants.Mathematical.EPSILON
+            )
             {
                 return Math.Abs(b.Altitude - a.Altitude);
             }
 
-            double lat1Rad = UnitConversionHelper.ToRadians(a.Latitude);
-            double lat2Rad = UnitConversionHelper.ToRadians(b.Latitude);
+            double lat1Rad = a.Latitude.ToRadians();
+            double lat2Rad = b.Latitude.ToRadians();
             double deltaLatRad = lat2Rad - lat1Rad;
-            double deltaLonRad = UnitConversionHelper.ToRadians(b.Longitude - a.Longitude);
+            double deltaLonRad = (b.Longitude - a.Longitude).ToRadians();
 
             double sinDeltaLat = Math.Sin(deltaLatRad / 2);
             double sinDeltaLon = Math.Sin(deltaLonRad / 2);
-            double haversine = sinDeltaLat * sinDeltaLat
-                               + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
+            double haversine =
+                sinDeltaLat * sinDeltaLat
+                + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
+
             haversine = Math.Min(1.0, Math.Max(0.0, haversine));
-
             double angularDistance = 2 * Math.Atan2(Math.Sqrt(haversine), Math.Sqrt(1 - haversine));
-            double horizontalDistance = SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
 
+            double horizontalDistance =
+                SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
             double verticalDistance = b.Altitude - a.Altitude;
-            return Math.Sqrt(horizontalDistance * horizontalDistance + verticalDistance * verticalDistance);
+            return Math.Sqrt(
+                horizontalDistance * horizontalDistance + verticalDistance * verticalDistance
+            );
         }
-
 
         public static Location CalculateDestinationLocation(
             Location origin,

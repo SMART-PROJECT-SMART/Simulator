@@ -21,10 +21,18 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                 SimulationConstants.Searcher_Constants.DataStorageCapacityGB
             )
         {
-            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants.Searcher_Constants.DragCoefficient;
-            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants.Searcher_Constants.LiftCoefficient;
-            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants.Searcher_Constants.CruiseAltitude;
-            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants.Searcher_Constants.ThrustAfterInfluence;
+            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants
+                .Searcher_Constants
+                .DragCoefficient;
+            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants
+                .Searcher_Constants
+                .LiftCoefficient;
+            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants
+                .Searcher_Constants
+                .CruiseAltitude;
+            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
+                .Searcher_Constants
+                .ThrustAfterInfluence;
 
             SensorStatus[SensorType.ElectroOptical] = true;
             SensorStatus[SensorType.InfraredImaging] = true;

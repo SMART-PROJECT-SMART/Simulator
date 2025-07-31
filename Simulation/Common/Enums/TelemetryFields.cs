@@ -41,7 +41,6 @@ namespace Simulation.Common.Enums
         [TelemetryCategory(TelemetryCategories.Flight)]
         CurrentSpeedKmph,
 
-
         [TelemetryCategory(TelemetryCategories.Flight)]
         YawDeg,
 
@@ -51,13 +50,11 @@ namespace Simulation.Common.Enums
         [TelemetryCategory(TelemetryCategories.Flight)]
         RollDeg,
 
-
         [TelemetryCategory(TelemetryCategories.Flight)]
         ThrustAfterInfluence,
 
         [TelemetryCategory(TelemetryCategories.Flight)]
         FuelAmount,
-
 
         [TelemetryCategory(TelemetryCategories.Surveillance)]
         DataStorageUsedGB,

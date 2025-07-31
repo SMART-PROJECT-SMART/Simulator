@@ -23,12 +23,14 @@ namespace Simulation.Services.Flight_Path.Speed_Controller
                 0.0
             );
 
-            double physicsAcceleration = FlightPhysicsCalculator.CalculateAcceleration(telemetry,
+            double physicsAcceleration = FlightPhysicsCalculator.CalculateAcceleration(
+                telemetry,
                 thrustMax,
                 frontalSurface,
                 mass,
                 maxAccelerationMps2,
-                maxCruiseSpeed);
+                maxCruiseSpeed
+            );
 
             double acceleration = Math.Min(physicsAcceleration, maxAccelerationMps2);
 

@@ -35,7 +35,7 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
                 horizM
             );
 
-            double newAlt = FlightPhysicsCalculator.CalculateAltitudeChange(
+            double rawAlt = FlightPhysicsCalculator.CalculateAltitudeChange(
                 travelM,
                 pitchDeg,
                 deltaSec,
@@ -45,17 +45,18 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
                 frontalSurface
             );
 
-            if (
-                Math.Abs(newAlt - destination.Altitude)
-                < SimulationConstants.FlightPath.ALTITUDE_TOLERANCE
-            )
+            double altChange = rawAlt - current.Altitude;
+            double altDiff = destination.Altitude - current.Altitude;
+            double newAlt;
+            if (Math.Abs(altChange) >= Math.Abs(altDiff))
                 newAlt = destination.Altitude;
             else
-                newAlt = Math.Clamp(newAlt, 0.0, Math.Max(current.Altitude, destination.Altitude));
+                newAlt = current.Altitude + altChange;
 
             nextHoriz.Longitude = nextHoriz.Longitude.NormalizeAngle();
 
             return new Location(nextHoriz.Latitude, nextHoriz.Longitude, newAlt);
         }
+
     }
 }

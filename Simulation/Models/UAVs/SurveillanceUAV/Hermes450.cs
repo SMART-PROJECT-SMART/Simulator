@@ -21,10 +21,18 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                 SimulationConstants.Hermes450_Constants.DataStorageCapacityGB
             )
         {
-            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants.Hermes450_Constants.DragCoefficient;
-            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants.Hermes450_Constants.LiftCoefficient;
-            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants.Hermes450_Constants.CruiseAltitude;
-            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants.Hermes450_Constants.ThrustAfterInfluence;
+            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants
+                .Hermes450_Constants
+                .DragCoefficient;
+            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants
+                .Hermes450_Constants
+                .LiftCoefficient;
+            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants
+                .Hermes450_Constants
+                .CruiseAltitude;
+            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
+                .Hermes450_Constants
+                .ThrustAfterInfluence;
 
             SensorStatus[SensorType.ElectroOptical] = true;
             SensorStatus[SensorType.InfraredImaging] = true;

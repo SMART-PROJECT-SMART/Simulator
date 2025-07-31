@@ -20,14 +20,25 @@ namespace Simulation.Models.UAVs.ArmedUav
                 SimulationConstants.Hermes900_Constants.FuelConsumption
             )
         {
-            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants.Hermes900_Constants.DragCoefficient;
-            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants.Hermes900_Constants.LiftCoefficient;
-            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants.Hermes900_Constants.CruiseAltitude;
-            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants.Hermes900_Constants.ThrustAfterInfluence;
+            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants
+                .Hermes900_Constants
+                .DragCoefficient;
+            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants
+                .Hermes900_Constants
+                .LiftCoefficient;
+            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants
+                .Hermes900_Constants
+                .CruiseAltitude;
+            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
+                .Hermes900_Constants
+                .ThrustAfterInfluence;
 
-            WeaponAmmo[WeaponType.Hellfire] = (int)SimulationConstants.Hermes900_Constants.HellfireAmmo;
-            WeaponAmmo[WeaponType.SpikeNLOS] = (int)SimulationConstants.Hermes900_Constants.SpikeNLOSAmmo;
-            WeaponAmmo[WeaponType.Griffin] = (int)SimulationConstants.Hermes900_Constants.GriffinAmmo;
+            WeaponAmmo[WeaponType.Hellfire] = (int)
+                SimulationConstants.Hermes900_Constants.HellfireAmmo;
+            WeaponAmmo[WeaponType.SpikeNLOS] = (int)
+                SimulationConstants.Hermes900_Constants.SpikeNLOSAmmo;
+            WeaponAmmo[WeaponType.Griffin] = (int)
+                SimulationConstants.Hermes900_Constants.GriffinAmmo;
         }
     }
 }

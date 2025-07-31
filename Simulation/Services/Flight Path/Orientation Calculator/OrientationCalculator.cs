@@ -101,7 +101,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                     0.0
                 );
                 double horizontalSpeedMps =
-                    currentSpeedKmph / SimulationConstants.Mathematical.FROM_KMH_TO_MPS;
+                    currentSpeedKmph;
 
                 if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 {

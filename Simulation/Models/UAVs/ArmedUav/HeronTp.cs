@@ -20,12 +20,21 @@ namespace Simulation.Models.UAVs.ArmedUav
                 SimulationConstants.HeronTP_Constants.FuelConsumption
             )
         {
-            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants.HeronTP_Constants.DragCoefficient;
-            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants.HeronTP_Constants.LiftCoefficient;
-            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants.HeronTP_Constants.CruiseAltitude;
-            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants.HeronTP_Constants.ThrustAfterInfluence;
+            TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants
+                .HeronTP_Constants
+                .DragCoefficient;
+            TelemetryData[TelemetryFields.LiftCoefficient] = SimulationConstants
+                .HeronTP_Constants
+                .LiftCoefficient;
+            TelemetryData[TelemetryFields.CruiseAltitude] = SimulationConstants
+                .HeronTP_Constants
+                .CruiseAltitude;
+            TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
+                .HeronTP_Constants
+                .ThrustAfterInfluence;
 
-            WeaponAmmo[WeaponType.Hellfire] = (int)SimulationConstants.HeronTP_Constants.HellfireAmmo;
+            WeaponAmmo[WeaponType.Hellfire] = (int)
+                SimulationConstants.HeronTP_Constants.HellfireAmmo;
             WeaponAmmo[WeaponType.Griffin] = (int)SimulationConstants.HeronTP_Constants.GriffinAmmo;
             WeaponAmmo[WeaponType.JDAM] = (int)SimulationConstants.HeronTP_Constants.JDAMAmmo;
         }

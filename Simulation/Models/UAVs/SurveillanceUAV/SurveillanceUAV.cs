@@ -22,7 +22,19 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             double fuelConsumption,
             double dataStorageCapacityGB
         )
-            : base(startLocation, tailId, mass, frontalSurface, wingsSurface, thrustMax, maxCruiseSpeed, maxAccelerationMps2, maxDecelerationMps2, fuelTankCapacity, fuelConsumption)
+            : base(
+                startLocation,
+                tailId,
+                mass,
+                frontalSurface,
+                wingsSurface,
+                thrustMax,
+                maxCruiseSpeed,
+                maxAccelerationMps2,
+                maxDecelerationMps2,
+                fuelTankCapacity,
+                fuelConsumption
+            )
         {
             TelemetryData = TelemetryData;
 
