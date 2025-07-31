@@ -72,12 +72,20 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                 [UAVProperties.FuelConsumption] = SimulationConstants
                     .Hermes450_Constants
                     .FuelConsumption,
-                [UAVProperties.TransmitPower] = SimulationConstants.Hermes450_Constants.TransmitPowerDbm,
-                [UAVProperties.TransmitAntennaGain] = SimulationConstants.Hermes450_Constants.TransmitAntennaGainDbi,
-                [UAVProperties.ReceiveAntennaGain] = SimulationConstants.Hermes450_Constants.ReceiveAntennaGainDbi,
-                [UAVProperties.TransmitLoss] = SimulationConstants.Hermes450_Constants.TransmitLossDb,
+                [UAVProperties.TransmitPower] = SimulationConstants
+                    .Hermes450_Constants
+                    .TransmitPowerDbm,
+                [UAVProperties.TransmitAntennaGain] = SimulationConstants
+                    .Hermes450_Constants
+                    .TransmitAntennaGainDbi,
+                [UAVProperties.ReceiveAntennaGain] = SimulationConstants
+                    .Hermes450_Constants
+                    .ReceiveAntennaGainDbi,
+                [UAVProperties.TransmitLoss] = SimulationConstants
+                    .Hermes450_Constants
+                    .TransmitLossDb,
                 [UAVProperties.ReceiveLoss] = SimulationConstants.Hermes450_Constants.ReceiveLossDb,
-                [UAVProperties.Frequency] = SimulationConstants.Hermes450_Constants.FrequencyHz
+                [UAVProperties.Frequency] = SimulationConstants.Hermes450_Constants.FrequencyHz,
             };
         }
     }

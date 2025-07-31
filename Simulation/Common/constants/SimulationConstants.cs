@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-
-namespace Simulation.Common.constants
+﻿namespace Simulation.Common.constants
 {
     public static class SimulationConstants
     {
@@ -22,12 +20,12 @@ namespace Simulation.Common.constants
             public const double HellfireAmmo = 2.0;
             public const double SpikeNLOSAmmo = 2.0;
             public const double GriffinAmmo = 1.0;
-            public const double TransmitPowerDbm = 50.0;
-            public const double TransmitAntennaGainDbi = 16.0;
-            public const double ReceiveAntennaGainDbi = 22.0;
+            public const double TransmitPowerDbm = 60.0;
+            public const double TransmitAntennaGainDbi = 25.0;
+            public const double ReceiveAntennaGainDbi = 30.0;
             public const double TransmitLossDb = 1.0;
             public const double ReceiveLossDb = 1.0;
-            public const double FrequencyHz = 1.3e9;
+            public const double FrequencyHz = 400e6;
         }
 
         public static class HeronTP_Constants
@@ -48,12 +46,12 @@ namespace Simulation.Common.constants
             public const double HellfireAmmo = 4.0;
             public const double GriffinAmmo = 2.0;
             public const double JDAMAmmo = 1.0;
-            public const double TransmitPowerDbm = 52.0;
-            public const double TransmitAntennaGainDbi = 18.0;
-            public const double ReceiveAntennaGainDbi = 24.0;
+            public const double TransmitPowerDbm = 60.0;
+            public const double TransmitAntennaGainDbi = 25.0;
+            public const double ReceiveAntennaGainDbi = 30.0;
             public const double TransmitLossDb = 1.0;
             public const double ReceiveLossDb = 1.0;
-            public const double FrequencyHz = 1.3e9;
+            public const double FrequencyHz = 400e6;
         }
 
         public static class Hermes450_Constants
@@ -72,12 +70,12 @@ namespace Simulation.Common.constants
             public const double LiftCoefficient = 0.8;
             public const double ThrustMax = 52.0;
             public const double ThrustAfterInfluence = 52.0;
-            public const double TransmitPowerDbm = 47.0;
-            public const double TransmitAntennaGainDbi = 15.0;
-            public const double ReceiveAntennaGainDbi = 20.0;
+            public const double TransmitPowerDbm = 60.0;
+            public const double TransmitAntennaGainDbi = 25.0;
+            public const double ReceiveAntennaGainDbi = 30.0;
             public const double TransmitLossDb = 1.0;
             public const double ReceiveLossDb = 1.0;
-            public const double FrequencyHz = 1.3e9;
+            public const double FrequencyHz = 400e6;
         }
 
         public static class Searcher_Constants
@@ -96,12 +94,12 @@ namespace Simulation.Common.constants
             public const double LiftCoefficient = 0.75;
             public const double ThrustMax = 150.0;
             public const double ThrustAfterInfluence = 150.0;
-            public const double TransmitPowerDbm = 45.0;
-            public const double TransmitAntennaGainDbi = 14.0;
-            public const double ReceiveAntennaGainDbi = 18.0;
-            public const double TransmitLossDb = 1.5;
-            public const double ReceiveLossDb = 1.5;
-            public const double FrequencyHz = 1.3e9;
+            public const double TransmitPowerDbm = 60.0;
+            public const double TransmitAntennaGainDbi = 25.0;
+            public const double ReceiveAntennaGainDbi = 30.0;
+            public const double TransmitLossDb = 1.0;
+            public const double ReceiveLossDb = 1.0;
+            public const double FrequencyHz = 400e6;
         }
 
         public static class FlightPath
@@ -175,6 +173,7 @@ namespace Simulation.Common.constants
         {
             public const double WHEELS_UP = 0;
             public const double WHEELS_DOWN = 1;
+            public const double NO_SIGNAL = -120.5;
         }
     }
 }

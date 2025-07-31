@@ -15,9 +15,9 @@ namespace Simulation.Services.Flight_Path;
 public class FlightPathService : IDisposable
 {
     private readonly ILogger<FlightPathService> _logger;
-    private readonly UAV _uav;
-    private readonly Location _destination;
-    private readonly double _cruiseAltitude;
+    private UAV _uav;
+    private Location _destination;
+    private double _cruiseAltitude;
     private readonly IMotionCalculator _motionCalculator;
     private readonly ISpeedController _speedController;
     private readonly IOrientationCalculator _orientationCalculator;
@@ -32,23 +32,24 @@ public class FlightPathService : IDisposable
     public event Action? MissionCompleted;
 
     public FlightPathService(
-        UAV uav,
-        Location destination,
-        double cruiseAltitude,
         IMotionCalculator motionCalculator,
         ISpeedController speedController,
         IOrientationCalculator orientationCalculator,
         ILogger<FlightPathService> logger
     )
     {
-        _uav = uav;
-        _destination = destination;
-        _cruiseAltitude = cruiseAltitude;
         _motionCalculator = motionCalculator;
         _speedController = speedController;
         _orientationCalculator = orientationCalculator;
         _logger = logger;
         _timer = new Timer(UpdateLocation, null, Timeout.Infinite, Timeout.Infinite);
+    }
+
+    public void Initialize(UAV uav, Location destination)
+    {
+        _uav = uav;
+        _destination = destination;
+        _cruiseAltitude = _uav.TelemetryData[TelemetryFields.CruiseAltitude];
 
         var t = _uav.TelemetryData;
         t.TryGetValue(TelemetryFields.Latitude, out double lat);
@@ -185,11 +186,8 @@ public class FlightPathService : IDisposable
         telemetry[TelemetryFields.YawDeg] = axis.Yaw;
         telemetry[TelemetryFields.RollDeg] = axis.Roll;
 
-
-
         _previousLocation = currentLoc;
         telemetry[TelemetryFields.FlightTimeSec] += SimulationConstants.FlightPath.DELTA_SECONDS;
-        
 
         _logger.LogInformation(
             "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg",
@@ -216,8 +214,10 @@ public class FlightPathService : IDisposable
         _isRunning = false;
     }
 
-    public bool MissionAborted(Dictionary<TelemetryFields,double> telemetryData)
+    public bool MissionAborted(Dictionary<TelemetryFields, double> telemetryData)
     {
-        return telemetryData[TelemetryFields.FuelAmount] <= 0.0 || telemetryData[TelemetryFields.SignalStrength] <= 0;
+        _logger.LogInformation("signal strength {st}",
+            telemetryData[TelemetryFields.SignalStrength]);
+        return telemetryData[TelemetryFields.FuelAmount] <= 0.0 || telemetryData[TelemetryFields.SignalStrength] < SimulationConstants.TelemetryData.NO_SIGNAL;
     }
 }

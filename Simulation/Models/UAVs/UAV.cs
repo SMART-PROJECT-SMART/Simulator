@@ -37,7 +37,9 @@ namespace Simulation.Models.UAVs
             TelemetryData[TelemetryFields.YawDeg] = 0.0;
             TelemetryData[TelemetryFields.PitchDeg] = 0.0;
             TelemetryData[TelemetryFields.RollDeg] = 0.0;
-            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_DOWN;
+            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
+                .TelemetryData
+                .WHEELS_DOWN;
         }
 
         public void ConsumeFuel(double deltaSec)
@@ -56,17 +58,21 @@ namespace Simulation.Models.UAVs
 
         public Location GetLocation()
         {
-            return new Location(TelemetryData[TelemetryFields.Latitude],
+            return new Location(
+                TelemetryData[TelemetryFields.Latitude],
                 TelemetryData[TelemetryFields.Longitude],
-                TelemetryData[TelemetryFields.Altitude]);
+                TelemetryData[TelemetryFields.Altitude]
+            );
         }
 
-
-
         public void TakeOff() =>
-            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_UP;
+            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
+                .TelemetryData
+                .WHEELS_UP;
 
         public void Land() =>
-                    TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_DOWN;   
+            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
+                .TelemetryData
+                .WHEELS_DOWN;
     }
 }

@@ -152,14 +152,13 @@ public static class FlightPhysicsCalculator
 
         double pathLossInDb = FrisPathLoss(separationDistanceInMeters, operatingFrequencyInHertz);
 
-        double receivedPowerDbm = transmitPowerInDbm
+        return transmitPowerInDbm
                                   + transmitAntennaGainInDbi
                                   + receiveAntennaGainInDbi
                                   - transmitSystemLossInDb
                                   - receiveSystemLossInDb
                                   - pathLossInDb;
 
-        return receivedPowerDbm;
     }
     private static double FrisPathLoss(double separationDistanceInMeters, double operatingFrequencyInHertz)
     {

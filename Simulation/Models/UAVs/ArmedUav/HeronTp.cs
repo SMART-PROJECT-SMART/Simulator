@@ -66,14 +66,18 @@ namespace Simulation.Models.UAVs.ArmedUav
                     .HeronTP_Constants
                     .FuelConsumption,
 
-                [UAVProperties.TransmitPower] = SimulationConstants.HeronTP_Constants.TransmitPowerDbm,
+                [UAVProperties.TransmitPower] = SimulationConstants
+                    .HeronTP_Constants
+                    .TransmitPowerDbm,
                 [UAVProperties.TransmitAntennaGain] = SimulationConstants
                     .HeronTP_Constants
                     .TransmitAntennaGainDbi,
-                [UAVProperties.ReceiveAntennaGain] = SimulationConstants.HeronTP_Constants.ReceiveAntennaGainDbi,
+                [UAVProperties.ReceiveAntennaGain] = SimulationConstants
+                    .HeronTP_Constants
+                    .ReceiveAntennaGainDbi,
                 [UAVProperties.TransmitLoss] = SimulationConstants.HeronTP_Constants.TransmitLossDb,
                 [UAVProperties.ReceiveLoss] = SimulationConstants.HeronTP_Constants.ReceiveLossDb,
-                [UAVProperties.Frequency] = SimulationConstants.HeronTP_Constants.FrequencyHz
+                [UAVProperties.Frequency] = SimulationConstants.HeronTP_Constants.FrequencyHz,
             };
         }
     }

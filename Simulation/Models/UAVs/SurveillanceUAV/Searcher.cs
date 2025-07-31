@@ -71,15 +71,20 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                     .Searcher_Constants
                     .FuelConsumption,
 
-                [UAVProperties.TransmitPower] = SimulationConstants.Searcher_Constants.TransmitPowerDbm,
+                [UAVProperties.TransmitPower] = SimulationConstants
+                    .Searcher_Constants
+                    .TransmitPowerDbm,
                 [UAVProperties.TransmitAntennaGain] = SimulationConstants
                     .Searcher_Constants
                     .TransmitAntennaGainDbi,
-                [UAVProperties.ReceiveAntennaGain] = SimulationConstants.Searcher_Constants.ReceiveAntennaGainDbi,
-                [UAVProperties.TransmitLoss] = SimulationConstants.Searcher_Constants.TransmitLossDb,
+                [UAVProperties.ReceiveAntennaGain] = SimulationConstants
+                    .Searcher_Constants
+                    .ReceiveAntennaGainDbi,
+                [UAVProperties.TransmitLoss] = SimulationConstants
+                    .Searcher_Constants
+                    .TransmitLossDb,
                 [UAVProperties.ReceiveLoss] = SimulationConstants.Searcher_Constants.ReceiveLossDb,
-                [UAVProperties.Frequency] = SimulationConstants.Searcher_Constants.FrequencyHz
-
+                [UAVProperties.Frequency] = SimulationConstants.Searcher_Constants.FrequencyHz,
             };
         }
     }
