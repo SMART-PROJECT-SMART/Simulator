@@ -12,10 +12,8 @@ namespace Simulation.Services.Flight_Path.helpers
             double toLatRad = to.Latitude.ToRadians();
             double deltaLonRad = to.Longitude.ToRadians() - from.Longitude.ToRadians();
 
-            double y = Math.Sin(deltaLonRad) * Math.Cos(toLatRad);
-            double x =
-                Math.Cos(fromLatRad) * Math.Sin(toLatRad)
-                - Math.Sin(fromLatRad) * Math.Cos(toLatRad) * Math.Cos(deltaLonRad);
+            double y = CalculateBearingYComponent(deltaLonRad, toLatRad);
+            double x = CalculateBearingXComponent(fromLatRad, toLatRad, deltaLonRad);
 
             if (
                 Math.Abs(x) < SimulationConstants.Mathematical.EPSILON
@@ -44,12 +42,7 @@ namespace Simulation.Services.Flight_Path.helpers
             double deltaLatRad = lat2Rad - lat1Rad;
             double deltaLonRad = (b.Longitude - a.Longitude).ToRadians();
 
-            double sinDeltaLat = Math.Sin(deltaLatRad / 2);
-            double sinDeltaLon = Math.Sin(deltaLonRad / 2);
-            double haversine =
-                sinDeltaLat * sinDeltaLat
-                + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
-
+            double haversine = CalculateHaversineValue(lat1Rad, lat2Rad, deltaLatRad, deltaLonRad);
             haversine = Math.Min(1.0, Math.Max(0.0, haversine));
             double angularDistance = 2 * Math.Atan2(Math.Sqrt(haversine), Math.Sqrt(1 - haversine));
 
@@ -75,17 +68,9 @@ namespace Simulation.Services.Flight_Path.helpers
             double bearingRad = bearing.ToRadians();
             double angularDistance = distance / SimulationConstants.FlightPath.EARTH_RADIUS_METERS;
 
-            double destLatRad = Math.Asin(
-                Math.Sin(originLatRad) * Math.Cos(angularDistance)
-                    + Math.Cos(originLatRad) * Math.Sin(angularDistance) * Math.Cos(bearingRad)
-            );
+            double destLatRad = CalculateDestinationLatitude(originLatRad, angularDistance, bearingRad);
 
-            double destLonRad =
-                originLonRad
-                + Math.Atan2(
-                    Math.Sin(bearingRad) * Math.Sin(angularDistance) * Math.Cos(originLatRad),
-                    Math.Cos(angularDistance) - Math.Sin(originLatRad) * Math.Sin(destLatRad)
-                );
+            double destLonRad = CalculateDestinationLongitude(originLonRad, originLatRad, destLatRad, bearingRad, angularDistance);
 
             double destLat = destLatRad.ToDegrees();
             double destLon = destLonRad.ToDegrees();
@@ -140,6 +125,47 @@ namespace Simulation.Services.Flight_Path.helpers
         public static double FromMToKm(this double meters)
         {
             return meters * SimulationConstants.Mathematical.FROM_M_TO_KM;
+        }
+
+        public static double GetHorizontalPart(double travelM, double pitchDeg)
+        {
+            return travelM * Math.Cos(pitchDeg.ToRadians());
+        }
+
+        private static double CalculateBearingYComponent(double deltaLonRad, double toLatRad)
+        {
+            return Math.Sin(deltaLonRad) * Math.Cos(toLatRad);
+        }
+
+        private static double CalculateBearingXComponent(double fromLatRad, double toLatRad, double deltaLonRad)
+        {
+            return Math.Cos(fromLatRad) * Math.Sin(toLatRad)
+                - Math.Sin(fromLatRad) * Math.Cos(toLatRad) * Math.Cos(deltaLonRad);
+        }
+
+        private static double CalculateHaversineValue(double lat1Rad, double lat2Rad, double deltaLatRad, double deltaLonRad)
+        {
+            double sinDeltaLat = Math.Sin(deltaLatRad / 2);
+            double sinDeltaLon = Math.Sin(deltaLonRad / 2);
+            return sinDeltaLat * sinDeltaLat
+                + Math.Cos(lat1Rad) * Math.Cos(lat2Rad) * sinDeltaLon * sinDeltaLon;
+        }
+
+        private static double CalculateDestinationLatitude(double originLatRad, double angularDistance, double bearingRad)
+        {
+            return Math.Asin(
+                Math.Sin(originLatRad) * Math.Cos(angularDistance)
+                + Math.Cos(originLatRad) * Math.Sin(angularDistance) * Math.Cos(bearingRad)
+            );
+        }
+
+        private static double CalculateDestinationLongitude(double originLonRad, double originLatRad, double destLatRad, double bearingRad, double angularDistance)
+        {
+            return originLonRad
+                + Math.Atan2(
+                    Math.Sin(bearingRad) * Math.Sin(angularDistance) * Math.Cos(originLatRad),
+                    Math.Cos(angularDistance) - Math.Sin(originLatRad) * Math.Sin(destLatRad)
+                );
         }
     }
 }
