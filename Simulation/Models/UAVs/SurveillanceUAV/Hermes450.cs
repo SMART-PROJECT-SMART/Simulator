@@ -86,6 +86,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                     .TransmitLossDb,
                 [UAVProperties.ReceiveLoss] = SimulationConstants.Hermes450_Constants.ReceiveLossDb,
                 [UAVProperties.Frequency] = SimulationConstants.Hermes450_Constants.FrequencyHz,
+                [UAVProperties.PropellerRadius] = SimulationConstants.Hermes450_Constants.PropellerRadius,
             };
         }
     }

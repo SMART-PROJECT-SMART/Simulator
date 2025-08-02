@@ -78,6 +78,7 @@ namespace Simulation.Models.UAVs.ArmedUav
                 [UAVProperties.TransmitLoss] = SimulationConstants.HeronTP_Constants.TransmitLossDb,
                 [UAVProperties.ReceiveLoss] = SimulationConstants.HeronTP_Constants.ReceiveLossDb,
                 [UAVProperties.Frequency] = SimulationConstants.HeronTP_Constants.FrequencyHz,
+                [UAVProperties.PropellerRadius] = SimulationConstants.HeronTP_Constants.PropellerRadius,
             };
         }
     }

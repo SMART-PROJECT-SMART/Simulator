@@ -35,5 +35,9 @@ namespace Simulation.Common.Enums
         FlightTimeSec,
 
         SignalStrength,
+
+        Rpm,
+
+        EngineDegrees,
     }
 }

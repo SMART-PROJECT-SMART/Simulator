@@ -26,6 +26,8 @@
             public const double TransmitLossDb = 1.0;
             public const double ReceiveLossDb = 1.0;
             public const double FrequencyHz = 400e6;
+            public const double PropellerRadius = 1.015;
+            public const double BladeCircumference = 6.38;
         }
 
         public static class HeronTP_Constants
@@ -52,6 +54,8 @@
             public const double TransmitLossDb = 1.0;
             public const double ReceiveLossDb = 1.0;
             public const double FrequencyHz = 400e6;
+            public const double PropellerRadius = 1.40;
+            public const double BladeCircumference = 8.80;
         }
 
         public static class Hermes450_Constants
@@ -76,6 +80,8 @@
             public const double TransmitLossDb = 1.0;
             public const double ReceiveLossDb = 1.0;
             public const double FrequencyHz = 400e6;
+            public const double PropellerRadius = 0.90;
+            public const double BladeCircumference = 5.65;
         }
 
         public static class Searcher_Constants
@@ -100,6 +106,8 @@
             public const double TransmitLossDb = 1.0;
             public const double ReceiveLossDb = 1.0;
             public const double FrequencyHz = 400e6;
+            public const double PropellerRadius = 0.60;
+            public const double BladeCircumference = 3.77;
         }
 
         public static class FlightPath
@@ -153,6 +161,7 @@
             public const double ALTITUDE_HOLD_GAIN = 8.0;
             public const double MISSION_COMPLETION_RADIUS_M = 10.0;
             public const double ALTITUDE_HOLD_TIME_TO_TARGET_SEC = 0.5;
+            public const int OVERHEAT = 300;
         }
 
         public static class Mathematical

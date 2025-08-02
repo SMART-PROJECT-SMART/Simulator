@@ -170,12 +170,19 @@ public class FlightPathService : IDisposable
             _missionCompleted = true;
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
             _timer.Dispose();
-            _logger.LogInformation(
-                "MISSION ABORTED: UAV {UavId} ran out of fuel at ({Lat:F6},{Lon:F6},{Alt:F1})",
+            
+            string abortReason = DetermineAbortReason(telemetry);
+            _logger.LogWarning(
+                "MISSION ABORTED - UAV {UavId} | {Reason} | Final Position: ({Lat:F6}, {Lon:F6}) | Altitude: {Alt:F1}m | Fuel: {Fuel:F3}kg | Signal: {Signal:F1}dBm | Engine Temp: {Engine:F1}°C | Flight Time: {Time:F1}s",
                 _uav.TailId,
+                abortReason,
                 currentLoc.Latitude,
                 currentLoc.Longitude,
-                currentLoc.Altitude
+                currentLoc.Altitude,
+                telemetry[TelemetryFields.FuelAmount],
+                telemetry[TelemetryFields.SignalStrength],
+                telemetry[TelemetryFields.EngineDegrees],
+                telemetry[TelemetryFields.FlightTimeSec]
             );
             MissionCompleted?.Invoke();
             return;
@@ -206,6 +213,7 @@ public class FlightPathService : IDisposable
 
         _previousLocation = currentLoc;
         telemetry[TelemetryFields.FlightTimeSec] += SimulationConstants.FlightPath.DELTA_SECONDS;
+        _uav.UpdateRpm();
 
         _logger.LogInformation(
             "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg | Destination {lat},{lon},{alt}",
@@ -243,6 +251,27 @@ public class FlightPathService : IDisposable
         );
         return telemetryData[TelemetryFields.FuelAmount] <= 0.0
             || telemetryData[TelemetryFields.SignalStrength]
-                < SimulationConstants.TelemetryData.NO_SIGNAL;
+                < SimulationConstants.TelemetryData.NO_SIGNAL
+            || telemetryData[TelemetryFields.EngineDegrees] > SimulationConstants.FlightPath.OVERHEAT;
+    }
+
+    private string DetermineAbortReason(Dictionary<TelemetryFields, double> telemetryData)
+    {
+        if (telemetryData[TelemetryFields.FuelAmount] <= 0.0)
+        {
+            return "FUEL DEPLETION - Critical fuel exhaustion";
+        }
+        
+        if (telemetryData[TelemetryFields.SignalStrength] < SimulationConstants.TelemetryData.NO_SIGNAL)
+        {
+            return "COMMUNICATION LOSS - Signal strength below operational threshold";
+        }
+        
+        if (telemetryData[TelemetryFields.EngineDegrees] > SimulationConstants.FlightPath.OVERHEAT)
+        {
+            return "ENGINE OVERHEAT - Critical temperature exceeded";
+        }
+        
+        return "UNKNOWN - Mission terminated for unspecified reason";
     }
 }

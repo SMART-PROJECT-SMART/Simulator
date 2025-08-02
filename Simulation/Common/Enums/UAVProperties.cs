@@ -22,5 +22,6 @@
 
         IsWeaponSystemArmed,
         WeaponSystemHealth,
+        PropellerRadius,
     }
 }

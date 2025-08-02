@@ -1,6 +1,7 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Ro.FlightPath;
+using Simulation.Services.Flight_Path.helpers;
 
 namespace Simulation.Models.UAVs
 {
@@ -54,6 +55,7 @@ namespace Simulation.Models.UAVs
             TelemetryData[TelemetryFields.FuelAmount] = remainingFuel;
             TelemetryData[TelemetryFields.FlightTimeSec] = 0;
             TelemetryData[TelemetryFields.SignalStrength] = 0;
+            TelemetryData[TelemetryFields.EngineDegrees] = 0;
         }
 
         public Location GetLocation()
@@ -74,5 +76,18 @@ namespace Simulation.Models.UAVs
             TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
                 .TelemetryData
                 .WHEELS_DOWN;
+
+        public void UpdateRpm()
+        {
+            TelemetryData[TelemetryFields.Rpm] = TelemetryData[TelemetryFields.CurrentSpeedKmph].ToKmhFromMps()
+                / Properties[UAVProperties.PropellerRadius] * 60;
+            UpdateEngineDegrees();
+        }
+
+        public void UpdateEngineDegrees()
+        {
+            TelemetryData[TelemetryFields.EngineDegrees] =
+                TelemetryData[TelemetryFields.Rpm] / 60.0 * 360.0;
+        }
     }
 }

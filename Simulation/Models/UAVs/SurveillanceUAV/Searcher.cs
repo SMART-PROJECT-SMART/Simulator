@@ -85,6 +85,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                     .TransmitLossDb,
                 [UAVProperties.ReceiveLoss] = SimulationConstants.Searcher_Constants.ReceiveLossDb,
                 [UAVProperties.Frequency] = SimulationConstants.Searcher_Constants.FrequencyHz,
+                [UAVProperties.PropellerRadius] = SimulationConstants.Searcher_Constants.PropellerRadius,
             };
         }
     }
