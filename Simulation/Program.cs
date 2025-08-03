@@ -4,9 +4,9 @@ using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
-using Simulation.Services.UAVManager;
 using Simulation.Services.Quartz;
 using Simulation.Services.Quartz.Jobs;
+using Simulation.Services.UAVManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,14 +17,7 @@ builder.Services.AddSingleton<ISpeedController, SpeedCalculator>();
 builder.Services.AddSingleton<IOrientationCalculator, OrientationCalculator>();
 builder.Services.AddTransient<FlightPathService>();
 
-builder.Services.AddQuartz(q =>
-{
-    q.UseMicrosoftDependencyInjectionJobFactory();
-
-    q.AddJob<FlightPathUpdateJob>(opts => opts
-        .WithIdentity(SimulationConstants.Quartz.JOB_GROUP)
-        .StoreDurably());
-});
+builder.Services.AddQuartz();
 
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 

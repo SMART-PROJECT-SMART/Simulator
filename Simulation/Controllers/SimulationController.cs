@@ -24,13 +24,15 @@ namespace Simulation.Controllers
         {
             _uavManager.AddUAV(dto.UAV);
             var success = await _uavManager.StartMission(dto.UAV, dto.Destination, dto.MissionId);
-            return success ? Ok("Mission started successfully") : BadRequest("Mission failed to start");
+            return success
+                ? Ok("Mission started successfully")
+                : BadRequest("Mission failed to start");
         }
 
         [HttpPost("switch")]
         public async Task<IActionResult> SwitchUAV([FromBody] SwitchDestinationDto dto)
         {
-            var success =  _uavManager.SwitchDestination(dto.TailId, dto.NewDestination);
+            var success = _uavManager.SwitchDestination(dto.TailId, dto.NewDestination);
             return success ? Ok() : BadRequest("Switch failed");
         }
 
@@ -38,28 +40,36 @@ namespace Simulation.Controllers
         public async Task<IActionResult> PauseMission(int tailId)
         {
             var success = await _uavManager.PauseMission(tailId);
-            return success ? Ok($"Mission for UAV {tailId} paused successfully") : BadRequest($"Failed to pause mission for UAV {tailId}");
+            return success
+                ? Ok($"Mission for UAV {tailId} paused successfully")
+                : BadRequest($"Failed to pause mission for UAV {tailId}");
         }
 
         [HttpPost("resume/{tailId}")]
         public async Task<IActionResult> ResumeMission(int tailId)
         {
             var success = await _uavManager.ResumeMission(tailId);
-            return success ? Ok($"Mission for UAV {tailId} resumed successfully") : BadRequest($"Failed to resume mission for UAV {tailId}");
+            return success
+                ? Ok($"Mission for UAV {tailId} resumed successfully")
+                : BadRequest($"Failed to resume mission for UAV {tailId}");
         }
 
         [HttpPost("abort/{tailId}")]
         public async Task<IActionResult> AbortMission(int tailId)
         {
             var success = await _uavManager.AbortMission(tailId);
-            return success ? Ok($"Mission for UAV {tailId} aborted successfully") : BadRequest($"Failed to abort mission for UAV {tailId}");
+            return success
+                ? Ok($"Mission for UAV {tailId} aborted successfully")
+                : BadRequest($"Failed to abort mission for UAV {tailId}");
         }
 
         [HttpPost("abort-all")]
         public async Task<IActionResult> AbortAllMissions()
         {
             var success = await _uavManager.AbortAllMissions();
-            return success ? Ok("All missions aborted successfully") : BadRequest("Failed to abort all missions");
+            return success
+                ? Ok("All missions aborted successfully")
+                : BadRequest("Failed to abort all missions");
         }
 
         [HttpGet("status")]
@@ -69,12 +79,14 @@ namespace Simulation.Controllers
             var activeJobs = await _uavManager.GetActiveJobCount();
             var activeTailIds = _uavManager.GetActiveTailIds.ToList();
 
-            return Ok(new
-            {
-                ActiveUAVs = activeUAVs,
-                ActiveJobs = activeJobs,
-                ActiveTailIds = activeTailIds
-            });
+            return Ok(
+                new
+                {
+                    ActiveUAVs = activeUAVs,
+                    ActiveJobs = activeJobs,
+                    ActiveTailIds = activeTailIds,
+                }
+            );
         }
 
         [HttpGet("run")]

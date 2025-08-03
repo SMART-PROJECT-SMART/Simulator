@@ -21,7 +21,9 @@ namespace Simulation.Services.Quartz
             try
             {
                 var jobKey = new JobKey($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uavId}");
-                var triggerKey = new TriggerKey($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uavId}");
+                var triggerKey = new TriggerKey(
+                    $"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uavId}"
+                );
 
                 if (await _scheduler.CheckExists(jobKey))
                 {
@@ -29,24 +31,29 @@ namespace Simulation.Services.Quartz
                     return false;
                 }
 
-                var jobDetail = JobBuilder.Create<FlightPathUpdateJob>()
+                var jobDetail = JobBuilder
+                    .Create<FlightPathUpdateJob>()
                     .WithIdentity(jobKey)
                     .UsingJobData(SimulationConstants.Quartz.UAV_ID, uavId)
                     .Build();
 
-                var trigger = TriggerBuilder.Create()
+                var trigger = TriggerBuilder
+                    .Create()
                     .WithIdentity(triggerKey)
                     .StartNow()
-                    .WithSimpleSchedule(x => x
-                        .WithIntervalInSeconds(intervalSeconds)
-                        .RepeatForever())
+                    .WithSimpleSchedule(x =>
+                        x.WithIntervalInSeconds(intervalSeconds).RepeatForever()
+                    )
                     .Build();
 
                 await _scheduler.ScheduleJob(jobDetail, trigger);
-                
-                _logger.LogInformation("Successfully scheduled flight path job for UAV {UavId} with {IntervalSeconds}s interval", 
-                    uavId, intervalSeconds);
-                
+
+                _logger.LogInformation(
+                    "Successfully scheduled flight path job for UAV {UavId} with {IntervalSeconds}s interval",
+                    uavId,
+                    intervalSeconds
+                );
+
                 return true;
             }
             catch (Exception ex)
@@ -61,18 +68,24 @@ namespace Simulation.Services.Quartz
             try
             {
                 var jobKey = new JobKey($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uavId}");
-                
+
                 var deleted = await _scheduler.DeleteJob(jobKey);
-                
+
                 if (deleted)
                 {
-                    _logger.LogInformation("Successfully deleted flight path job for UAV {UavId}", uavId);
+                    _logger.LogInformation(
+                        "Successfully deleted flight path job for UAV {UavId}",
+                        uavId
+                    );
                 }
                 else
                 {
-                    _logger.LogWarning("Job for UAV {UavId} was not found or could not be deleted", uavId);
+                    _logger.LogWarning(
+                        "Job for UAV {UavId} was not found or could not be deleted",
+                        uavId
+                    );
                 }
-                
+
                 return deleted;
             }
             catch (Exception ex)
@@ -87,7 +100,7 @@ namespace Simulation.Services.Quartz
             try
             {
                 var jobKey = new JobKey($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uavId}");
-                
+
                 if (!await _scheduler.CheckExists(jobKey))
                 {
                     _logger.LogWarning("Job for UAV {UavId} does not exist, cannot pause", uavId);
@@ -95,7 +108,10 @@ namespace Simulation.Services.Quartz
                 }
 
                 await _scheduler.PauseJob(jobKey);
-                _logger.LogInformation("Successfully paused flight path job for UAV {UavId}", uavId);
+                _logger.LogInformation(
+                    "Successfully paused flight path job for UAV {UavId}",
+                    uavId
+                );
                 return true;
             }
             catch (Exception ex)
@@ -110,7 +126,7 @@ namespace Simulation.Services.Quartz
             try
             {
                 var jobKey = new JobKey($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uavId}");
-                
+
                 if (!await _scheduler.CheckExists(jobKey))
                 {
                     _logger.LogWarning("Job for UAV {UavId} does not exist, cannot resume", uavId);
@@ -118,7 +134,10 @@ namespace Simulation.Services.Quartz
                 }
 
                 await _scheduler.ResumeJob(jobKey);
-                _logger.LogInformation("Successfully resumed flight path job for UAV {UavId}", uavId);
+                _logger.LogInformation(
+                    "Successfully resumed flight path job for UAV {UavId}",
+                    uavId
+                );
                 return true;
             }
             catch (Exception ex)
@@ -151,7 +170,9 @@ namespace Simulation.Services.Quartz
 
                 foreach (var group in jobGroups)
                 {
-                    var jobKeys = await _scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(group));
+                    var jobKeys = await _scheduler.GetJobKeys(
+                        GroupMatcher<JobKey>.GroupEquals(group)
+                    );
                     foreach (var jobKey in jobKeys)
                     {
                         if (jobKey.Name.StartsWith(SimulationConstants.Quartz.IDENTITY_PREFIX))
@@ -231,11 +252,18 @@ namespace Simulation.Services.Quartz
 
                 foreach (var group in jobGroups)
                 {
-                    var jobKeys = await _scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(group));
-                    foreach (var jobKey in jobKeys.Where(jk => jk.Name.StartsWith(SimulationConstants.Quartz.IDENTITY_PREFIX)))
+                    var jobKeys = await _scheduler.GetJobKeys(
+                        GroupMatcher<JobKey>.GroupEquals(group)
+                    );
+                    foreach (
+                        var jobKey in jobKeys.Where(jk =>
+                            jk.Name.StartsWith(SimulationConstants.Quartz.IDENTITY_PREFIX)
+                        )
+                    )
                     {
                         var deleted = await _scheduler.DeleteJob(jobKey);
-                        if (deleted) deletedCount++;
+                        if (deleted)
+                            deletedCount++;
                     }
                 }
 

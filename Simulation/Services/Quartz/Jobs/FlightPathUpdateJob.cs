@@ -15,7 +15,9 @@ namespace Simulation.Services.Quartz.Jobs
 
         public Task Execute(IJobExecutionContext jobExecutionContext)
         {
-            var uavId = jobExecutionContext.JobDetail.JobDataMap.GetInt(SimulationConstants.Quartz.UAV_ID);
+            var uavId = jobExecutionContext.JobDetail.JobDataMap.GetInt(
+                SimulationConstants.Quartz.UAV_ID
+            );
             var context = _uavManager.GetUAVContext(uavId);
 
             context?.Service?.UpdateLocation();

@@ -66,8 +66,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                     TelemetryFields.CurrentSpeedKmph,
                     0.0
                 );
-                double horizontalSpeedMps =
-                    currentSpeedKmph.ToKmhFromMps();
+                double horizontalSpeedMps = currentSpeedKmph.ToKmhFromMps();
 
                 if (horizontalSpeedMps > SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 {
@@ -118,7 +117,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                         requiredVerticalSpeedMps,
                         horizontalSpeedMps
                     );
-                    pitch = UnitConversionHelper.ToDegrees(requiredPitchRad);
+                    pitch = requiredPitchRad.ToDegrees();
 
                     pitch = Math.Clamp(pitch, -SimulationConstants.FlightPath.MAX_DESCENT_DEG, 0.0);
                 }
@@ -157,7 +156,8 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 if (Math.Abs(yawRate) > SimulationConstants.FlightPath.MIN_YAW_RATE)
                 {
                     double latAcc = speedMps * yawRate;
-                    targetRoll = Math.Atan2(latAcc, SimulationConstants.FlightPath.GRAVITY_MPS2).ToDegrees();
+                    targetRoll = Math.Atan2(latAcc, SimulationConstants.FlightPath.GRAVITY_MPS2)
+                        .ToDegrees();
                     targetRoll = Math.Clamp(
                         targetRoll,
                         -SimulationConstants.FlightPath.MAX_ROLL_DEG,
@@ -193,7 +193,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 newYaw = targetYaw;
             else
                 newYaw = currentYaw + Math.Sign(diff) * maxDelta;
-            
+
             return newYaw.NormalizeAngle();
         }
 

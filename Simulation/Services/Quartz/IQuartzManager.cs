@@ -1,4 +1,3 @@
-
 namespace Simulation.Services.Quartz
 {
     public interface IQuartzManager

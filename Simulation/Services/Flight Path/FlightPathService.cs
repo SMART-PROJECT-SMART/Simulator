@@ -91,9 +91,7 @@ public class FlightPathService : IDisposable
         _destination = newDestination;
     }
 
-    public Location GetDestination() => 
-        _destination;
-    
+    public Location GetDestination() => _destination;
 
     public void UpdateLocation()
     {
@@ -164,7 +162,7 @@ public class FlightPathService : IDisposable
         if (MissionAborted(telemetry))
         {
             _missionCompleted = true;
-            
+
             string abortReason = DetermineAbortReason(telemetry);
             _logger.LogWarning(
                 "MISSION ABORTED - UAV {UavId} | {Reason} | Final Position: ({Lat:F6}, {Lon:F6}) | Altitude: {Alt:F1}m | Fuel: {Fuel:F3}kg | Signal: {Signal:F1}dBm | Engine Temp: {Engine:F1}°C | Flight Time: {Time:F1}s",
@@ -228,7 +226,6 @@ public class FlightPathService : IDisposable
         LocationUpdated?.Invoke(nextLoc);
     }
 
-
     public bool MissionAborted(Dictionary<TelemetryFields, double> telemetryData)
     {
         _logger.LogInformation(
@@ -238,7 +235,8 @@ public class FlightPathService : IDisposable
         return telemetryData[TelemetryFields.FuelAmount] <= 0.0
             || telemetryData[TelemetryFields.SignalStrength]
                 < SimulationConstants.TelemetryData.NO_SIGNAL
-            || telemetryData[TelemetryFields.EngineDegrees] > SimulationConstants.FlightPath.OVERHEAT;
+            || telemetryData[TelemetryFields.EngineDegrees]
+                > SimulationConstants.FlightPath.OVERHEAT;
     }
 
     private string DetermineAbortReason(Dictionary<TelemetryFields, double> telemetryData)
@@ -247,17 +245,20 @@ public class FlightPathService : IDisposable
         {
             return SimulationConstants.FlightPath.ABORT_REASON_FUEL_DEPLETION;
         }
-        
-        if (telemetryData[TelemetryFields.SignalStrength] < SimulationConstants.TelemetryData.NO_SIGNAL)
+
+        if (
+            telemetryData[TelemetryFields.SignalStrength]
+            < SimulationConstants.TelemetryData.NO_SIGNAL
+        )
         {
             return SimulationConstants.FlightPath.ABORT_REASON_COMMUNICATION_LOSS;
         }
-        
+
         if (telemetryData[TelemetryFields.EngineDegrees] > SimulationConstants.FlightPath.OVERHEAT)
         {
             return SimulationConstants.FlightPath.ABORT_REASON_ENGINE_OVERHEAT;
         }
-        
+
         return SimulationConstants.FlightPath.ABORT_REASON_UNKNOWN;
     }
 

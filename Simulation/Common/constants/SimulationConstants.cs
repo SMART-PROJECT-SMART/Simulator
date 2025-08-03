@@ -163,10 +163,14 @@
             public const double ALTITUDE_HOLD_TIME_TO_TARGET_SEC = 0.5;
             public const int OVERHEAT = 300;
 
-            public const string ABORT_REASON_FUEL_DEPLETION = "FUEL DEPLETION - Critical fuel exhaustion";
-            public const string ABORT_REASON_COMMUNICATION_LOSS = "COMMUNICATION LOSS - Signal strength below operational threshold";
-            public const string ABORT_REASON_ENGINE_OVERHEAT = "ENGINE OVERHEAT - Critical temperature exceeded";
-            public const string ABORT_REASON_UNKNOWN = "UNKNOWN - Mission terminated for unspecified reason";
+            public const string ABORT_REASON_FUEL_DEPLETION =
+                "FUEL DEPLETION - Critical fuel exhaustion";
+            public const string ABORT_REASON_COMMUNICATION_LOSS =
+                "COMMUNICATION LOSS - Signal strength below operational threshold";
+            public const string ABORT_REASON_ENGINE_OVERHEAT =
+                "ENGINE OVERHEAT - Critical temperature exceeded";
+            public const string ABORT_REASON_UNKNOWN =
+                "UNKNOWN - Mission terminated for unspecified reason";
         }
 
         public static class Mathematical
@@ -189,7 +193,6 @@
             public const double WHEELS_DOWN = 1;
             public const double NO_SIGNAL = -120.5;
             public const int BYTES_PER_FIELD = 8;
-
         }
 
         public static class Quartz

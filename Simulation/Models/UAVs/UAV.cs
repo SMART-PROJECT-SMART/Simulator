@@ -79,8 +79,10 @@ namespace Simulation.Models.UAVs
 
         public void UpdateRpm()
         {
-            TelemetryData[TelemetryFields.Rpm] = TelemetryData[TelemetryFields.CurrentSpeedKmph].ToKmhFromMps()
-                / Properties[UAVProperties.PropellerRadius] * 60;
+            TelemetryData[TelemetryFields.Rpm] =
+                TelemetryData[TelemetryFields.CurrentSpeedKmph].ToKmhFromMps()
+                / Properties[UAVProperties.PropellerRadius]
+                * 60;
             UpdateEngineDegrees();
         }
 

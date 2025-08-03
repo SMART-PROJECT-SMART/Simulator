@@ -1,12 +1,12 @@
-﻿using Quartz;
+﻿using System.Collections.Concurrent;
+using Quartz;
+using Simulation.Common.constants;
 using Simulation.Models;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
-using System.Collections.Concurrent;
-using Simulation.Common.constants;
 using Simulation.Services.Quartz;
 
 namespace Simulation.Services.UAVManager
@@ -25,7 +25,8 @@ namespace Simulation.Services.UAVManager
             ISpeedController speedController,
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
-            IQuartzManager quartzManager)
+            IQuartzManager quartzManager
+        )
         {
             _uavs = new ConcurrentDictionary<int, UAVMissionContext?>();
             _motionCalculator = motionCalculator;
@@ -34,7 +35,6 @@ namespace Simulation.Services.UAVManager
             _logger = logger;
             _quartzManager = quartzManager;
         }
-    
 
         public void AddUAV(UAV uav)
         {
@@ -44,8 +44,8 @@ namespace Simulation.Services.UAVManager
                 _orientationCalculator,
                 _logger
             );
-            
-            _uavs.TryAdd(uav.TailId,new UAVMissionContext(uav,flightService));
+
+            _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
         }
 
         public void RemoveUAV(int tailId)
@@ -63,12 +63,11 @@ namespace Simulation.Services.UAVManager
 
         public bool SwitchUAVs(int tailId1, int tailId2)
         {
-            var tail1Destination = GetUAVContext(tailId1)
-                .Service.GetDestination();
-            var tail2Destination = GetUAVContext(tailId2)
-                .Service.GetDestination();
+            var tail1Destination = GetUAVContext(tailId1).Service.GetDestination();
+            var tail2Destination = GetUAVContext(tailId2).Service.GetDestination();
 
-            return SwitchDestination(tailId1, tail2Destination) && SwitchDestination(tailId2,tail1Destination);
+            return SwitchDestination(tailId1, tail2Destination)
+                && SwitchDestination(tailId2, tail1Destination);
         }
 
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
@@ -85,8 +84,9 @@ namespace Simulation.Services.UAVManager
 
             // Use QuartzManager to schedule the job
             var jobScheduled = await _quartzManager.ScheduleUAVFlightPathJob(
-                uav.TailId, 
-                (int)SimulationConstants.FlightPath.DELTA_SECONDS);
+                uav.TailId,
+                (int)SimulationConstants.FlightPath.DELTA_SECONDS
+            );
 
             if (!jobScheduled)
             {
@@ -103,8 +103,7 @@ namespace Simulation.Services.UAVManager
                 _uavs.TryRemove(uav.TailId, out _);
             };
 
-
-            return true; 
+            return true;
         }
 
         public bool SwitchDestination(int tailId, Location newDestination)
@@ -141,12 +140,12 @@ namespace Simulation.Services.UAVManager
             {
                 // Delete the scheduled job
                 var jobDeleted = await _quartzManager.DeleteUAVFlightPathJob(tailId);
-                
+
                 // Clean up UAV context
                 uavData.UAV.CurrentMissionId = string.Empty;
                 uavData.Service.Dispose();
                 _uavs.TryRemove(tailId, out _);
-                
+
                 return jobDeleted;
             }
             return false;
@@ -155,7 +154,7 @@ namespace Simulation.Services.UAVManager
         public async Task<bool> AbortAllMissions()
         {
             var allJobsDeleted = await _quartzManager.DeleteAllJobs();
-            
+
             // Clean up all UAV contexts
             foreach (var kvp in _uavs)
             {
@@ -165,7 +164,7 @@ namespace Simulation.Services.UAVManager
                     kvp.Value.Service.Dispose();
                 }
             }
-            
+
             _uavs.Clear();
             return allJobsDeleted;
         }
@@ -176,7 +175,7 @@ namespace Simulation.Services.UAVManager
         }
 
         public int ActiveUAVCount => _uavs.Count;
-        
+
         public IEnumerable<int> GetActiveTailIds => _uavs.Keys;
     }
 }
