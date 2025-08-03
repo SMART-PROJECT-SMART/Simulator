@@ -241,23 +241,22 @@ public class FlightPathService : IDisposable
     {
         if (telemetryData[TelemetryFields.FuelAmount] <= 0.0)
         {
-            return "FUEL DEPLETION - Critical fuel exhaustion";
+            return SimulationConstants.FlightPath.ABORT_REASON_FUEL_DEPLETION;
         }
         
         if (telemetryData[TelemetryFields.SignalStrength] < SimulationConstants.TelemetryData.NO_SIGNAL)
         {
-            return "COMMUNICATION LOSS - Signal strength below operational threshold";
+            return SimulationConstants.FlightPath.ABORT_REASON_COMMUNICATION_LOSS;
         }
         
         if (telemetryData[TelemetryFields.EngineDegrees] > SimulationConstants.FlightPath.OVERHEAT)
         {
-            return "ENGINE OVERHEAT - Critical temperature exceeded";
+            return SimulationConstants.FlightPath.ABORT_REASON_ENGINE_OVERHEAT;
         }
         
-        return "UNKNOWN - Mission terminated for unspecified reason";
+        return SimulationConstants.FlightPath.ABORT_REASON_UNKNOWN;
     }
 
-    public bool IsMissionCompleted => _missionCompleted;
     public void Dispose()
     {
         _isRunning = false;

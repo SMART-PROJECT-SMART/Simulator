@@ -1,4 +1,5 @@
-﻿using Quartz;
+﻿
+using Quartz;
 using Simulation.Models;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
@@ -8,38 +9,32 @@ using Simulation.Services.Flight_Path.Speed_Controller;
 using System.Collections.Concurrent;
 using Simulation.Common.constants;
 
-namespace Simulation.Services
+namespace Simulation.Services.UAVManager
 {
-    public class UAVManager
+    public class UAVManager : IUAVManager
     {
         private readonly ConcurrentDictionary<int, UAVMissionContext?> _uavs;
         private readonly IMotionCalculator _motionCalculator;
         private readonly ISpeedController _speedController;
         private readonly IOrientationCalculator _orientationCalculator;
         private readonly ILogger<FlightPathService> _logger;
-        private readonly ISchedulerFactory _schedulerFactory;
-        private IScheduler? _scheduler;
+        private readonly IScheduler _scheduler;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
             ISpeedController speedController,
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
-            ISchedulerFactory schedulerFactory)
+            IScheduler scheduler)
         {
             _uavs = new ConcurrentDictionary<int, UAVMissionContext?>();
             _motionCalculator = motionCalculator;
             _speedController = speedController;
             _orientationCalculator = orientationCalculator;
             _logger = logger;
-            _schedulerFactory = schedulerFactory;
+            _scheduler = scheduler;
         }
-
-        private async Task<IScheduler> GetSchedulerAsync()
-        {
-            _scheduler ??= await _schedulerFactory.GetScheduler();
-            return _scheduler;
-        }
+    
 
         public void AddUAV(UAV uav)
         {
@@ -49,13 +44,13 @@ namespace Simulation.Services
                 _orientationCalculator,
                 _logger
             );
-
-            _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
+            
+            _uavs.TryAdd(uav.TailId,new UAVMissionContext(uav,flightService));
         }
 
         public void RemoveUAV(int tailId)
         {
-            if (_uavs.TryRemove(tailId, out var uavData) && uavData != null)
+            if (_uavs.TryRemove(tailId, out var uavData))
             {
                 uavData.Service.Dispose();
             }
@@ -78,38 +73,36 @@ namespace Simulation.Services
             context.Service.Initialize(uav, destination);
             context.Service.StartFlightPath();
 
-            var scheduler = await GetSchedulerAsync();
-
             var jobDetail = JobBuilder.Create<FlightPathUpdateJob>()
-                .WithIdentity($"FlightPath-{uav.TailId}")
-                .UsingJobData("UAVId", uav.TailId)
+                .WithIdentity($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uav.TailId}")
+                .UsingJobData(SimulationConstants.Quartz.UAV_ID, uav.TailId)
                 .Build();
 
             var trigger = TriggerBuilder.Create()
-                .WithIdentity($"FlightPathTrigger-{uav.TailId}")
+                .WithIdentity($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uav.TailId}")
                 .StartNow()
                 .WithSimpleSchedule(x => x
                     .WithIntervalInSeconds((int)SimulationConstants.FlightPath.DELTA_SECONDS)
                     .RepeatForever())
                 .Build();
 
-            await scheduler.ScheduleJob(jobDetail, trigger);
+            await _scheduler.ScheduleJob(jobDetail, trigger);
 
             context.Service.MissionCompleted += async () =>
             {
-                var schedulerForCleanup = await GetSchedulerAsync();
-                await schedulerForCleanup.DeleteJob(jobDetail.Key);
+                await _scheduler.DeleteJob(jobDetail.Key);
                 uav.CurrentMissionId = string.Empty;
                 context.Service.Dispose();
                 _uavs.TryRemove(uav.TailId, out _);
             };
 
-            return true;
+
+            return true; 
         }
 
         public bool SwitchDestination(int tailId, Location newDestination)
         {
-            if (_uavs.TryGetValue(tailId, out var uavData) && uavData != null)
+            if (_uavs.TryGetValue(tailId, out var uavData))
             {
                 uavData.Service.SwitchDestination(newDestination);
                 return true;
@@ -118,6 +111,7 @@ namespace Simulation.Services
         }
 
         public int ActiveUAVCount => _uavs.Count;
+        
         public IEnumerable<int> GetActiveTailIds => _uavs.Keys;
     }
 }

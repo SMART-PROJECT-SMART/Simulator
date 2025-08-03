@@ -1,9 +1,10 @@
 using Quartz;
-using Simulation.Services;
+using Simulation.Common.constants;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
+using Simulation.Services.UAVManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +20,18 @@ builder.Services.AddQuartz(q =>
     q.UseMicrosoftDependencyInjectionJobFactory();
 
     q.AddJob<FlightPathUpdateJob>(opts => opts
-        .WithIdentity("FlightPathUpdateJob")
+        .WithIdentity(SimulationConstants.Quartz.JOB_GROUP)
         .StoreDurably());
 });
 
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-builder.Services.AddSingleton<UAVManager>();
+builder.Services.AddSingleton<IUAVManager, UAVManager>();
+
+builder.Services.AddSingleton(provider =>
+{
+    var schedulerFactory = provider.GetRequiredService<ISchedulerFactory>();
+    return schedulerFactory.GetScheduler().GetAwaiter().GetResult();
+});
 
 var app = builder.Build();
 

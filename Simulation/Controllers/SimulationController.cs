@@ -4,7 +4,7 @@ using Simulation.Common.Enums;
 using Simulation.Dto.FlightPath;
 using Simulation.Models;
 using Simulation.Models.UAVs.SurveillanceUAV;
-using Simulation.Services;
+using Simulation.Services.UAVManager;
 
 namespace Simulation.Controllers
 {
@@ -12,9 +12,9 @@ namespace Simulation.Controllers
     [Route("api/[controller]")]
     public class SimulationController : ControllerBase
     {
-        private readonly UAVManager _uavManager;
+        private readonly IUAVManager _uavManager;
 
-        public SimulationController(UAVManager uavManager)
+        public SimulationController(IUAVManager uavManager)
         {
             _uavManager = uavManager;
         }
