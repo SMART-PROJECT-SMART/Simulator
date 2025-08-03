@@ -1,12 +1,10 @@
 using Quartz;
-using Simulation.Common.constants;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
-using Simulation.Services.Quartz;
-using Simulation.Services.Quartz.Jobs;
 using Simulation.Services.UAVManager;
+using Simulation.Services.Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
