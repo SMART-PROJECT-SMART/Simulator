@@ -21,9 +21,7 @@ public class FlightPathService : IDisposable
     private readonly IMotionCalculator _motionCalculator;
     private readonly ISpeedController _speedController;
     private readonly IOrientationCalculator _orientationCalculator;
-    private readonly Timer _timer;
     private bool _isRunning;
-    private bool _timerDisposed;
     private bool _missionCompleted;
     private Location _previousLocation;
     private Location _startLocation;
@@ -42,7 +40,6 @@ public class FlightPathService : IDisposable
         _speedController = speedController;
         _orientationCalculator = orientationCalculator;
         _logger = logger;
-        _timer = new Timer(UpdateLocation, null, Timeout.Infinite, Timeout.Infinite);
     }
 
     public void Initialize(UAV uav, Location destination)
@@ -78,10 +75,6 @@ public class FlightPathService : IDisposable
         _startLocation = _uav.GetLocation();
         _isRunning = true;
         _uav.TakeOff();
-        _timer.Change(
-            TimeSpan.Zero,
-            TimeSpan.FromSeconds(SimulationConstants.FlightPath.DELTA_SECONDS)
-        );
     }
 
     public void SwitchDestination(Location newDestination)
@@ -98,7 +91,7 @@ public class FlightPathService : IDisposable
         _destination = newDestination;
     }
 
-    private void UpdateLocation(object? state)
+    public void UpdateLocation()
     {
         if (_missionCompleted)
             return;
@@ -123,9 +116,8 @@ public class FlightPathService : IDisposable
 
         if (horizontalReached && altitudeReached)
         {
+            _uav.Land();
             _missionCompleted = true;
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            _timer.Dispose();
             _logger.LogInformation(
                 "MISSION COMPLETED at ({Lat:F6},{Lon:F6},{Alt:F1}), rem=0",
                 currentLoc.Latitude,
@@ -168,8 +160,6 @@ public class FlightPathService : IDisposable
         if (MissionAborted(telemetry))
         {
             _missionCompleted = true;
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            _timer.Dispose();
             
             string abortReason = DetermineAbortReason(telemetry);
             _logger.LogWarning(
@@ -234,14 +224,6 @@ public class FlightPathService : IDisposable
         LocationUpdated?.Invoke(nextLoc);
     }
 
-    public void Dispose()
-    {
-        if (_timerDisposed)
-            return;
-        _timer.Dispose();
-        _timerDisposed = true;
-        _isRunning = false;
-    }
 
     public bool MissionAborted(Dictionary<TelemetryFields, double> telemetryData)
     {
@@ -273,5 +255,11 @@ public class FlightPathService : IDisposable
         }
         
         return "UNKNOWN - Mission terminated for unspecified reason";
+    }
+
+    public bool IsMissionCompleted => _missionCompleted;
+    public void Dispose()
+    {
+        _isRunning = false;
     }
 }

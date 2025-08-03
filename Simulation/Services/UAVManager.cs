@@ -1,4 +1,4 @@
-﻿
+﻿using Quartz;
 using Simulation.Models;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
@@ -6,28 +6,39 @@ using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
 using System.Collections.Concurrent;
+using Simulation.Common.constants;
 
 namespace Simulation.Services
 {
     public class UAVManager
     {
-        private readonly ConcurrentDictionary<int, (UAV Uav, FlightPathService Service)> _uavs;
+        private readonly ConcurrentDictionary<int, UAVMissionContext?> _uavs;
         private readonly IMotionCalculator _motionCalculator;
         private readonly ISpeedController _speedController;
         private readonly IOrientationCalculator _orientationCalculator;
         private readonly ILogger<FlightPathService> _logger;
+        private readonly ISchedulerFactory _schedulerFactory;
+        private IScheduler? _scheduler;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
             ISpeedController speedController,
             IOrientationCalculator orientationCalculator,
-            ILogger<FlightPathService> logger)
+            ILogger<FlightPathService> logger,
+            ISchedulerFactory schedulerFactory)
         {
-            _uavs = new ConcurrentDictionary<int, (UAV, FlightPathService)>();
+            _uavs = new ConcurrentDictionary<int, UAVMissionContext?>();
             _motionCalculator = motionCalculator;
             _speedController = speedController;
             _orientationCalculator = orientationCalculator;
             _logger = logger;
+            _schedulerFactory = schedulerFactory;
+        }
+
+        private async Task<IScheduler> GetSchedulerAsync()
+        {
+            _scheduler ??= await _schedulerFactory.GetScheduler();
+            return _scheduler;
         }
 
         public void AddUAV(UAV uav)
@@ -38,48 +49,67 @@ namespace Simulation.Services
                 _orientationCalculator,
                 _logger
             );
-            
-            _uavs.TryAdd(uav.TailId, (uav, flightService));
+
+            _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
         }
 
         public void RemoveUAV(int tailId)
         {
-            if (_uavs.TryRemove(tailId, out var uavData))
+            if (_uavs.TryRemove(tailId, out var uavData) && uavData != null)
             {
                 uavData.Service.Dispose();
             }
         }
 
+        public UAVMissionContext? GetUAVContext(int tailId)
+        {
+            return _uavs.GetValueOrDefault(tailId);
+        }
+
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
         {
             uav.CurrentMissionId = missionId;
-
             if (!_uavs.ContainsKey(uav.TailId))
             {
                 AddUAV(uav);
             }
 
-            var (_, flightService) = _uavs[uav.TailId];
-            flightService.Initialize(uav, destination);
-            flightService.StartFlightPath();
+            UAVMissionContext context = _uavs[uav.TailId];
+            context.Service.Initialize(uav, destination);
+            context.Service.StartFlightPath();
 
-            var tcs = new TaskCompletionSource<bool>();
-            flightService.MissionCompleted += () =>
+            var scheduler = await GetSchedulerAsync();
+
+            var jobDetail = JobBuilder.Create<FlightPathUpdateJob>()
+                .WithIdentity($"FlightPath-{uav.TailId}")
+                .UsingJobData("UAVId", uav.TailId)
+                .Build();
+
+            var trigger = TriggerBuilder.Create()
+                .WithIdentity($"FlightPathTrigger-{uav.TailId}")
+                .StartNow()
+                .WithSimpleSchedule(x => x
+                    .WithIntervalInSeconds((int)SimulationConstants.FlightPath.DELTA_SECONDS)
+                    .RepeatForever())
+                .Build();
+
+            await scheduler.ScheduleJob(jobDetail, trigger);
+
+            context.Service.MissionCompleted += async () =>
             {
-                tcs.SetResult(true);
-                uav.Land();
+                var schedulerForCleanup = await GetSchedulerAsync();
+                await schedulerForCleanup.DeleteJob(jobDetail.Key);
                 uav.CurrentMissionId = string.Empty;
+                context.Service.Dispose();
+                _uavs.TryRemove(uav.TailId, out _);
             };
 
-            await tcs.Task;
-            flightService.Dispose();
-            _uavs.TryRemove(uav.TailId, out _);
             return true;
         }
 
         public bool SwitchDestination(int tailId, Location newDestination)
         {
-            if (_uavs.TryGetValue(tailId, out var uavData))
+            if (_uavs.TryGetValue(tailId, out var uavData) && uavData != null)
             {
                 uavData.Service.SwitchDestination(newDestination);
                 return true;
@@ -88,7 +118,6 @@ namespace Simulation.Services
         }
 
         public int ActiveUAVCount => _uavs.Count;
-        
         public IEnumerable<int> GetActiveTailIds => _uavs.Keys;
     }
 }

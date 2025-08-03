@@ -23,10 +23,8 @@ namespace Simulation.Controllers
         public async Task<IActionResult> CalculateFlightPath([FromBody] SimulateDto dto)
         {
             _uavManager.AddUAV(dto.UAV);
-
-            var success = await _uavManager.StartMission(dto.UAV, dto.Destination,dto.MissionId);
-
-            return success ? Ok() : BadRequest("Mission failed");
+            var success = await _uavManager.StartMission(dto.UAV, dto.Destination, dto.MissionId);
+            return success ? Ok("Mission started successfully") : BadRequest("Mission failed to start");
         }
 
         [HttpPost("switch")]
