@@ -44,7 +44,7 @@ namespace Simulation.Services.Flight_Path.helpers
 
             double haversine = CalculateHaversineValue(lat1Rad, lat2Rad, deltaLatRad, deltaLonRad);
             haversine = Math.Min(1.0, Math.Max(0.0, haversine));
-            double angularDistance = 2 * Math.Atan2(Math.Sqrt(haversine), Math.Sqrt(1 - haversine));
+            double angularDistance = CalculateAngularDistance(haversine);
 
             double horizontalDistance =
                 SimulationConstants.FlightPath.EARTH_RADIUS_METERS * angularDistance;
@@ -52,6 +52,11 @@ namespace Simulation.Services.Flight_Path.helpers
             return Math.Sqrt(
                 horizontalDistance * horizontalDistance + verticalDistance * verticalDistance
             );
+        }
+
+        private static double CalculateAngularDistance(double haversine)
+        {
+            return 2 * Math.Atan2(Math.Sqrt(haversine), Math.Sqrt(1 - haversine));
         }
 
         public static Location CalculateDestinationLocation(
