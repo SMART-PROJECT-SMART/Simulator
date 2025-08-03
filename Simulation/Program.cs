@@ -8,7 +8,6 @@ using Simulation.Services.Flight_Path.Speed_Controller;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IMotionCalculator, MotionCalculator>();
 builder.Services.AddSingleton<ISpeedController, SpeedCalculator>();
@@ -19,11 +18,12 @@ builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionJobFactory();
 
-    q.AddJob<FlightPathUpdateJob>(opts => opts.WithIdentity("FlightPathUpdateJob"));
+    q.AddJob<FlightPathUpdateJob>(opts => opts
+        .WithIdentity("FlightPathUpdateJob")
+        .StoreDurably());
 });
 
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-
 builder.Services.AddSingleton<UAVManager>();
 
 var app = builder.Build();

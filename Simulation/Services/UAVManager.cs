@@ -1,5 +1,4 @@
-﻿
-using Quartz;
+﻿using Quartz;
 using Simulation.Models;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
@@ -18,23 +17,29 @@ namespace Simulation.Services
         private readonly ISpeedController _speedController;
         private readonly IOrientationCalculator _orientationCalculator;
         private readonly ILogger<FlightPathService> _logger;
-        private readonly IScheduler _scheduler;
+        private readonly ISchedulerFactory _schedulerFactory;
+        private IScheduler? _scheduler;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
             ISpeedController speedController,
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
-            IScheduler scheduler)
+            ISchedulerFactory schedulerFactory)
         {
             _uavs = new ConcurrentDictionary<int, UAVMissionContext?>();
             _motionCalculator = motionCalculator;
             _speedController = speedController;
             _orientationCalculator = orientationCalculator;
             _logger = logger;
-            _scheduler = scheduler;
+            _schedulerFactory = schedulerFactory;
         }
-    
+
+        private async Task<IScheduler> GetSchedulerAsync()
+        {
+            _scheduler ??= await _schedulerFactory.GetScheduler();
+            return _scheduler;
+        }
 
         public void AddUAV(UAV uav)
         {
@@ -44,13 +49,13 @@ namespace Simulation.Services
                 _orientationCalculator,
                 _logger
             );
-            
-            _uavs.TryAdd(uav.TailId,new UAVMissionContext(uav,flightService));
+
+            _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
         }
 
         public void RemoveUAV(int tailId)
         {
-            if (_uavs.TryRemove(tailId, out var uavData))
+            if (_uavs.TryRemove(tailId, out var uavData) && uavData != null)
             {
                 uavData.Service.Dispose();
             }
@@ -58,7 +63,7 @@ namespace Simulation.Services
 
         public UAVMissionContext? GetUAVContext(int tailId)
         {
-            return _uavs.GetValueOrDefault(tailId) ?? null;
+            return _uavs.GetValueOrDefault(tailId);
         }
 
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
@@ -73,6 +78,8 @@ namespace Simulation.Services
             context.Service.Initialize(uav, destination);
             context.Service.StartFlightPath();
 
+            var scheduler = await GetSchedulerAsync();
+
             var jobDetail = JobBuilder.Create<FlightPathUpdateJob>()
                 .WithIdentity($"FlightPath-{uav.TailId}")
                 .UsingJobData("UAVId", uav.TailId)
@@ -86,23 +93,23 @@ namespace Simulation.Services
                     .RepeatForever())
                 .Build();
 
-            await _scheduler.ScheduleJob(jobDetail, trigger);
+            await scheduler.ScheduleJob(jobDetail, trigger);
 
             context.Service.MissionCompleted += async () =>
             {
-                await _scheduler.DeleteJob(jobDetail.Key);
+                var schedulerForCleanup = await GetSchedulerAsync();
+                await schedulerForCleanup.DeleteJob(jobDetail.Key);
                 uav.CurrentMissionId = string.Empty;
                 context.Service.Dispose();
                 _uavs.TryRemove(uav.TailId, out _);
             };
 
-
-            return true; 
+            return true;
         }
 
         public bool SwitchDestination(int tailId, Location newDestination)
         {
-            if (_uavs.TryGetValue(tailId, out var uavData))
+            if (_uavs.TryGetValue(tailId, out var uavData) && uavData != null)
             {
                 uavData.Service.SwitchDestination(newDestination);
                 return true;
@@ -111,7 +118,6 @@ namespace Simulation.Services
         }
 
         public int ActiveUAVCount => _uavs.Count;
-        
         public IEnumerable<int> GetActiveTailIds => _uavs.Keys;
     }
 }
