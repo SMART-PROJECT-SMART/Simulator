@@ -1,5 +1,4 @@
-﻿
-using Quartz;
+﻿using Quartz;
 using Simulation.Models;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
@@ -8,6 +7,7 @@ using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
 using System.Collections.Concurrent;
 using Simulation.Common.constants;
+using Simulation.Services.Quartz;
 
 namespace Simulation.Services.UAVManager
 {
@@ -18,21 +18,21 @@ namespace Simulation.Services.UAVManager
         private readonly ISpeedController _speedController;
         private readonly IOrientationCalculator _orientationCalculator;
         private readonly ILogger<FlightPathService> _logger;
-        private readonly IScheduler _scheduler;
+        private readonly IQuartzManager _quartzManager;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
             ISpeedController speedController,
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
-            IScheduler scheduler)
+            IQuartzManager quartzManager)
         {
             _uavs = new ConcurrentDictionary<int, UAVMissionContext?>();
             _motionCalculator = motionCalculator;
             _speedController = speedController;
             _orientationCalculator = orientationCalculator;
             _logger = logger;
-            _scheduler = scheduler;
+            _quartzManager = quartzManager;
         }
     
 
@@ -73,24 +73,21 @@ namespace Simulation.Services.UAVManager
             context.Service.Initialize(uav, destination);
             context.Service.StartFlightPath();
 
-            var jobDetail = JobBuilder.Create<FlightPathUpdateJob>()
-                .WithIdentity($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uav.TailId}")
-                .UsingJobData(SimulationConstants.Quartz.UAV_ID, uav.TailId)
-                .Build();
+            // Use QuartzManager to schedule the job
+            var jobScheduled = await _quartzManager.ScheduleUAVFlightPathJob(
+                uav.TailId, 
+                (int)SimulationConstants.FlightPath.DELTA_SECONDS);
 
-            var trigger = TriggerBuilder.Create()
-                .WithIdentity($"{SimulationConstants.Quartz.IDENTITY_PREFIX}{uav.TailId}")
-                .StartNow()
-                .WithSimpleSchedule(x => x
-                    .WithIntervalInSeconds((int)SimulationConstants.FlightPath.DELTA_SECONDS)
-                    .RepeatForever())
-                .Build();
+            if (!jobScheduled)
+            {
+                _logger.LogError("Failed to schedule flight path job for UAV {TailId}", uav.TailId);
+                return false;
+            }
 
-            await _scheduler.ScheduleJob(jobDetail, trigger);
-
+            // Set up mission completion handler
             context.Service.MissionCompleted += async () =>
             {
-                await _scheduler.DeleteJob(jobDetail.Key);
+                await _quartzManager.DeleteUAVFlightPathJob(uav.TailId);
                 uav.CurrentMissionId = string.Empty;
                 context.Service.Dispose();
                 _uavs.TryRemove(uav.TailId, out _);
@@ -108,6 +105,64 @@ namespace Simulation.Services.UAVManager
                 return true;
             }
             return false;
+        }
+
+        public async Task<bool> PauseMission(int tailId)
+        {
+            if (_uavs.ContainsKey(tailId))
+            {
+                return await _quartzManager.PauseUAVFlightPathJob(tailId);
+            }
+            return false;
+        }
+
+        public async Task<bool> ResumeMission(int tailId)
+        {
+            if (_uavs.ContainsKey(tailId))
+            {
+                return await _quartzManager.ResumeUAVFlightPathJob(tailId);
+            }
+            return false;
+        }
+
+        public async Task<bool> AbortMission(int tailId)
+        {
+            if (_uavs.TryGetValue(tailId, out var uavData))
+            {
+                // Delete the scheduled job
+                var jobDeleted = await _quartzManager.DeleteUAVFlightPathJob(tailId);
+                
+                // Clean up UAV context
+                uavData.UAV.CurrentMissionId = string.Empty;
+                uavData.Service.Dispose();
+                _uavs.TryRemove(tailId, out _);
+                
+                return jobDeleted;
+            }
+            return false;
+        }
+
+        public async Task<bool> AbortAllMissions()
+        {
+            var allJobsDeleted = await _quartzManager.DeleteAllJobs();
+            
+            // Clean up all UAV contexts
+            foreach (var kvp in _uavs)
+            {
+                if (kvp.Value != null)
+                {
+                    kvp.Value.UAV.CurrentMissionId = string.Empty;
+                    kvp.Value.Service.Dispose();
+                }
+            }
+            
+            _uavs.Clear();
+            return allJobsDeleted;
+        }
+
+        public async Task<int> GetActiveJobCount()
+        {
+            return await _quartzManager.GetActiveJobCount();
         }
 
         public int ActiveUAVCount => _uavs.Count;

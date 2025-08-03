@@ -10,7 +10,12 @@ namespace Simulation.Services.UAVManager
         public UAVMissionContext? GetUAVContext(int tailId);
         public bool SwitchDestination(int tailId, Location newDestination);
         public Task<bool> StartMission(UAV uav, Location destination, string missionId);
+        public Task<bool> PauseMission(int tailId);
+        public Task<bool> ResumeMission(int tailId);
+        public Task<bool> AbortMission(int tailId);
+        public Task<bool> AbortAllMissions();
         public int ActiveUAVCount { get; }
         public IEnumerable<int> GetActiveTailIds { get; }
+        public Task<int> GetActiveJobCount();
     }
 }

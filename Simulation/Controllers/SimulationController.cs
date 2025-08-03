@@ -34,6 +34,49 @@ namespace Simulation.Controllers
             return success ? Ok() : BadRequest("Switch failed");
         }
 
+        [HttpPost("pause/{tailId}")]
+        public async Task<IActionResult> PauseMission(int tailId)
+        {
+            var success = await _uavManager.PauseMission(tailId);
+            return success ? Ok($"Mission for UAV {tailId} paused successfully") : BadRequest($"Failed to pause mission for UAV {tailId}");
+        }
+
+        [HttpPost("resume/{tailId}")]
+        public async Task<IActionResult> ResumeMission(int tailId)
+        {
+            var success = await _uavManager.ResumeMission(tailId);
+            return success ? Ok($"Mission for UAV {tailId} resumed successfully") : BadRequest($"Failed to resume mission for UAV {tailId}");
+        }
+
+        [HttpPost("abort/{tailId}")]
+        public async Task<IActionResult> AbortMission(int tailId)
+        {
+            var success = await _uavManager.AbortMission(tailId);
+            return success ? Ok($"Mission for UAV {tailId} aborted successfully") : BadRequest($"Failed to abort mission for UAV {tailId}");
+        }
+
+        [HttpPost("abort-all")]
+        public async Task<IActionResult> AbortAllMissions()
+        {
+            var success = await _uavManager.AbortAllMissions();
+            return success ? Ok("All missions aborted successfully") : BadRequest("Failed to abort all missions");
+        }
+
+        [HttpGet("status")]
+        public async Task<IActionResult> GetStatus()
+        {
+            var activeUAVs = _uavManager.ActiveUAVCount;
+            var activeJobs = await _uavManager.GetActiveJobCount();
+            var activeTailIds = _uavManager.GetActiveTailIds.ToList();
+
+            return Ok(new
+            {
+                ActiveUAVs = activeUAVs,
+                ActiveJobs = activeJobs,
+                ActiveTailIds = activeTailIds
+            });
+        }
+
         [HttpGet("run")]
         public async Task<IActionResult> Run()
         {
