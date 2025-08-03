@@ -1,4 +1,3 @@
-using Quartz;
 
 namespace Simulation.Services.Quartz
 {

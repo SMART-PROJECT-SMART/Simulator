@@ -91,6 +91,10 @@ public class FlightPathService : IDisposable
         _destination = newDestination;
     }
 
+    public Location GetDestination() => 
+        _destination;
+    
+
     public void UpdateLocation()
     {
         if (_missionCompleted)

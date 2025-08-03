@@ -9,6 +9,8 @@ namespace Simulation.Services.UAVManager
         public void RemoveUAV(int tailId);
         public UAVMissionContext? GetUAVContext(int tailId);
         public bool SwitchDestination(int tailId, Location newDestination);
+
+        public bool SwitchUAVs(int tailId1, int tailId2);
         public Task<bool> StartMission(UAV uav, Location destination, string missionId);
         public Task<bool> PauseMission(int tailId);
         public Task<bool> ResumeMission(int tailId);

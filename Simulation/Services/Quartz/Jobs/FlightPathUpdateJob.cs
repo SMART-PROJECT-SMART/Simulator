@@ -2,7 +2,7 @@
 using Simulation.Common.constants;
 using Simulation.Services.UAVManager;
 
-namespace Simulation.Services.Jobs
+namespace Simulation.Services.Quartz.Jobs
 {
     public class FlightPathUpdateJob : IJob
     {

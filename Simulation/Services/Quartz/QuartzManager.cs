@@ -1,7 +1,7 @@
 ﻿using Quartz;
 using Quartz.Impl.Matchers;
 using Simulation.Common.constants;
-using Simulation.Services.Jobs;
+using Simulation.Services.Quartz.Jobs;
 
 namespace Simulation.Services.Quartz
 {

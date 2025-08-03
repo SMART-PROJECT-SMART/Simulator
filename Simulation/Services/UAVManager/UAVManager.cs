@@ -61,6 +61,16 @@ namespace Simulation.Services.UAVManager
             return _uavs.GetValueOrDefault(tailId);
         }
 
+        public bool SwitchUAVs(int tailId1, int tailId2)
+        {
+            var tail1Destination = GetUAVContext(tailId1)
+                .Service.GetDestination();
+            var tail2Destination = GetUAVContext(tailId2)
+                .Service.GetDestination();
+
+            return SwitchDestination(tailId1, tail2Destination) && SwitchDestination(tailId2,tail1Destination);
+        }
+
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
         {
             uav.CurrentMissionId = missionId;
