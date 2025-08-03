@@ -1,4 +1,5 @@
 ﻿using Quartz;
+using Simulation.Common.constants;
 using Simulation.Services;
 
 public class FlightPathUpdateJob : IJob
@@ -12,7 +13,7 @@ public class FlightPathUpdateJob : IJob
 
     public Task Execute(IJobExecutionContext jobExecutionContext)
     {
-        var uavId = jobExecutionContext.JobDetail.JobDataMap.GetInt("UAVId");
+        var uavId = jobExecutionContext.JobDetail.JobDataMap.GetInt(SimulationConstants.Quartz.UAV_ID);
         var context = _uavManager.GetUAVContext(uavId);
 
         if (context?.Service == null)

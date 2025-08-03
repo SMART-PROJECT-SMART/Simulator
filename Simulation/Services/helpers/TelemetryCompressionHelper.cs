@@ -1,30 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using Simulation.Common.constants;
 using Simulation.Common.Enums;
 
 namespace Simulation.Services.Flight_Path.helpers
 {
     public static class TelemetryCompressionHelper
     {
+        private static readonly int TOTAL_FIELDS = Enum.GetValues<TelemetryFields>().Length;
+
         public static byte[] CompressTelemetryData(Dictionary<TelemetryFields, double> telemetryData)
         {
-            var fields = Enum.GetValues<TelemetryFields>();
-            byte[] result = new byte[fields.Length * 4];
+            byte[] result = new byte[TOTAL_FIELDS * SimulationConstants.TelemetryData.BYTES_PER_FIELD];
 
-            for (int i = 0; i < fields.Length; i++)
+            foreach (TelemetryFields field in Enum.GetValues<TelemetryFields>())
             {
-                TelemetryFields field = fields[i];
-                if (telemetryData.TryGetValue(field, out double value))
-                {
-                    float floatValue = (float)value;
-                    byte[] floatBytes = BitConverter.GetBytes(floatValue);
+                double value = telemetryData.GetValueOrDefault(field, 0.0);
+                byte[] doubleBytes = BitConverter.GetBytes(value);
 
-                    int baseIndex = i * 4;
-                    result[baseIndex] = floatBytes[0];
-                    result[baseIndex + 1] = floatBytes[1];
-                    result[baseIndex + 2] = floatBytes[2];
-                    result[baseIndex + 3] = floatBytes[3];
-                }
+                int baseIndex = (int)field * SimulationConstants.TelemetryData.BYTES_PER_FIELD;
+                Buffer.BlockCopy(doubleBytes, 0, result, baseIndex, SimulationConstants.TelemetryData.BYTES_PER_FIELD);
             }
 
             return result;
@@ -32,24 +27,17 @@ namespace Simulation.Services.Flight_Path.helpers
 
         public static Dictionary<TelemetryFields, double> DecompressTelemetryData(byte[] compressedData)
         {
-            var fields = Enum.GetValues<TelemetryFields>();
             Dictionary<TelemetryFields, double> result = new Dictionary<TelemetryFields, double>();
 
-            for (int i = 0; i < fields.Length && (i * 4 + 3) < compressedData.Length; i++)
+            for (int i = 0; i < TOTAL_FIELDS; i++)
             {
-                TelemetryFields field = fields[i];
+                int baseIndex = i * SimulationConstants.TelemetryData.BYTES_PER_FIELD;
 
-                int baseIndex = i * 4;
-                byte[] floatBytes = new byte[4];
-                floatBytes[0] = compressedData[baseIndex];
-                floatBytes[1] = compressedData[baseIndex + 1];
-                floatBytes[2] = compressedData[baseIndex + 2];
-                floatBytes[3] = compressedData[baseIndex + 3];
-
-                float floatValue = BitConverter.ToSingle(floatBytes, 0);
-                result[field] = (double)floatValue;
+                if (baseIndex + SimulationConstants.TelemetryData.BYTES_PER_FIELD - 1 < compressedData.Length)
+                {
+                    result[(TelemetryFields)i] = BitConverter.ToDouble(compressedData, baseIndex);
+                }
             }
-
             return result;
         }
     }
