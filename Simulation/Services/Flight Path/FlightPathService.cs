@@ -123,6 +123,7 @@ public class FlightPathService : IDisposable
 
         if (horizontalReached && altitudeReached)
         {
+            _uav.Land();
             _missionCompleted = true;
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
             _timer.Dispose();

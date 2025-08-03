@@ -11,7 +11,7 @@ namespace Simulation.Services
 {
     public class UAVManager
     {
-        private readonly ConcurrentDictionary<int, (UAV Uav, FlightPathService Service)> _uavs;
+        private readonly ConcurrentDictionary<int, UAVMissionContext> _uavs;
         private readonly IMotionCalculator _motionCalculator;
         private readonly ISpeedController _speedController;
         private readonly IOrientationCalculator _orientationCalculator;
@@ -23,7 +23,7 @@ namespace Simulation.Services
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger)
         {
-            _uavs = new ConcurrentDictionary<int, (UAV, FlightPathService)>();
+            _uavs = new ConcurrentDictionary<int, UAVMissionContext>();
             _motionCalculator = motionCalculator;
             _speedController = speedController;
             _orientationCalculator = orientationCalculator;
@@ -39,7 +39,7 @@ namespace Simulation.Services
                 _logger
             );
             
-            _uavs.TryAdd(uav.TailId, (uav, flightService));
+            _uavs.TryAdd(uav.TailId,new UAVMissionContext(uav,flightService));
         }
 
         public void RemoveUAV(int tailId)
@@ -59,20 +59,19 @@ namespace Simulation.Services
                 AddUAV(uav);
             }
 
-            var (_, flightService) = _uavs[uav.TailId];
-            flightService.Initialize(uav, destination);
-            flightService.StartFlightPath();
+            UAVMissionContext context = _uavs[uav.TailId];
+            context.Service.Initialize(uav, destination);
+            context.Service.StartFlightPath();
 
             var tcs = new TaskCompletionSource<bool>();
-            flightService.MissionCompleted += () =>
+            context.Service.MissionCompleted += () =>
             {
                 tcs.SetResult(true);
-                uav.Land();
                 uav.CurrentMissionId = string.Empty;
             };
 
             await tcs.Task;
-            flightService.Dispose();
+            context.Service.Dispose();
             _uavs.TryRemove(uav.TailId, out _);
             return true;
         }
