@@ -298,7 +298,7 @@ namespace Simulation.Services.ICD.Factories
 
         private static double GenerateRandomValue(double minValue, double maxValue)
         {
-            if (Math.Abs(maxValue - minValue) < 0.0001)
+            if (Math.Abs(maxValue - minValue) < SimulationConstants.TelemetryCompression.EPSILON_COMPARISON)
                 return minValue;
 
             return _random.NextDouble() * (maxValue - minValue) + minValue;

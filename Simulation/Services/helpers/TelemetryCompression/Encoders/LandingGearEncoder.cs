@@ -9,7 +9,7 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Encoders
 
         public ulong Encode(double value, int bits)
         {
-            return value > SimulationConstants.TelemetryData.WHEELS_UP ? 1UL : 0UL;
+            return value > SimulationConstants.TelemetryData.WHEELS_UP ? SimulationConstants.TelemetryCompression.BOOLEAN_TRUE_VALUE : SimulationConstants.TelemetryCompression.BOOLEAN_FALSE_VALUE;
         }
     }
 } 

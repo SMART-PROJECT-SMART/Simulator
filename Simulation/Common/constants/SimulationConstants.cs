@@ -221,6 +221,10 @@
             public const ulong BOOLEAN_TRUE_VALUE = 1;
             public const ulong BOOLEAN_FALSE_VALUE = 0;
 
+            public const double DEFAULT_TELEMETRY_VALUE = 0.0;
+            public const double EPSILON_COMPARISON = 0.0001;
+            public const ulong BIT_SHIFT_BASE = 1UL;
+
             public const int DRAG_COEFFICIENT_BITS = 16;
             public const int LIFT_COEFFICIENT_BITS = 16;
             public const int THROTTLE_PERCENT_BITS = 7;

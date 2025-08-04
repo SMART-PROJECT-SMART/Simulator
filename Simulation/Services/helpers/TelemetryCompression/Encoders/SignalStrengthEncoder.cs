@@ -9,7 +9,7 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Encoders
 
         public ulong Encode(double value, int bits)
         {
-            ulong maxValue = ((1UL << bits) - 1);
+            ulong maxValue = ((SimulationConstants.TelemetryCompression.BIT_SHIFT_BASE << bits) - 1);
             return (ulong)Math.Clamp(Math.Round((value + SimulationConstants.TelemetryCompression.SIGNAL_STRENGTH_OFFSET) * SimulationConstants.TelemetryCompression.SIGNAL_STRENGTH_SCALE), 0, maxValue);
         }
     }

@@ -3,7 +3,7 @@
     {
       "name": "DragCoefficient",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 1.8805414262429303,
+      "value": 0.25578361282238476,
       "unit": "coeff",
       "minValue": 0.0,
       "maxValue": 6.5535,
@@ -13,7 +13,7 @@
     {
       "name": "LiftCoefficient",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 6.014826819774578,
+      "value": 5.678401056534474,
       "unit": "coeff",
       "minValue": 0.0,
       "maxValue": 6.5535,
@@ -23,7 +23,7 @@
     {
       "name": "ThrottlePercent",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 95.04905928902348,
+      "value": 9.573918941441395,
       "unit": "%",
       "minValue": 0.0,
       "maxValue": 100.0,
@@ -33,7 +33,7 @@
     {
       "name": "CruiseAltitude",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 35158.883737271615,
+      "value": 14406.202319043861,
       "unit": "m",
       "minValue": 0.0,
       "maxValue": 65535.0,
@@ -43,7 +43,7 @@
     {
       "name": "Latitude",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": -82.41617427725912,
+      "value": 18.95194114491541,
       "unit": "deg",
       "minValue": -90.0,
       "maxValue": 90.0,
@@ -53,7 +53,7 @@
     {
       "name": "LandingGearStatus",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 0.17351698510700098,
+      "value": 0.3046202567828785,
       "unit": "bool",
       "minValue": 0.0,
       "maxValue": 1.0,
@@ -63,7 +63,7 @@
     {
       "name": "Longitude",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": -24.700203490619543,
+      "value": 41.452340398913265,
       "unit": "deg",
       "minValue": -180.0,
       "maxValue": 180.0,
@@ -73,7 +73,7 @@
     {
       "name": "Altitude",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 49754.534102389065,
+      "value": 57151.094235504104,
       "unit": "m",
       "minValue": 0.0,
       "maxValue": 65535.0,
@@ -83,7 +83,7 @@
     {
       "name": "CurrentSpeedKmph",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 2359.148809272302,
+      "value": 3962.917483170394,
       "unit": "kmph",
       "minValue": 0.0,
       "maxValue": 4095.0,
@@ -93,7 +93,7 @@
     {
       "name": "YawDeg",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 241.76885598663395,
+      "value": 99.16494621070355,
       "unit": "deg",
       "minValue": 0.0,
       "maxValue": 360.0,
@@ -103,7 +103,7 @@
     {
       "name": "PitchDeg",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 31.819319400461893,
+      "value": 86.36308114741362,
       "unit": "deg",
       "minValue": -90.0,
       "maxValue": 90.0,
@@ -113,7 +113,7 @@
     {
       "name": "RollDeg",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 86.05879690303394,
+      "value": 11.221694440675307,
       "unit": "deg",
       "minValue": -90.0,
       "maxValue": 90.0,
@@ -123,7 +123,7 @@
     {
       "name": "ThrustAfterInfluence",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 34988.655798581356,
+      "value": 421356.4186760905,
       "unit": "N",
       "minValue": 0.0,
       "maxValue": 1048575.0,
@@ -133,7 +133,7 @@
     {
       "name": "FuelAmount",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 31.531115948023512,
+      "value": 56.96937955531061,
       "unit": "%",
       "minValue": 0.0,
       "maxValue": 100.0,
@@ -143,7 +143,7 @@
     {
       "name": "DataStorageUsedGB",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 6546.329061215894,
+      "value": 4248.291572643563,
       "unit": "GB",
       "minValue": 0.0,
       "maxValue": 10485.75,
@@ -153,7 +153,7 @@
     {
       "name": "FlightTimeSec",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 512997.2652154875,
+      "value": 579889.3385743555,
       "unit": "sec",
       "minValue": 0.0,
       "maxValue": 1048575.0,
@@ -163,7 +163,7 @@
     {
       "name": "SignalStrength",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 111.80943976279411,
+      "value": -52.1634676782289,
       "unit": "dBm",
       "minValue": -200.0,
       "maxValue": 200.0,
@@ -173,7 +173,7 @@
     {
       "name": "Rpm",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 7928.366156634222,
+      "value": 24782.595957072244,
       "unit": "rpm",
       "minValue": 0.0,
       "maxValue": 65535.0,
@@ -183,7 +183,7 @@
     {
       "name": "EngineDegrees",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 391.1785396502917,
+      "value": 499.84616278738696,
       "unit": "°C",
       "minValue": 0.0,
       "maxValue": 524.287,
@@ -193,7 +193,7 @@
     {
       "name": "NearestSleeveId",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 11737.202974991722,
+      "value": 61651.390678908945,
       "unit": "id",
       "minValue": 0.0,
       "maxValue": 65535.0,
@@ -203,7 +203,7 @@
     {
       "name": "Checksum",
       "type": "System.Double, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
-      "value": 3617414952.81787,
+      "value": 3498809953.4612265,
       "unit": "checksum",
       "minValue": 0.0,
       "maxValue": 4294967295.0,

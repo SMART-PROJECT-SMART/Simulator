@@ -36,6 +36,7 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Strategies
                 { TelemetryFields.Rpm, SimulationConstants.TelemetryCompression.RPM_BITS },
                 { TelemetryFields.EngineDegrees, SimulationConstants.TelemetryCompression.ENGINE_DEGREES_BITS },
                 { TelemetryFields.NearestSleeveId, SimulationConstants.TelemetryCompression.NEAREST_SLEEVE_ID_BITS },
+                { TelemetryFields.Checksum, SimulationConstants.TelemetryCompression.CHECKSUM_BITS },
             };
 
             _encoders = new Dictionary<TelemetryFields, ITelemetryFieldEncoder>
@@ -60,11 +61,10 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Strategies
                 { TelemetryFields.SignalStrength, new SignalStrengthEncoder() },
                 { TelemetryFields.Rpm, new RpmEncoder() },
                 { TelemetryFields.NearestSleeveId, new SleeveIdEncoder() },
+                { TelemetryFields.Checksum, new ChecksumEncoder() },
             };
 
-            _dataFields = Enum.GetValues<TelemetryFields>()
-                .Where(field => field != TelemetryFields.Checksum)
-                .ToArray();
+            _dataFields = Enum.GetValues<TelemetryFields>().ToArray();
             
             _totalBits = _dataFields.Sum(field => _sizeInBits[field]);
         }
@@ -76,7 +76,7 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Strategies
 
             foreach (var field in _dataFields)
             {
-                double value = telemetryData.GetValueOrDefault(field, 0.0);
+                double value = telemetryData.GetValueOrDefault(field, SimulationConstants.TelemetryCompression.DEFAULT_TELEMETRY_VALUE);
                 int bits = _sizeInBits[field];
                 ulong encodedValue = _encoders[field].Encode(value, bits);
 
@@ -91,7 +91,7 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Strategies
         {
             for (int i = 0; i < bitCount; i++)
             {
-                bitArray[bitOffset + i] = (value & (1UL << i)) != 0;
+                bitArray[bitOffset + i] = (value & (SimulationConstants.TelemetryCompression.BIT_SHIFT_BASE << i)) != 0;
             }
         }
     }
