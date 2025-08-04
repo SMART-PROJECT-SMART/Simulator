@@ -3,7 +3,7 @@ using System.Collections;
 
 static class BitPacker
 {
-    public static byte[] ToByteArray(BitArray bits)
+    public static byte[] ToByteArray(this BitArray bits)
     {
         int numBytes = (bits.Length + 7) / 8;
         byte[] bytes = new byte[numBytes];
@@ -11,7 +11,7 @@ static class BitPacker
         return bytes;
     }
 
-    public static BitArray FromByteArray(byte[] bytes, int originalBitCount)
+    public static BitArray FromByteArray(this byte[] bytes, int originalBitCount)
     {
         var bits = new BitArray(bytes);
         if (bits.Length != originalBitCount)

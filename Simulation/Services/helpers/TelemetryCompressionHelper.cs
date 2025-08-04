@@ -1,5 +1,6 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
+using Simulation.Models.ICD;
 using System.Collections;
 
 namespace Simulation.Services.Helpers
@@ -31,6 +32,42 @@ namespace Simulation.Services.Helpers
             { TelemetryFields.Checksum, SimulationConstants.TelemetryCompression.CHECKSUM_BITS },
         };
 
+        public static BitArray CompressTelemetryData(Models.ICD.ICD icd)
+        {
+            int totalDataBits = _sizeInBits.Where(kvp => kvp.Key != TelemetryFields.Checksum)
+                                           .Sum(kvp => kvp.Value);
+            int totalBits = totalDataBits + _sizeInBits[TelemetryFields.Checksum];
+            
+            BitArray result = new BitArray(totalBits);
+            int bitOffset = 0;
+
+            // Convert ICD to Dictionary for processing
+            Dictionary<TelemetryFields, double> telemetryData = new Dictionary<TelemetryFields, double>();
+            foreach (var item in icd.Document)
+            {
+                telemetryData[item.Name] = item.Value;
+            }
+
+            foreach (TelemetryFields field in Enum.GetValues<TelemetryFields>())
+            {
+                if (field == TelemetryFields.Checksum)
+                    continue;
+
+                double value = telemetryData.GetValueOrDefault(field, 0.0);
+                int bits = _sizeInBits[field];
+                ulong encodedValue = EncodeFieldValueWithPrecision(field, value, bits);
+
+                WriteBitsToArray(result, bitOffset, encodedValue, bits);
+                bitOffset += bits;
+            }
+
+            uint checksum = CalculateSimpleChecksum(result, totalDataBits);
+            WriteBitsToArray(result, bitOffset, checksum, _sizeInBits[TelemetryFields.Checksum]);
+
+            return result;
+        }
+
+        // Keep the original method for backward compatibility
         public static BitArray CompressTelemetryData(Dictionary<TelemetryFields, double> telemetryData)
         {
             int totalDataBits = _sizeInBits.Where(kvp => kvp.Key != TelemetryFields.Checksum)

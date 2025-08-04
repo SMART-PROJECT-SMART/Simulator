@@ -6,7 +6,7 @@ using Simulation.Services.Helpers;
 
 namespace Simulation.Services.ICD
 {
-    public class ICDDirectory
+    public class ICDDirectory : IICDDirectory
     {
         private  Models.ICD.ICD DeSerializeICD(string icdName)
         {
@@ -17,10 +17,8 @@ namespace Simulation.Services.ICD
 
         public BitArray DecodeICD(string icdName)
         {
-            Dictionary<TelemetryFields,double> telemetryData = new Dictionary<TelemetryFields, double>();
             Models.ICD.ICD icd = DeSerializeICD(icdName);
-
-            return TelemetryCompressionHelper.CompressTelemetryData(telemetryData);
+            return TelemetryCompressionHelper.CompressTelemetryData(icd);
         }
     }
 

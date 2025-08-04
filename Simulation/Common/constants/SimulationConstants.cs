@@ -244,6 +244,43 @@
             public const int CHECKSUM_BITS = 32;
         }
 
+        public static class Units
+        {
+            public const string KILOMETERS_PER_HOUR = "kmph";
+            public const string METERS_PER_SECOND = "mps";
+            
+            public const string METERS = "m";
+            public const string KILOMETERS = "km";
+            public const string DEGREES = "deg";
+            
+            public const string DEGREES_PER_SECOND = "deg/s";
+            public const string REVOLUTIONS_PER_MINUTE = "rpm";
+            
+            public const string CELSIUS = "°C";
+            public const string FAHRENHEIT = "°F";
+            
+            public const string PERCENTAGE = "%";
+            public const string COEFFICIENT = "coeff";
+            
+            public const string SECONDS = "sec";
+            public const string MINUTES = "min";
+            public const string HOURS = "hr";
+            
+            public const string GIGABYTES = "GB";
+            public const string MEGABYTES = "MB";
+            
+            public const string DECIBELS = "dB";
+            public const string DECIBEL_MILLIWATTS = "dBm";
+            
+            public const string NEWTONS = "N";
+            
+            public const string UNITLESS = "unitless";
+            public const string COUNT = "count";
+            public const string ID = "id";
+            public const string BOOLEAN = "bool";
+            public const string CHECKSUM = "checksum";
+        }
+
         public static class ICDGeneration
         {
             public const string ICD_DIRECTORY = "files/icd";
