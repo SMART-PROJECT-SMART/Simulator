@@ -218,7 +218,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.ThrottlePercent => new ICDItem(
                     field,
-                    typeof(byte),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.PERCENTAGE_MAX_VALUE
@@ -231,7 +231,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.CruiseAltitude => new ICDItem(
                     field,
-                    typeof(ushort),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.ALTITUDE_MAX_VALUE
@@ -257,7 +257,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.LandingGearStatus => new ICDItem(
                     field,
-                    typeof(bool),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.TelemetryData.WHEELS_UP,
                         SimulationConstants.TelemetryData.WHEELS_DOWN
@@ -283,7 +283,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.Altitude => new ICDItem(
                     field,
-                    typeof(ushort),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.ALTITUDE_MAX_VALUE
@@ -296,7 +296,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.CurrentSpeedKmph => new ICDItem(
                     field,
-                    typeof(ushort),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.SPEED_MAX_VALUE
@@ -361,7 +361,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.FuelAmount => new ICDItem(
                     field,
-                    typeof(byte),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.PERCENTAGE_MAX_VALUE
@@ -387,7 +387,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.FlightTimeSec => new ICDItem(
                     field,
-                    typeof(uint),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.FLIGHT_TIME_MAX_VALUE
@@ -413,7 +413,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.Rpm => new ICDItem(
                     field,
-                    typeof(ushort),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.RPM_MAX_VALUE
@@ -439,7 +439,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.NearestSleeveId => new ICDItem(
                     field,
-                    typeof(ushort),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.SLEEVE_ID_MAX_VALUE
@@ -452,7 +452,7 @@ namespace Simulation.Services.ICD
                 ),
                 TelemetryFields.Checksum => new ICDItem(
                     field,
-                    typeof(uint),
+                    typeof(double),
                     GenerateRandomValue(
                         SimulationConstants.ICDGeneration.DEFAULT_VALUE,
                         SimulationConstants.ICDGeneration.CHECKSUM_MAX_VALUE
