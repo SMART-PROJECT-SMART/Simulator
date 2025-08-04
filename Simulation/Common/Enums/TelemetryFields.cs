@@ -40,6 +40,8 @@ namespace Simulation.Common.Enums
 
         EngineDegrees,
 
+        NearestSleeveId,
+
         Checksum,
     }
 }

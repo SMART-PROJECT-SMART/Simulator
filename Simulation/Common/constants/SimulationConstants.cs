@@ -195,6 +195,55 @@
             public const int BYTES_PER_FIELD = 8;
         }
 
+        public static class TelemetryCompression
+        {
+            public const int BITS_PER_BYTE = 8;
+            public const int BIT_MASK_SINGLE = 1;
+            public const int BYTE_MASK = 0xFF;
+            
+            public const uint CHECKSUM_SEED = 0x5A5A5A5A;
+            public const uint CHECKSUM_MULTIPLIER = 1103515245;
+            public const uint CHECKSUM_INCREMENT = 12345;
+            public const uint CHECKSUM_MODULO = 0xFFFFFFFF;
+            
+            public const int PRECISION_SCALE_FACTOR = 10000;
+            public const int PERCENTAGE_SCALE = 100;
+            public const int ANGLE_SCALE = 1000;
+            public const int COORDINATE_SCALE = 1000000;
+            
+            public const double LATITUDE_OFFSET = 90.0;
+            public const double LONGITUDE_OFFSET = 180.0;
+            public const double ANGLE_OFFSET = 90.0;
+            public const double SIGNAL_STRENGTH_OFFSET = 200.0;
+            public const double SIGNAL_STRENGTH_SCALE = 10.0;
+            
+            public const ulong CLAMP_MIN_VALUE = 0;
+            public const ulong BOOLEAN_TRUE_VALUE = 1;
+            public const ulong BOOLEAN_FALSE_VALUE = 0;
+            
+            public const int DRAG_COEFFICIENT_BITS = 16;
+            public const int LIFT_COEFFICIENT_BITS = 16;
+            public const int THROTTLE_PERCENT_BITS = 7;
+            public const int CRUISE_ALTITUDE_BITS = 16;
+            public const int LATITUDE_BITS = 25;
+            public const int LANDING_GEAR_STATUS_BITS = 1;
+            public const int LONGITUDE_BITS = 26;
+            public const int ALTITUDE_BITS = 16;
+            public const int CURRENT_SPEED_KMPH_BITS = 12;
+            public const int YAW_DEG_BITS = 19;
+            public const int PITCH_DEG_BITS = 17;
+            public const int ROLL_DEG_BITS = 17;
+            public const int THRUST_AFTER_INFLUENCE_BITS = 20;
+            public const int FUEL_AMOUNT_BITS = 7;
+            public const int DATA_STORAGE_USED_GB_BITS = 20;
+            public const int FLIGHT_TIME_SEC_BITS = 20;
+            public const int SIGNAL_STRENGTH_BITS = 12;
+            public const int RPM_BITS = 16;
+            public const int ENGINE_DEGREES_BITS = 19;
+            public const int NEAREST_SLEEVE_ID_BITS = 16;
+            public const int CHECKSUM_BITS = 32;
+        }
+
         public static class Quartz
         {
             public const string UAV_ID = "UAVId";

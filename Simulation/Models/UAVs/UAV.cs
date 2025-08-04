@@ -41,6 +41,7 @@ namespace Simulation.Models.UAVs
             TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
                 .TelemetryData
                 .WHEELS_DOWN;
+            TelemetryData[TelemetryFields.NearestSleeveId] = 0;
         }
 
         public void ConsumeFuel(double deltaSec)
