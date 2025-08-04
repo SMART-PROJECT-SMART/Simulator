@@ -292,5 +292,10 @@
             public const string IDENTITY_PREFIX = "FlightPath-";
             public const string JOB_GROUP = "FlightPathJob";
         }
+
+        public static class Networking
+        {
+            public const string HOST = "localhost";
+        }
     }
 }

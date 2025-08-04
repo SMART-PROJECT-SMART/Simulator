@@ -4,6 +4,7 @@ using Simulation.Common.Enums;
 using Simulation.Dto.FlightPath;
 using Simulation.Models;
 using Simulation.Models.UAVs.SurveillanceUAV;
+using Simulation.Services.ICD;
 using Simulation.Services.UAVManager;
 
 namespace Simulation.Controllers
@@ -124,6 +125,14 @@ namespace Simulation.Controllers
             await Task.WhenAll(task1, task2);
 
             return Ok("Both UAVs started successfully");
+        }
+
+        [HttpGet("generate-icd")]
+        public async Task<IActionResult> generate()
+        {
+            var generator = new ICDGenerator();
+            await generator.GenerateTwoICDDocuments();
+            return Ok("ICD documents generated successfully");
         }
     }
 }

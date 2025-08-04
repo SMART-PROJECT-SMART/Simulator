@@ -1,5 +1,6 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
+using System.Collections;
 
 namespace Simulation.Services.Helpers
 {
@@ -30,15 +31,13 @@ namespace Simulation.Services.Helpers
             { TelemetryFields.Checksum, SimulationConstants.TelemetryCompression.CHECKSUM_BITS },
         };
 
-        public static byte[] CompressTelemetryData(Dictionary<TelemetryFields, double> telemetryData)
+        public static BitArray CompressTelemetryData(Dictionary<TelemetryFields, double> telemetryData)
         {
             int totalDataBits = _sizeInBits.Where(kvp => kvp.Key != TelemetryFields.Checksum)
                                            .Sum(kvp => kvp.Value);
             int totalBits = totalDataBits + _sizeInBits[TelemetryFields.Checksum];
             
-            int totalBytes = (totalBits + SimulationConstants.TelemetryCompression.BITS_PER_BYTE - 1) / SimulationConstants.TelemetryCompression.BITS_PER_BYTE;
-            byte[] result = new byte[totalBytes];
-
+            BitArray result = new BitArray(totalBits);
             int bitOffset = 0;
 
             foreach (TelemetryFields field in Enum.GetValues<TelemetryFields>())
@@ -50,18 +49,17 @@ namespace Simulation.Services.Helpers
                 int bits = _sizeInBits[field];
                 ulong encodedValue = EncodeFieldValueWithPrecision(field, value, bits);
 
-                WriteBitsToBuffer(result, bitOffset, encodedValue, bits);
+                WriteBitsToArray(result, bitOffset, encodedValue, bits);
                 bitOffset += bits;
             }
 
             uint checksum = CalculateSimpleChecksum(result, totalDataBits);
-            
-            WriteBitsToBuffer(result, bitOffset, checksum, _sizeInBits[TelemetryFields.Checksum]);
+            WriteBitsToArray(result, bitOffset, checksum, _sizeInBits[TelemetryFields.Checksum]);
 
             return result;
         }
 
-        public static Dictionary<TelemetryFields, double> DecompressTelemetryData(byte[] compressedData)
+        public static Dictionary<TelemetryFields, double> DecompressTelemetryData(BitArray compressedData)
         {
             Dictionary<TelemetryFields, double> result = new();
             int bitOffset = 0;
@@ -75,14 +73,14 @@ namespace Simulation.Services.Helpers
                     continue;
 
                 int bits = _sizeInBits[field];
-                ulong encodedValue = ReadBitsFromBuffer(compressedData, bitOffset, bits);
+                ulong encodedValue = ReadBitsFromArray(compressedData, bitOffset, bits);
                 double value = DecodeFieldValueWithPrecision(field, encodedValue);
 
                 result[field] = value;
                 bitOffset += bits;
             }
 
-            uint storedChecksum = (uint)ReadBitsFromBuffer(compressedData, bitOffset, _sizeInBits[TelemetryFields.Checksum]);
+            uint storedChecksum = (uint)ReadBitsFromArray(compressedData, bitOffset, _sizeInBits[TelemetryFields.Checksum]);
             uint calculatedChecksum = CalculateSimpleChecksum(compressedData, totalDataBits);
 
             if (storedChecksum != calculatedChecksum)
@@ -198,66 +196,60 @@ namespace Simulation.Services.Helpers
             };
         }
 
-        private static void WriteBitsToBuffer(byte[] buffer, int bitOffset, ulong value, int bitCount)
+        private static void WriteBitsToArray(BitArray bitArray, int bitOffset, ulong value, int bitCount)
         {
             for (int i = 0; i < bitCount; i++)
             {
-                int byteIndex = (bitOffset + i) / SimulationConstants.TelemetryCompression.BITS_PER_BYTE;
-                int bitIndex = (bitOffset + i) % SimulationConstants.TelemetryCompression.BITS_PER_BYTE;
-                
-                if ((value & (1UL << i)) != 0)
-                {
-                    buffer[byteIndex] |= (byte)(SimulationConstants.TelemetryCompression.BIT_MASK_SINGLE << bitIndex);
-                }
+                bitArray[bitOffset + i] = (value & (1UL << i)) != 0;
             }
         }
 
-        private static ulong ReadBitsFromBuffer(byte[] buffer, int bitOffset, int bitCount)
+        private static ulong ReadBitsFromArray(BitArray bitArray, int bitOffset, int bitCount)
         {
             ulong result = 0;
-            
             for (int i = 0; i < bitCount; i++)
             {
-                int byteIndex = (bitOffset + i) / SimulationConstants.TelemetryCompression.BITS_PER_BYTE;
-                int bitIndex = (bitOffset + i) % SimulationConstants.TelemetryCompression.BITS_PER_BYTE;
-                
-                if ((buffer[byteIndex] & (SimulationConstants.TelemetryCompression.BIT_MASK_SINGLE << bitIndex)) != 0)
+                if (bitArray[bitOffset + i])
                 {
                     result |= (1UL << i);
                 }
             }
-            
             return result;
         }
 
-        private static uint CalculateSimpleChecksum(byte[] data, int totalDataBits)
+        private static uint CalculateSimpleChecksum(BitArray data, int totalDataBits)
         {
             uint checksum = SimulationConstants.TelemetryCompression.CHECKSUM_SEED;
             int dataBytes = (totalDataBits + SimulationConstants.TelemetryCompression.BITS_PER_BYTE - 1) / SimulationConstants.TelemetryCompression.BITS_PER_BYTE;
             
             for (int i = 0; i < dataBytes; i++)
             {
-                checksum = ((checksum * SimulationConstants.TelemetryCompression.CHECKSUM_MULTIPLIER) + data[i] + SimulationConstants.TelemetryCompression.CHECKSUM_INCREMENT) & SimulationConstants.TelemetryCompression.CHECKSUM_MODULO;
-            }
-            
-            int remainingBits = totalDataBits % SimulationConstants.TelemetryCompression.BITS_PER_BYTE;
-            if (remainingBits > 0 && dataBytes > 0)
-            {
-                byte lastByte = (byte)(data[dataBytes - 1] & ((SimulationConstants.TelemetryCompression.BIT_MASK_SINGLE << remainingBits) - 1));
-                checksum = ((checksum * SimulationConstants.TelemetryCompression.CHECKSUM_MULTIPLIER) + lastByte + SimulationConstants.TelemetryCompression.CHECKSUM_INCREMENT) & SimulationConstants.TelemetryCompression.CHECKSUM_MODULO;
+                byte currentByte = 0;
+                int startBit = i * SimulationConstants.TelemetryCompression.BITS_PER_BYTE;
+                int endBit = Math.Min(startBit + SimulationConstants.TelemetryCompression.BITS_PER_BYTE, totalDataBits);
+                
+                for (int bit = startBit; bit < endBit; bit++)
+                {
+                    if (data[bit])
+                    {
+                        currentByte |= (byte)(1 << (bit - startBit));
+                    }
+                }
+                
+                checksum = ((checksum * SimulationConstants.TelemetryCompression.CHECKSUM_MULTIPLIER) + currentByte + SimulationConstants.TelemetryCompression.CHECKSUM_INCREMENT) & SimulationConstants.TelemetryCompression.CHECKSUM_MODULO;
             }
             
             return checksum;
         }
 
-        public static bool ValidateChecksum(byte[] compressedData)
+        public static bool ValidateChecksum(BitArray compressedData)
         {
             try
             {
                 int totalDataBits = _sizeInBits.Where(kvp => kvp.Key != TelemetryFields.Checksum)
                                                .Sum(kvp => kvp.Value);
                 
-                uint storedChecksum = (uint)ReadBitsFromBuffer(compressedData, totalDataBits, _sizeInBits[TelemetryFields.Checksum]);
+                uint storedChecksum = (uint)ReadBitsFromArray(compressedData, totalDataBits, _sizeInBits[TelemetryFields.Checksum]);
                 uint calculatedChecksum = CalculateSimpleChecksum(compressedData, totalDataBits);
                 
                 return storedChecksum == calculatedChecksum;
@@ -267,5 +259,6 @@ namespace Simulation.Services.Helpers
                 return false;
             }
         }
+
     }
 }

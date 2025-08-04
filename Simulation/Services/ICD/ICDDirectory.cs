@@ -8,24 +8,19 @@ namespace Simulation.Services.ICD
 {
     public class ICDDirectory
     {
-        private static Models.ICD.ICD DeSerializeICD(string icdName)
+        private  Models.ICD.ICD DeSerializeICD(string icdName)
         {
             string path = $"SimulationConstants.ICDGeneration.ICD_DIRECTORY/{icdName}";
             string fileJson = File.ReadAllText(path);
-            return JsonConvert.DeserializeObject<Models.ICD.ICD>(fileJson);
+            return JsonConvert.DeserializeObject<Models.ICD.ICD>(fileJson)!;
         }
 
-        public static BitArray DecodeICD(string icdName)
+        public BitArray DecodeICD(string icdName)
         {
             Dictionary<TelemetryFields,double> telemetryData = new Dictionary<TelemetryFields, double>();
             Models.ICD.ICD icd = DeSerializeICD(icdName);
-            foreach (ICDItem item  in icd)
-            {
-                telemetryData[item.Name] = item.Value;
-            }
 
-            return new BitArray(1);
-            //TelemetryCompressionHelper.CompressTelemetryData(telemetryData);
+            return TelemetryCompressionHelper.CompressTelemetryData(telemetryData);
         }
     }
 
