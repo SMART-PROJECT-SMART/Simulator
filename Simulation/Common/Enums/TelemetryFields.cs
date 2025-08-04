@@ -39,5 +39,7 @@ namespace Simulation.Common.Enums
         Rpm,
 
         EngineDegrees,
+
+        Checksum,
     }
 }

@@ -100,8 +100,6 @@ namespace Simulation.Services.UAVManager
                 context.Service.Dispose();
                 _uavs.TryRemove(uav.TailId, out _);
             };
-
-
             return true; 
         }
 
@@ -154,11 +152,8 @@ namespace Simulation.Services.UAVManager
             
             foreach (var kvp in _uavs)
             {
-                if (kvp.Value != null)
-                {
-                    kvp.Value.UAV.CurrentMissionId = string.Empty;
-                    kvp.Value.Service.Dispose();
-                }
+                kvp.Value.UAV.CurrentMissionId = string.Empty;
+                kvp.Value.Service.Dispose();
             }
             
             _uavs.Clear();
