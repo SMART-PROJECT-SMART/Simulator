@@ -96,7 +96,7 @@ namespace Simulation.Services.Helpers
 
         private static ulong EncodeFieldValueWithPrecision(TelemetryFields field, double value, int bits)
         {
-            ulong maxValue = ((1UL << bits) - 1);
+            ulong maxValue = ((SimulationConstants.TelemetryCompression.BOOLEAN_TRUE_VALUE << bits) - 1);
 
             return field switch
             {
