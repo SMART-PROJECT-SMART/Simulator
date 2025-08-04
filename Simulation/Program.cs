@@ -7,6 +7,7 @@ using Simulation.Services.Helpers;
 using Simulation.Services.ICD;
 using Simulation.Services.UAVManager;
 using Simulation.Services.Quartz;
+using Simulation.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +32,11 @@ builder.Services.AddSingleton<IQuartzManager, QuartzManager>();
 builder.Services.AddSingleton<IUAVManager, UAVManager>();
 builder.Services.AddSingleton<IICDDirectory, ICDDirectory>();
 builder.Services.AddSingleton<IICDNetworking, ICDNetworkingHelper>();
-
+builder.Services.AddSingleton<StartUp>();
 var app = builder.Build();
+
+var startupService = app.Services.GetRequiredService<StartUp>();
+startupService.LoadAndSendICDsOnStartup();
 
 if (app.Environment.IsDevelopment())
 {

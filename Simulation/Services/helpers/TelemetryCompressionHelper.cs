@@ -41,7 +41,6 @@ namespace Simulation.Services.Helpers
             BitArray result = new BitArray(totalBits);
             int bitOffset = 0;
 
-            // Convert ICD to Dictionary for processing
             Dictionary<TelemetryFields, double> telemetryData = new Dictionary<TelemetryFields, double>();
             foreach (var item in icd.Document)
             {
@@ -67,7 +66,6 @@ namespace Simulation.Services.Helpers
             return result;
         }
 
-        // Keep the original method for backward compatibility
         public static BitArray CompressTelemetryData(Dictionary<TelemetryFields, double> telemetryData)
         {
             int totalDataBits = _sizeInBits.Where(kvp => kvp.Key != TelemetryFields.Checksum)

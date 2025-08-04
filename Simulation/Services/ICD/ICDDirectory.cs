@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Newtonsoft.Json;
+using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models.ICD;
 using Simulation.Services.Helpers;
@@ -8,11 +9,14 @@ namespace Simulation.Services.ICD
 {
     public class ICDDirectory : IICDDirectory
     {
-        private  Models.ICD.ICD DeSerializeICD(string icdName)
+        private Models.ICD.ICD DeSerializeICD(string icdName)
         {
-            string path = $"SimulationConstants.ICDGeneration.ICD_DIRECTORY/{icdName}";
+            string path = Path.Combine(SimulationConstants.ICDGeneration.ICD_DIRECTORY, icdName);
             string fileJson = File.ReadAllText(path);
-            return JsonConvert.DeserializeObject<Models.ICD.ICD>(fileJson)!;
+
+            var jsonObject = JsonConvert.DeserializeAnonymousType(fileJson, new { telemetryFields = new List<ICDItem>() });
+
+            return new Models.ICD.ICD(jsonObject.telemetryFields);
         }
 
         public BitArray DecodeICD(string icdName)
@@ -21,5 +25,4 @@ namespace Simulation.Services.ICD
             return TelemetryCompressionHelper.CompressTelemetryData(icd);
         }
     }
-
 }
