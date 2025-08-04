@@ -10,12 +10,14 @@ namespace Simulation.Services
     {
         private readonly IICDDirectory _directory;
         private readonly IICDNetworking _networking;
+        private readonly ICDGenerator _icdGenerator;
         private static readonly Random _random = new Random();
 
-        public StartUp(IICDDirectory directory, IICDNetworking networking)
+        public StartUp(IICDDirectory directory, IICDNetworking networking, ICDGenerator icdGenerator)
         {
             _directory = directory;
             _networking = networking;
+            _icdGenerator = icdGenerator;
         }
 
         public void LoadAndSendICD(StartUpLoadDto dto)
@@ -24,8 +26,10 @@ namespace Simulation.Services
             _networking.SendICDByteArray(dto.Channel, icdDataBitArray);
         }
 
-        public void LoadAndSendICDsOnStartup()
+        public async Task LoadAndSendICDsOnStartup()
         {
+            await GenerateICDFilesIfNotExist();
+
             int northPort = 8000;
             int southPort = 9000;
 
@@ -36,8 +40,12 @@ namespace Simulation.Services
             var southDto = new StartUpLoadDto("south_telemetry_icd.json", southChannel);
 
             LoadAndSendICD(northDto);
-
             LoadAndSendICD(southDto);
+        }
+
+        private async Task GenerateICDFilesIfNotExist()
+        {
+            await _icdGenerator.GenerateTwoICDDocuments();
         }
     }
 }
