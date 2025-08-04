@@ -11,9 +11,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                 tailId,
                 BuildProperties(),
                 SimulationConstants.Searcher_Constants.DataStorageCapacityGB
-            )
-        {
-        }
+            ) { }
 
         public Searcher(
             Location startLocation,
@@ -52,14 +50,44 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             return new Dictionary<UAVProperties, double>
             {
                 [UAVProperties.Mass] = SimulationConstants.Searcher_Constants.Mass,
-                [UAVProperties.FrontalSurface] = SimulationConstants.Searcher_Constants.FrontalSurface,
+                [UAVProperties.FrontalSurface] = SimulationConstants
+                    .Searcher_Constants
+                    .FrontalSurface,
                 [UAVProperties.WingsSurface] = SimulationConstants.Searcher_Constants.WingsSurface,
                 [UAVProperties.ThrustMax] = SimulationConstants.Searcher_Constants.ThrustMax,
-                [UAVProperties.MaxCruiseSpeed] = SimulationConstants.Searcher_Constants.MaxCruiseSpeedKmph,
-                [UAVProperties.MaxAcceleration] = SimulationConstants.Searcher_Constants.MaxAcceleration,
-                [UAVProperties.MaxDeceleration] = SimulationConstants.Searcher_Constants.MaxDeceleration,
-                [UAVProperties.FuelTankCapacity] = SimulationConstants.Searcher_Constants.FuelTankCapacity,
-                [UAVProperties.FuelConsumption] = SimulationConstants.Searcher_Constants.FuelConsumption,
+                [UAVProperties.MaxCruiseSpeed] = SimulationConstants
+                    .Searcher_Constants
+                    .MaxCruiseSpeedKmph,
+                [UAVProperties.MaxAcceleration] = SimulationConstants
+                    .Searcher_Constants
+                    .MaxAcceleration,
+                [UAVProperties.MaxDeceleration] = SimulationConstants
+                    .Searcher_Constants
+                    .MaxDeceleration,
+                [UAVProperties.FuelTankCapacity] = SimulationConstants
+                    .Searcher_Constants
+                    .FuelTankCapacity,
+                [UAVProperties.FuelConsumption] = SimulationConstants
+                    .Searcher_Constants
+                    .FuelConsumption,
+
+                [UAVProperties.TransmitPower] = SimulationConstants
+                    .Searcher_Constants
+                    .TransmitPowerDbm,
+                [UAVProperties.TransmitAntennaGain] = SimulationConstants
+                    .Searcher_Constants
+                    .TransmitAntennaGainDbi,
+                [UAVProperties.ReceiveAntennaGain] = SimulationConstants
+                    .Searcher_Constants
+                    .ReceiveAntennaGainDbi,
+                [UAVProperties.TransmitLoss] = SimulationConstants
+                    .Searcher_Constants
+                    .TransmitLossDb,
+                [UAVProperties.ReceiveLoss] = SimulationConstants.Searcher_Constants.ReceiveLossDb,
+                [UAVProperties.Frequency] = SimulationConstants.Searcher_Constants.FrequencyHz,
+                [UAVProperties.PropellerRadius] = SimulationConstants
+                    .Searcher_Constants
+                    .PropellerRadius,
             };
         }
     }

@@ -12,9 +12,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                 tailId,
                 BuildProperties(),
                 SimulationConstants.Hermes450_Constants.DataStorageCapacityGB
-            )
-        {
-        }
+            ) { }
 
         // Main constructor
         public Hermes450(
@@ -54,14 +52,43 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             return new Dictionary<UAVProperties, double>
             {
                 [UAVProperties.Mass] = SimulationConstants.Hermes450_Constants.Mass,
-                [UAVProperties.FrontalSurface] = SimulationConstants.Hermes450_Constants.FrontalSurface,
+                [UAVProperties.FrontalSurface] = SimulationConstants
+                    .Hermes450_Constants
+                    .FrontalSurface,
                 [UAVProperties.WingsSurface] = SimulationConstants.Hermes450_Constants.WingsSurface,
                 [UAVProperties.ThrustMax] = SimulationConstants.Hermes450_Constants.ThrustMax,
-                [UAVProperties.MaxCruiseSpeed] = SimulationConstants.Hermes450_Constants.MaxCruiseSpeedKmph,
-                [UAVProperties.MaxAcceleration] = SimulationConstants.Hermes450_Constants.MaxAcceleration,
-                [UAVProperties.MaxDeceleration] = SimulationConstants.Hermes450_Constants.MaxDeceleration,
-                [UAVProperties.FuelTankCapacity] = SimulationConstants.Hermes450_Constants.FuelTankCapacity,
-                [UAVProperties.FuelConsumption] = SimulationConstants.Hermes450_Constants.FuelConsumption,
+                [UAVProperties.MaxCruiseSpeed] = SimulationConstants
+                    .Hermes450_Constants
+                    .MaxCruiseSpeedKmph,
+                [UAVProperties.MaxAcceleration] = SimulationConstants
+                    .Hermes450_Constants
+                    .MaxAcceleration,
+                [UAVProperties.MaxDeceleration] = SimulationConstants
+                    .Hermes450_Constants
+                    .MaxDeceleration,
+                [UAVProperties.FuelTankCapacity] = SimulationConstants
+                    .Hermes450_Constants
+                    .FuelTankCapacity,
+                [UAVProperties.FuelConsumption] = SimulationConstants
+                    .Hermes450_Constants
+                    .FuelConsumption,
+                [UAVProperties.TransmitPower] = SimulationConstants
+                    .Hermes450_Constants
+                    .TransmitPowerDbm,
+                [UAVProperties.TransmitAntennaGain] = SimulationConstants
+                    .Hermes450_Constants
+                    .TransmitAntennaGainDbi,
+                [UAVProperties.ReceiveAntennaGain] = SimulationConstants
+                    .Hermes450_Constants
+                    .ReceiveAntennaGainDbi,
+                [UAVProperties.TransmitLoss] = SimulationConstants
+                    .Hermes450_Constants
+                    .TransmitLossDb,
+                [UAVProperties.ReceiveLoss] = SimulationConstants.Hermes450_Constants.ReceiveLossDb,
+                [UAVProperties.Frequency] = SimulationConstants.Hermes450_Constants.FrequencyHz,
+                [UAVProperties.PropellerRadius] = SimulationConstants
+                    .Hermes450_Constants
+                    .PropellerRadius,
             };
         }
     }

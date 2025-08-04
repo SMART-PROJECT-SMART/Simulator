@@ -1,11 +1,14 @@
-﻿using Simulation.Common.Enums;
+﻿using Simulation.Common.constants;
+using Simulation.Common.Enums;
+using Simulation.Ro.FlightPath;
+using Simulation.Services.Flight_Path.helpers;
 
 namespace Simulation.Models.UAVs
 {
     public abstract class UAV
     {
         public int TailId { get; set; }
-        public Dictionary<UAVProperties,double> Properties { get; set; }
+        public Dictionary<UAVProperties, double> Properties { get; set; }
         public Dictionary<TelemetryFields, double> TelemetryData { get; set; }
         public string CurrentMissionId { get; set; }
 
@@ -13,7 +16,8 @@ namespace Simulation.Models.UAVs
             Location startLocation,
             int tailId,
             double fuelAmount,
-           Dictionary<UAVProperties,double> properties)
+            Dictionary<UAVProperties, double> properties
+        )
         {
             TailId = tailId;
             Properties = properties;
@@ -24,7 +28,7 @@ namespace Simulation.Models.UAVs
             {
                 [TelemetryFields.Latitude] = startLocation.Latitude,
                 [TelemetryFields.Longitude] = startLocation.Longitude,
-                [TelemetryFields.Altitude] = startLocation.Altitude
+                [TelemetryFields.Altitude] = startLocation.Altitude,
             };
 
             TelemetryData[TelemetryFields.FuelAmount] = fuelAmount;
@@ -34,6 +38,10 @@ namespace Simulation.Models.UAVs
             TelemetryData[TelemetryFields.YawDeg] = 0.0;
             TelemetryData[TelemetryFields.PitchDeg] = 0.0;
             TelemetryData[TelemetryFields.RollDeg] = 0.0;
+            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
+                .TelemetryData
+                .WHEELS_DOWN;
+            TelemetryData[TelemetryFields.NearestSleeveId] = 0;
         }
 
         public void ConsumeFuel(double deltaSec)
@@ -46,6 +54,43 @@ namespace Simulation.Models.UAVs
             double remainingFuel = TelemetryData[TelemetryFields.FuelAmount];
             remainingFuel = Math.Max(remainingFuel - burnedInKg, 0.0);
             TelemetryData[TelemetryFields.FuelAmount] = remainingFuel;
+            TelemetryData[TelemetryFields.FlightTimeSec] = 0;
+            TelemetryData[TelemetryFields.SignalStrength] = 0;
+            TelemetryData[TelemetryFields.EngineDegrees] = 0;
+        }
+
+        public Location GetLocation()
+        {
+            return new Location(
+                TelemetryData[TelemetryFields.Latitude],
+                TelemetryData[TelemetryFields.Longitude],
+                TelemetryData[TelemetryFields.Altitude]
+            );
+        }
+
+        public void TakeOff() =>
+            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
+                .TelemetryData
+                .WHEELS_UP;
+
+        public void Land() =>
+            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
+                .TelemetryData
+                .WHEELS_DOWN;
+
+        public void UpdateRpm()
+        {
+            TelemetryData[TelemetryFields.Rpm] =
+                TelemetryData[TelemetryFields.CurrentSpeedKmph].ToKmhFromMps()
+                / Properties[UAVProperties.PropellerRadius]
+                * 60;
+            UpdateEngineDegrees();
+        }
+
+        public void UpdateEngineDegrees()
+        {
+            TelemetryData[TelemetryFields.EngineDegrees] =
+                TelemetryData[TelemetryFields.Rpm] / 60.0 * 360.0;
         }
     }
 }

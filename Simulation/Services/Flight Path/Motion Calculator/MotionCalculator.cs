@@ -24,7 +24,7 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
             double speedMps = speedKmph.ToKmhFromMps();
             double travelM = speedMps * deltaSec;
 
-            double horizM = travelM * Math.Cos(UnitConversionHelper.ToRadians(pitchDeg));
+            double horizM = FlightPathMathHelper.GetHorizontalPart(travelM, pitchDeg);
             if (horizM >= distToDestination)
                 horizM = distToDestination;
 
@@ -57,6 +57,5 @@ namespace Simulation.Services.Flight_Path.Motion_Calculator
 
             return new Location(nextHoriz.Latitude, nextHoriz.Longitude, newAlt);
         }
-
     }
 }

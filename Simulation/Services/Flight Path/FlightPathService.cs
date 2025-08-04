@@ -15,39 +15,38 @@ namespace Simulation.Services.Flight_Path;
 public class FlightPathService : IDisposable
 {
     private readonly ILogger<FlightPathService> _logger;
-    private readonly UAV _uav;
-    private readonly Location _destination;
-    private readonly double _cruiseAltitude;
+    private UAV _uav;
+    private Location _destination;
+    private double _cruiseAltitude;
     private readonly IMotionCalculator _motionCalculator;
     private readonly ISpeedController _speedController;
     private readonly IOrientationCalculator _orientationCalculator;
-    private readonly Timer _timer;
     private bool _isRunning;
-    private bool _timerDisposed;
     private bool _missionCompleted;
     private Location _previousLocation;
+    private Location _startLocation;
 
     public event Action<Location>? LocationUpdated;
     public event Action? MissionCompleted;
 
     public FlightPathService(
-        UAV uav,
-        Location destination,
-        double cruiseAltitude,
         IMotionCalculator motionCalculator,
         ISpeedController speedController,
         IOrientationCalculator orientationCalculator,
         ILogger<FlightPathService> logger
     )
     {
-        _uav = uav;
-        _destination = destination;
-        _cruiseAltitude = cruiseAltitude;
         _motionCalculator = motionCalculator;
         _speedController = speedController;
         _orientationCalculator = orientationCalculator;
         _logger = logger;
-        _timer = new Timer(UpdateLocation, null, Timeout.Infinite, Timeout.Infinite);
+    }
+
+    public void Initialize(UAV uav, Location destination)
+    {
+        _uav = uav;
+        _destination = destination;
+        _cruiseAltitude = _uav.TelemetryData[TelemetryFields.CruiseAltitude];
 
         var t = _uav.TelemetryData;
         t.TryGetValue(TelemetryFields.Latitude, out double lat);
@@ -72,14 +71,29 @@ public class FlightPathService : IDisposable
     {
         if (_isRunning)
             return;
+
+        _startLocation = _uav.GetLocation();
         _isRunning = true;
-        _timer.Change(
-            TimeSpan.Zero,
-            TimeSpan.FromSeconds(SimulationConstants.FlightPath.DELTA_SECONDS)
-        );
+        _uav.TakeOff();
     }
 
-    private void UpdateLocation(object? state)
+    public void SwitchDestination(Location newDestination)
+    {
+        _logger.LogInformation(
+            "Location switched from ({Lat:F6}, {Lon:F6}, {Alt:F1}) to ({NewLat:F6}, {NewLon:F6}, {NewAlt:F1})",
+            _destination.Latitude,
+            _destination.Longitude,
+            _destination.Altitude,
+            newDestination.Latitude,
+            newDestination.Longitude,
+            newDestination.Altitude
+        );
+        _destination = newDestination;
+    }
+
+    public Location GetDestination() => _destination;
+
+    public void UpdateLocation()
     {
         if (_missionCompleted)
             return;
@@ -91,6 +105,10 @@ public class FlightPathService : IDisposable
             telemetry[TelemetryFields.Altitude]
         );
         double remainingMeters = FlightPathMathHelper.CalculateDistance(currentLoc, _destination);
+        double distanceFromStart = FlightPathMathHelper.CalculateDistance(
+            _startLocation,
+            currentLoc
+        );
 
         bool horizontalReached =
             remainingMeters <= SimulationConstants.FlightPath.MISSION_COMPLETION_RADIUS_M;
@@ -100,9 +118,8 @@ public class FlightPathService : IDisposable
 
         if (horizontalReached && altitudeReached)
         {
+            _uav.Land();
             _missionCompleted = true;
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            _timer.Dispose();
             _logger.LogInformation(
                 "MISSION COMPLETED at ({Lat:F6},{Lon:F6},{Alt:F1}), rem=0",
                 currentLoc.Latitude,
@@ -131,18 +148,33 @@ public class FlightPathService : IDisposable
         telemetry[TelemetryFields.ThrottlePercent] = throttlePct;
 
         _uav.ConsumeFuel(SimulationConstants.FlightPath.DELTA_SECONDS);
+        telemetry[TelemetryFields.SignalStrength] =
+            FlightPhysicsCalculator.CalculateReceivedSignalStrengthDbm(
+                _uav.Properties[UAVProperties.TransmitPower],
+                _uav.Properties[UAVProperties.TransmitAntennaGain],
+                _uav.Properties[UAVProperties.ReceiveAntennaGain],
+                _uav.Properties[UAVProperties.TransmitLoss],
+                _uav.Properties[UAVProperties.ReceiveLoss],
+                _uav.Properties[UAVProperties.Frequency],
+                distanceFromStart
+            );
 
-        if (_uav.TelemetryData[TelemetryFields.FuelAmount] <= 0.0)
+        if (MissionAborted(telemetry))
         {
             _missionCompleted = true;
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            _timer.Dispose();
-            _logger.LogInformation(
-                "MISSION ABORTED: UAV {UavId} ran out of fuel at ({Lat:F6},{Lon:F6},{Alt:F1})",
+
+            string abortReason = DetermineAbortReason(telemetry);
+            _logger.LogWarning(
+                "MISSION ABORTED - UAV {UavId} | {Reason} | Final Position: ({Lat:F6}, {Lon:F6}) | Altitude: {Alt:F1}m | Fuel: {Fuel:F3}kg | Signal: {Signal:F1}dBm | Engine Temp: {Engine:F1}°C | Flight Time: {Time:F1}s",
                 _uav.TailId,
+                abortReason,
                 currentLoc.Latitude,
                 currentLoc.Longitude,
-                currentLoc.Altitude
+                currentLoc.Altitude,
+                telemetry[TelemetryFields.FuelAmount],
+                telemetry[TelemetryFields.SignalStrength],
+                telemetry[TelemetryFields.EngineDegrees],
+                telemetry[TelemetryFields.FlightTimeSec]
             );
             MissionCompleted?.Invoke();
             return;
@@ -170,10 +202,13 @@ public class FlightPathService : IDisposable
         telemetry[TelemetryFields.Altitude] = nextLoc.Altitude;
         telemetry[TelemetryFields.YawDeg] = axis.Yaw;
         telemetry[TelemetryFields.RollDeg] = axis.Roll;
+
         _previousLocation = currentLoc;
+        telemetry[TelemetryFields.FlightTimeSec] += SimulationConstants.FlightPath.DELTA_SECONDS;
+        _uav.UpdateRpm();
 
         _logger.LogInformation(
-            "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg",
+            "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg | Destination {lat},{lon},{alt}",
             _uav.TailId,
             nextLoc.Latitude,
             nextLoc.Longitude,
@@ -183,18 +218,52 @@ public class FlightPathService : IDisposable
             axis.Pitch,
             axis.Roll,
             remainingMeters,
-            _uav.TelemetryData[TelemetryFields.FuelAmount]
+            _uav.TelemetryData[TelemetryFields.FuelAmount],
+            _destination.Latitude,
+            _destination.Longitude,
+            _destination.Altitude
         );
-
         LocationUpdated?.Invoke(nextLoc);
+    }
+
+    public bool MissionAborted(Dictionary<TelemetryFields, double> telemetryData)
+    {
+        _logger.LogInformation(
+            "signal strength {st}",
+            telemetryData[TelemetryFields.SignalStrength]
+        );
+        return telemetryData[TelemetryFields.FuelAmount] <= 0.0
+            || telemetryData[TelemetryFields.SignalStrength]
+                < SimulationConstants.TelemetryData.NO_SIGNAL
+            || telemetryData[TelemetryFields.EngineDegrees]
+                > SimulationConstants.FlightPath.OVERHEAT;
+    }
+
+    private string DetermineAbortReason(Dictionary<TelemetryFields, double> telemetryData)
+    {
+        if (telemetryData[TelemetryFields.FuelAmount] <= 0.0)
+        {
+            return SimulationConstants.FlightPath.ABORT_REASON_FUEL_DEPLETION;
+        }
+
+        if (
+            telemetryData[TelemetryFields.SignalStrength]
+            < SimulationConstants.TelemetryData.NO_SIGNAL
+        )
+        {
+            return SimulationConstants.FlightPath.ABORT_REASON_COMMUNICATION_LOSS;
+        }
+
+        if (telemetryData[TelemetryFields.EngineDegrees] > SimulationConstants.FlightPath.OVERHEAT)
+        {
+            return SimulationConstants.FlightPath.ABORT_REASON_ENGINE_OVERHEAT;
+        }
+
+        return SimulationConstants.FlightPath.ABORT_REASON_UNKNOWN;
     }
 
     public void Dispose()
     {
-        if (_timerDisposed)
-            return;
-        _timer.Dispose();
-        _timerDisposed = true;
         _isRunning = false;
     }
 }

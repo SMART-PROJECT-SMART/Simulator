@@ -11,10 +11,17 @@
         MaxDeceleration,
         FuelTankCapacity,
         FuelConsumption,
+        ReceiveLoss,
+        TransmitLoss,
+        TransmitAntennaGain,
+        ReceiveAntennaGain,
+        TransmitPower,
+        Frequency,
 
         DataStorageCapacityGB,
 
         IsWeaponSystemArmed,
-        WeaponSystemHealth
+        WeaponSystemHealth,
+        PropellerRadius,
     }
 }

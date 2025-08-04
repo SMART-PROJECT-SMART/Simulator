@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-
-namespace Simulation.Common.constants
+﻿namespace Simulation.Common.constants
 {
     public static class SimulationConstants
     {
@@ -15,13 +13,21 @@ namespace Simulation.Common.constants
             public const double Mass = 1100.0;
             public const double FrontalSurface = 4.8;
             public const double WingsSurface = 15.2;
-            public const double DragCoefficient = 0.022;
+            public const double DragCoefficient = 0.002;
             public const double LiftCoefficient = 0.85;
             public const double ThrustMax = 120.0;
             public const double ThrustAfterInfluence = 120.0;
             public const double HellfireAmmo = 2.0;
             public const double SpikeNLOSAmmo = 2.0;
             public const double GriffinAmmo = 1.0;
+            public const double TransmitPowerDbm = 60.0;
+            public const double TransmitAntennaGainDbi = 25.0;
+            public const double ReceiveAntennaGainDbi = 30.0;
+            public const double TransmitLossDb = 1.0;
+            public const double ReceiveLossDb = 1.0;
+            public const double FrequencyHz = 400e6;
+            public const double PropellerRadius = 1.015;
+            public const double BladeCircumference = 6.38;
         }
 
         public static class HeronTP_Constants
@@ -35,13 +41,21 @@ namespace Simulation.Common.constants
             public const double Mass = 4650.0;
             public const double FrontalSurface = 8.2;
             public const double WingsSurface = 26.0;
-            public const double DragCoefficient = 0.018;
+            public const double DragCoefficient = 0.0018;
             public const double LiftCoefficient = 0.9;
             public const double ThrustMax = 1200.0;
             public const double ThrustAfterInfluence = 1200.0;
             public const double HellfireAmmo = 4.0;
             public const double GriffinAmmo = 2.0;
             public const double JDAMAmmo = 1.0;
+            public const double TransmitPowerDbm = 60.0;
+            public const double TransmitAntennaGainDbi = 25.0;
+            public const double ReceiveAntennaGainDbi = 30.0;
+            public const double TransmitLossDb = 1.0;
+            public const double ReceiveLossDb = 1.0;
+            public const double FrequencyHz = 400e6;
+            public const double PropellerRadius = 1.40;
+            public const double BladeCircumference = 8.80;
         }
 
         public static class Hermes450_Constants
@@ -56,10 +70,18 @@ namespace Simulation.Common.constants
             public const double Mass = 450.0;
             public const double FrontalSurface = 2.5;
             public const double WingsSurface = 8.5;
-            public const double DragCoefficient = 0.025;
+            public const double DragCoefficient = 0.0025;
             public const double LiftCoefficient = 0.8;
             public const double ThrustMax = 52.0;
             public const double ThrustAfterInfluence = 52.0;
+            public const double TransmitPowerDbm = 60.0;
+            public const double TransmitAntennaGainDbi = 25.0;
+            public const double ReceiveAntennaGainDbi = 30.0;
+            public const double TransmitLossDb = 1.0;
+            public const double ReceiveLossDb = 1.0;
+            public const double FrequencyHz = 400e6;
+            public const double PropellerRadius = 0.90;
+            public const double BladeCircumference = 5.65;
         }
 
         public static class Searcher_Constants
@@ -74,10 +96,18 @@ namespace Simulation.Common.constants
             public const double Mass = 120.0;
             public const double FrontalSurface = 1.2;
             public const double WingsSurface = 4.8;
-            public const double DragCoefficient = 0.03;
+            public const double DragCoefficient = 0.001;
             public const double LiftCoefficient = 0.75;
             public const double ThrustMax = 150.0;
             public const double ThrustAfterInfluence = 150.0;
+            public const double TransmitPowerDbm = 60.0;
+            public const double TransmitAntennaGainDbi = 25.0;
+            public const double ReceiveAntennaGainDbi = 30.0;
+            public const double TransmitLossDb = 1.0;
+            public const double ReceiveLossDb = 1.0;
+            public const double FrequencyHz = 400e6;
+            public const double PropellerRadius = 0.60;
+            public const double BladeCircumference = 3.77;
         }
 
         public static class FlightPath
@@ -131,24 +161,94 @@ namespace Simulation.Common.constants
             public const double ALTITUDE_HOLD_GAIN = 8.0;
             public const double MISSION_COMPLETION_RADIUS_M = 10.0;
             public const double ALTITUDE_HOLD_TIME_TO_TARGET_SEC = 0.5;
+            public const int OVERHEAT = 300;
+
+            public const string ABORT_REASON_FUEL_DEPLETION =
+                "FUEL DEPLETION - Critical fuel exhaustion";
+            public const string ABORT_REASON_COMMUNICATION_LOSS =
+                "COMMUNICATION LOSS - Signal strength below operational threshold";
+            public const string ABORT_REASON_ENGINE_OVERHEAT =
+                "ENGINE OVERHEAT - Critical temperature exceeded";
+            public const string ABORT_REASON_UNKNOWN =
+                "UNKNOWN - Mission terminated for unspecified reason";
         }
 
         public static class Mathematical
         {
-            public const double GRAVITY = 9.81;
+            public const int GIGA = 1000000000;
             public const double EPSILON = 1e-10;
             public const double RHO = 1.225;
-            public const double CRITICAL_MACH_NUMBER = 0.78;
-            public const double MAXIMAL_KINETIC_ENERGY_FOR_LANDING = 1323000.0;
-            public const double SPEED_OF_SOUND = 343.2;
             public const double FROM_KMH_TO_MPS = 3.6;
             public const double FROM_MPS_TO_KMH = 3.6;
             public const double FROM_M_TO_KM = 0.0001;
             public const int FULL_TURN_DEGREES = 360;
             public const int HALF_TURN_DEGREES = 180;
-            public const double MAX_HAVERSINE_RANGE = 1.0;
             public const double MIN_ACCELERATION_FACTOR = 0.1;
-            public const double REALISTIC_STOP_PERCENT = 0.3;
+            public const int SPEED_OF_LIGHT_MPS = 299792458;
+        }
+
+        public static class TelemetryData
+        {
+            public const double WHEELS_UP = 0;
+            public const double WHEELS_DOWN = 1;
+            public const double NO_SIGNAL = -120.5;
+            public const int BYTES_PER_FIELD = 8;
+        }
+
+        public static class TelemetryCompression
+        {
+            public const int BITS_PER_BYTE = 8;
+            public const int BIT_MASK_SINGLE = 1;
+            public const int BYTE_MASK = 0xFF;
+            
+            public const uint CHECKSUM_SEED = 0x5A5A5A5A;
+            public const uint CHECKSUM_MULTIPLIER = 1103515245;
+            public const uint CHECKSUM_INCREMENT = 12345;
+            public const uint CHECKSUM_MODULO = 0xFFFFFFFF;
+            
+            public const int PRECISION_SCALE_FACTOR = 10000;
+            public const int PERCENTAGE_SCALE = 100;
+            public const int ANGLE_SCALE = 1000;
+            public const int COORDINATE_SCALE = 1000000;
+            
+            public const double LATITUDE_OFFSET = 90.0;
+            public const double LONGITUDE_OFFSET = 180.0;
+            public const double ANGLE_OFFSET = 90.0;
+            public const double SIGNAL_STRENGTH_OFFSET = 200.0;
+            public const double SIGNAL_STRENGTH_SCALE = 10.0;
+            
+            public const ulong CLAMP_MIN_VALUE = 0;
+            public const ulong BOOLEAN_TRUE_VALUE = 1;
+            public const ulong BOOLEAN_FALSE_VALUE = 0;
+            
+            public const int DRAG_COEFFICIENT_BITS = 16;
+            public const int LIFT_COEFFICIENT_BITS = 16;
+            public const int THROTTLE_PERCENT_BITS = 7;
+            public const int CRUISE_ALTITUDE_BITS = 16;
+            public const int LATITUDE_BITS = 25;
+            public const int LANDING_GEAR_STATUS_BITS = 1;
+            public const int LONGITUDE_BITS = 26;
+            public const int ALTITUDE_BITS = 16;
+            public const int CURRENT_SPEED_KMPH_BITS = 12;
+            public const int YAW_DEG_BITS = 19;
+            public const int PITCH_DEG_BITS = 17;
+            public const int ROLL_DEG_BITS = 17;
+            public const int THRUST_AFTER_INFLUENCE_BITS = 20;
+            public const int FUEL_AMOUNT_BITS = 7;
+            public const int DATA_STORAGE_USED_GB_BITS = 20;
+            public const int FLIGHT_TIME_SEC_BITS = 20;
+            public const int SIGNAL_STRENGTH_BITS = 12;
+            public const int RPM_BITS = 16;
+            public const int ENGINE_DEGREES_BITS = 19;
+            public const int NEAREST_SLEEVE_ID_BITS = 16;
+            public const int CHECKSUM_BITS = 32;
+        }
+
+        public static class Quartz
+        {
+            public const string UAV_ID = "UAVId";
+            public const string IDENTITY_PREFIX = "FlightPath-";
+            public const string JOB_GROUP = "FlightPathJob";
         }
     }
 }

@@ -1,19 +1,13 @@
-﻿using Simulation.Common.constants;
+﻿using System.Collections.Generic;
+using Simulation.Common.constants;
 using Simulation.Common.Enums;
-using System.Collections.Generic;
 
 namespace Simulation.Models.UAVs.ArmedUav
 {
     public class HeronTp : ArmedUAV
     {
         public HeronTp(int tailId, Location startLocation)
-            : this(
-                startLocation,
-                tailId,
-                BuildProperties()
-            )
-        {
-        }
+            : this(startLocation, tailId, BuildProperties()) { }
 
         public HeronTp(
             Location startLocation,
@@ -40,7 +34,8 @@ namespace Simulation.Models.UAVs.ArmedUav
                 .HeronTP_Constants
                 .ThrustAfterInfluence;
 
-            WeaponAmmo[WeaponType.Hellfire] = (int)SimulationConstants.HeronTP_Constants.HellfireAmmo;
+            WeaponAmmo[WeaponType.Hellfire] = (int)
+                SimulationConstants.HeronTP_Constants.HellfireAmmo;
             WeaponAmmo[WeaponType.Griffin] = (int)SimulationConstants.HeronTP_Constants.GriffinAmmo;
             WeaponAmmo[WeaponType.JDAM] = (int)SimulationConstants.HeronTP_Constants.JDAMAmmo;
         }
@@ -50,14 +45,42 @@ namespace Simulation.Models.UAVs.ArmedUav
             return new Dictionary<UAVProperties, double>
             {
                 [UAVProperties.Mass] = SimulationConstants.HeronTP_Constants.Mass,
-                [UAVProperties.FrontalSurface] = SimulationConstants.HeronTP_Constants.FrontalSurface,
+                [UAVProperties.FrontalSurface] = SimulationConstants
+                    .HeronTP_Constants
+                    .FrontalSurface,
                 [UAVProperties.WingsSurface] = SimulationConstants.HeronTP_Constants.WingsSurface,
                 [UAVProperties.ThrustMax] = SimulationConstants.HeronTP_Constants.ThrustMax,
-                [UAVProperties.MaxCruiseSpeed] = SimulationConstants.HeronTP_Constants.MaxCruiseSpeedKmph,
-                [UAVProperties.MaxAcceleration] = SimulationConstants.HeronTP_Constants.MaxAcceleration,
-                [UAVProperties.MaxDeceleration] = SimulationConstants.HeronTP_Constants.MaxDeceleration,
-                [UAVProperties.FuelTankCapacity] = SimulationConstants.HeronTP_Constants.FuelTankCapacity,
-                [UAVProperties.FuelConsumption] = SimulationConstants.HeronTP_Constants.FuelConsumption,
+                [UAVProperties.MaxCruiseSpeed] = SimulationConstants
+                    .HeronTP_Constants
+                    .MaxCruiseSpeedKmph,
+                [UAVProperties.MaxAcceleration] = SimulationConstants
+                    .HeronTP_Constants
+                    .MaxAcceleration,
+                [UAVProperties.MaxDeceleration] = SimulationConstants
+                    .HeronTP_Constants
+                    .MaxDeceleration,
+                [UAVProperties.FuelTankCapacity] = SimulationConstants
+                    .HeronTP_Constants
+                    .FuelTankCapacity,
+                [UAVProperties.FuelConsumption] = SimulationConstants
+                    .HeronTP_Constants
+                    .FuelConsumption,
+
+                [UAVProperties.TransmitPower] = SimulationConstants
+                    .HeronTP_Constants
+                    .TransmitPowerDbm,
+                [UAVProperties.TransmitAntennaGain] = SimulationConstants
+                    .HeronTP_Constants
+                    .TransmitAntennaGainDbi,
+                [UAVProperties.ReceiveAntennaGain] = SimulationConstants
+                    .HeronTP_Constants
+                    .ReceiveAntennaGainDbi,
+                [UAVProperties.TransmitLoss] = SimulationConstants.HeronTP_Constants.TransmitLossDb,
+                [UAVProperties.ReceiveLoss] = SimulationConstants.HeronTP_Constants.ReceiveLossDb,
+                [UAVProperties.Frequency] = SimulationConstants.HeronTP_Constants.FrequencyHz,
+                [UAVProperties.PropellerRadius] = SimulationConstants
+                    .HeronTP_Constants
+                    .PropellerRadius,
             };
         }
     }

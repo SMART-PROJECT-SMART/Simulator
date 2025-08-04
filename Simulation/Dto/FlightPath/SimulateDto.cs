@@ -7,6 +7,7 @@ namespace Simulation.Dto.FlightPath
     {
         public UAV UAV { get; set; }
         public Location Destination { get; set; }
+        public string MissionId { get; set; } = string.Empty;
 
         public SimulateDto() { }
 
