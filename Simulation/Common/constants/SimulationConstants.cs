@@ -200,27 +200,27 @@
             public const int BITS_PER_BYTE = 8;
             public const int BIT_MASK_SINGLE = 1;
             public const int BYTE_MASK = 0xFF;
-            
+
             public const uint CHECKSUM_SEED = 0x5A5A5A5A;
             public const uint CHECKSUM_MULTIPLIER = 1103515245;
             public const uint CHECKSUM_INCREMENT = 12345;
             public const uint CHECKSUM_MODULO = 0xFFFFFFFF;
-            
+
             public const int PRECISION_SCALE_FACTOR = 10000;
             public const int PERCENTAGE_SCALE = 100;
             public const int ANGLE_SCALE = 1000;
             public const int COORDINATE_SCALE = 1000000;
-            
+
             public const double LATITUDE_OFFSET = 90.0;
             public const double LONGITUDE_OFFSET = 180.0;
             public const double ANGLE_OFFSET = 90.0;
             public const double SIGNAL_STRENGTH_OFFSET = 200.0;
             public const double SIGNAL_STRENGTH_SCALE = 10.0;
-            
+
             public const ulong CLAMP_MIN_VALUE = 0;
             public const ulong BOOLEAN_TRUE_VALUE = 1;
             public const ulong BOOLEAN_FALSE_VALUE = 0;
-            
+
             public const int DRAG_COEFFICIENT_BITS = 16;
             public const int LIFT_COEFFICIENT_BITS = 16;
             public const int THROTTLE_PERCENT_BITS = 7;
@@ -248,32 +248,32 @@
         {
             public const string KILOMETERS_PER_HOUR = "kmph";
             public const string METERS_PER_SECOND = "mps";
-            
+
             public const string METERS = "m";
             public const string KILOMETERS = "km";
             public const string DEGREES = "deg";
-            
+
             public const string DEGREES_PER_SECOND = "deg/s";
             public const string REVOLUTIONS_PER_MINUTE = "rpm";
-            
+
             public const string CELSIUS = "°C";
             public const string FAHRENHEIT = "°F";
-            
+
             public const string PERCENTAGE = "%";
             public const string COEFFICIENT = "coeff";
-            
+
             public const string SECONDS = "sec";
             public const string MINUTES = "min";
             public const string HOURS = "hr";
-            
+
             public const string GIGABYTES = "GB";
             public const string MEGABYTES = "MB";
-            
+
             public const string DECIBELS = "dB";
             public const string DECIBEL_MILLIWATTS = "dBm";
-            
+
             public const string NEWTONS = "N";
-            
+
             public const string UNITLESS = "unitless";
             public const string COUNT = "count";
             public const string ID = "id";
@@ -288,15 +288,18 @@
             public const string TELEMETRY_ICD_HTML_FILENAME = "telemetry_icd.html";
             public const string COMPRESSION_ICD_JSON_FILENAME = "compression_icd.json";
             public const string COMPRESSION_ICD_HTML_FILENAME = "compression_icd.html";
-            
+
             public const string DOCUMENT_VERSION = "1.0";
             public const string TELEMETRY_ICD_TITLE = "UAV Telemetry Interface Control Document";
-            public const string COMPRESSION_ICD_TITLE = "UAV Telemetry Compression Interface Control Document";
-            public const string ICD_DESCRIPTION = "Interface specification for UAV telemetry data compression and transmission";
-            public const string COMPRESSION_DESCRIPTION = "Compression constants and parameters for UAV telemetry data";
+            public const string COMPRESSION_ICD_TITLE =
+                "UAV Telemetry Compression Interface Control Document";
+            public const string ICD_DESCRIPTION =
+                "Interface specification for UAV telemetry data compression and transmission";
+            public const string COMPRESSION_DESCRIPTION =
+                "Compression constants and parameters for UAV telemetry data";
             public const string COMPRESSION_TYPE = "Bit-level packing with precision scaling";
             public const string CHECKSUM_ALGORITHM = "Simple linear congruential checksum";
-            
+
             public const double DEFAULT_VALUE = 0.0;
             public const double COEFFICIENT_MAX_VALUE = 6.5535;
             public const double PERCENTAGE_MAX_VALUE = 100.0;
@@ -318,7 +321,7 @@
             public const double ENGINE_TEMPERATURE_MAX = 524.287;
             public const double SLEEVE_ID_MAX_VALUE = 65535.0;
             public const double CHECKSUM_MAX_VALUE = 4294967295.0;
-            
+
             public const int BITS_TO_BYTES_CONVERSION = 7;
             public const int BITS_PER_BYTE_CALCULATION = 8;
         }

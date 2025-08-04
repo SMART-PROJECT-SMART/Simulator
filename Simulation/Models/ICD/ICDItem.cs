@@ -13,7 +13,16 @@ namespace Simulation.Models.ICD
         public int StartBitArrayIndex { get; set; }
         public int BitLength { get; set; }
 
-        public ICDItem(TelemetryFields name, object type, double value, string unit, double minValue, double maxValue, int startBitArrayIndex, int bitLength)
+        public ICDItem(
+            TelemetryFields name,
+            object type,
+            double value,
+            string unit,
+            double minValue,
+            double maxValue,
+            int startBitArrayIndex,
+            int bitLength
+        )
         {
             Name = name;
             Type = type;

@@ -26,8 +26,6 @@ namespace Simulation.Services
 
         public void LoadAndSendICDsOnStartup()
         {
-            Console.WriteLine("=== STARTUP: Loading and sending ICD files ===");
-            
             int northPort = 8000;
             int southPort = 9000;
 
@@ -37,24 +35,9 @@ namespace Simulation.Services
             var northDto = new StartUpLoadDto("north_telemetry_icd.json", northChannel);
             var southDto = new StartUpLoadDto("south_telemetry_icd.json", southChannel);
 
-            Console.WriteLine($"STARTUP: Sending North ICD to localhost:{northPort}");
-            Console.WriteLine($"STARTUP: Sending South ICD to localhost:{southPort}");
+            LoadAndSendICD(northDto);
 
-            try
-            {
-                LoadAndSendICD(northDto);
-                Console.WriteLine("STARTUP: North ICD sent successfully");
-                
-                LoadAndSendICD(southDto);
-                Console.WriteLine("STARTUP: South ICD sent successfully");
-                
-                Console.WriteLine("=== STARTUP: All ICD files sent successfully ===");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"STARTUP ERROR: Failed to send ICD files - {ex.Message}");
-                Console.WriteLine($"STARTUP ERROR: Stack trace: {ex.StackTrace}");
-            }
+            LoadAndSendICD(southDto);
         }
     }
 }

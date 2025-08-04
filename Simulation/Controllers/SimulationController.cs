@@ -93,7 +93,6 @@ namespace Simulation.Controllers
         [HttpGet("run")]
         public async Task<IActionResult> Run()
         {
-
             var startLocation = new Location(40.6413, -73.7781, 10.0);
             var uav = new Searcher(tailId: 1, startLocation: startLocation);
             uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;

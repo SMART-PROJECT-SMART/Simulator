@@ -14,7 +14,10 @@ namespace Simulation.Services.ICD
             string path = Path.Combine(SimulationConstants.ICDGeneration.ICD_DIRECTORY, icdName);
             string fileJson = File.ReadAllText(path);
 
-            var jsonObject = JsonConvert.DeserializeAnonymousType(fileJson, new { telemetryFields = new List<ICDItem>() });
+            var jsonObject = JsonConvert.DeserializeAnonymousType(
+                fileJson,
+                new { telemetryFields = new List<ICDItem>() }
+            );
 
             return new Models.ICD.ICD(jsonObject.telemetryFields);
         }
