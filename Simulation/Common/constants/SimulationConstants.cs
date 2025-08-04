@@ -244,6 +244,48 @@
             public const int CHECKSUM_BITS = 32;
         }
 
+        public static class ICDGeneration
+        {
+            public const string ICD_DIRECTORY = "files/icd";
+            public const string TELEMETRY_ICD_JSON_FILENAME = "telemetry_icd.json";
+            public const string TELEMETRY_ICD_HTML_FILENAME = "telemetry_icd.html";
+            public const string COMPRESSION_ICD_JSON_FILENAME = "compression_icd.json";
+            public const string COMPRESSION_ICD_HTML_FILENAME = "compression_icd.html";
+            
+            public const string DOCUMENT_VERSION = "1.0";
+            public const string TELEMETRY_ICD_TITLE = "UAV Telemetry Interface Control Document";
+            public const string COMPRESSION_ICD_TITLE = "UAV Telemetry Compression Interface Control Document";
+            public const string ICD_DESCRIPTION = "Interface specification for UAV telemetry data compression and transmission";
+            public const string COMPRESSION_DESCRIPTION = "Compression constants and parameters for UAV telemetry data";
+            public const string COMPRESSION_TYPE = "Bit-level packing with precision scaling";
+            public const string CHECKSUM_ALGORITHM = "Simple linear congruential checksum";
+            
+            public const double DEFAULT_VALUE = 0.0;
+            public const double COEFFICIENT_MAX_VALUE = 6.5535;
+            public const double PERCENTAGE_MAX_VALUE = 100.0;
+            public const double ALTITUDE_MAX_VALUE = 65535.0;
+            public const double COORDINATE_LATITUDE_MIN = -90.0;
+            public const double COORDINATE_LATITUDE_MAX = 90.0;
+            public const double COORDINATE_LONGITUDE_MIN = -180.0;
+            public const double COORDINATE_LONGITUDE_MAX = 180.0;
+            public const double SPEED_MAX_VALUE = 4095.0;
+            public const double ANGLE_FULL_ROTATION = 360.0;
+            public const double ANGLE_HALF_ROTATION_NEGATIVE = -90.0;
+            public const double ANGLE_HALF_ROTATION_POSITIVE = 90.0;
+            public const double THRUST_MAX_VALUE = 1048575.0;
+            public const double DATA_STORAGE_MAX_VALUE = 10485.75;
+            public const double FLIGHT_TIME_MAX_VALUE = 1048575.0;
+            public const double SIGNAL_STRENGTH_MIN = -200.0;
+            public const double SIGNAL_STRENGTH_MAX = 200.0;
+            public const double RPM_MAX_VALUE = 65535.0;
+            public const double ENGINE_TEMPERATURE_MAX = 524.287;
+            public const double SLEEVE_ID_MAX_VALUE = 65535.0;
+            public const double CHECKSUM_MAX_VALUE = 4294967295.0;
+            
+            public const int BITS_TO_BYTES_CONVERSION = 7;
+            public const int BITS_PER_BYTE_CALCULATION = 8;
+        }
+
         public static class Quartz
         {
             public const string UAV_ID = "UAVId";
