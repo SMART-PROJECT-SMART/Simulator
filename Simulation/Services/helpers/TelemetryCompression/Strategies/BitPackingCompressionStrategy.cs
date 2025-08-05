@@ -36,7 +36,6 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Strategies
                 { TelemetryFields.Rpm, SimulationConstants.TelemetryCompression.RPM_BITS },
                 { TelemetryFields.EngineDegrees, SimulationConstants.TelemetryCompression.ENGINE_DEGREES_BITS },
                 { TelemetryFields.NearestSleeveId, SimulationConstants.TelemetryCompression.NEAREST_SLEEVE_ID_BITS },
-                { TelemetryFields.Checksum, SimulationConstants.TelemetryCompression.CHECKSUM_BITS },
             };
 
             _encoders = new Dictionary<TelemetryFields, ITelemetryFieldEncoder>
@@ -61,7 +60,6 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Strategies
                 { TelemetryFields.SignalStrength, new SignalStrengthEncoder() },
                 { TelemetryFields.Rpm, new RpmEncoder() },
                 { TelemetryFields.NearestSleeveId, new SleeveIdEncoder() },
-                { TelemetryFields.Checksum, new ChecksumEncoder() },
             };
 
             _dataFields = Enum.GetValues<TelemetryFields>().ToArray();

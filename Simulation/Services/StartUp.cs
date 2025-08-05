@@ -11,7 +11,6 @@ namespace Simulation.Services
         private readonly IICDDirectory _directory;
         private readonly IICDNetworking _networking;
         private readonly ICDGenerator _icdGenerator;
-        private static readonly Random _random = new Random();
 
         public StartUp(IICDDirectory directory, IICDNetworking networking, ICDGenerator icdGenerator)
         {

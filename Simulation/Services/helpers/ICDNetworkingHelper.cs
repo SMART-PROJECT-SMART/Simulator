@@ -16,33 +16,17 @@ namespace Simulation.Services.Helpers
 
                 string targetHost = GetLocalIPAddress();
 
-                Console.WriteLine(
-                    $"NETWORK: Sending {byteArray.Length} bytes to {targetHost}:{channel.PortNumber}"
-                );
-                Console.WriteLine(
-                    $"NETWORK: Data preview: {Convert.ToHexString(byteArray.Take(SimulationConstants.Networking.DATA_PREVIEW_BYTES).ToArray())}..."
-                );
-
                 try
                 {
                     client.Send(byteArray, byteArray.Length, targetHost, channel.PortNumber);
-                    Console.WriteLine(
-                        $"NETWORK: Successfully sent to {targetHost}:{channel.PortNumber}"
-                    );
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(
-                        $"NETWORK: Failed to send to {targetHost}, using localhost: {ex.Message}"
-                    );
                     client.Send(
                         byteArray,
                         byteArray.Length,
                         SimulationConstants.Networking.HOST,
                         channel.PortNumber
-                    );
-                    Console.WriteLine(
-                        $"NETWORK: Fallback sent to {SimulationConstants.Networking.HOST}:{channel.PortNumber}"
                     );
                 }
             }

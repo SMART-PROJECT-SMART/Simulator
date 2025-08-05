@@ -38,7 +38,7 @@ builder.Services.AddSingleton<StartUp>();
 var app = builder.Build();
 
 var startupService = app.Services.GetRequiredService<StartUp>();
-await startupService.LoadAndSendICDsOnStartup();
+_ = startupService.LoadAndSendICDsOnStartup();
 
 if (app.Environment.IsDevelopment())
 {

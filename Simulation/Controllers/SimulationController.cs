@@ -125,13 +125,5 @@ namespace Simulation.Controllers
 
             return Ok("Both UAVs started successfully");
         }
-
-        [HttpGet("generate-icd")]
-        public async Task<IActionResult> generate()
-        {
-            var generator = new ICDGenerator();
-            await generator.GenerateTwoICDDocuments();
-            return Ok("ICD documents generated successfully");
-        }
     }
 }

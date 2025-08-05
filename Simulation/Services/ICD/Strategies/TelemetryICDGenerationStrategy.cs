@@ -16,7 +16,6 @@ namespace Simulation.Services.ICD.Strategies
         {
             _itemFactory = itemFactory;
             _dataFields = Enum.GetValues<TelemetryFields>()
-                .Where(field => field != TelemetryFields.Checksum)
                 .ToArray();
             
             _sizeInBits = new Dictionary<TelemetryFields, int>
@@ -55,9 +54,6 @@ namespace Simulation.Services.ICD.Strategies
                 items.Add(icdItem);
                 currentBitOffset += _sizeInBits[field];
             }
-
-            var checksumItem = _itemFactory.CreateItem(TelemetryFields.Checksum, currentBitOffset, SimulationConstants.TelemetryCompression.CHECKSUM_BITS);
-            items.Add(checksumItem);
 
             return items;
         }

@@ -30,7 +30,6 @@ namespace Simulation.Services.ICD.Factories
             { TelemetryFields.Rpm, SimulationConstants.TelemetryCompression.RPM_BITS },
             { TelemetryFields.EngineDegrees, SimulationConstants.TelemetryCompression.ENGINE_DEGREES_BITS },
             { TelemetryFields.NearestSleeveId, SimulationConstants.TelemetryCompression.NEAREST_SLEEVE_ID_BITS },
-            { TelemetryFields.Checksum, SimulationConstants.TelemetryCompression.CHECKSUM_BITS },
         };
 
         public ICDItem CreateItem(TelemetryFields field, int bitOffset, int bitLength)
@@ -53,7 +52,6 @@ namespace Simulation.Services.ICD.Factories
                 TelemetryFields.Rpm => CreateRpmItem(field, bitOffset, bitLength),
                 TelemetryFields.EngineDegrees => CreateEngineDegreesItem(field, bitOffset, bitLength),
                 TelemetryFields.NearestSleeveId => CreateSleeveIdItem(field, bitOffset, bitLength),
-                TelemetryFields.Checksum => CreateChecksumItem(field, bitOffset, bitLength),
                 _ => throw new ArgumentException($"Unknown telemetry field: {field}"),
             };
         }
