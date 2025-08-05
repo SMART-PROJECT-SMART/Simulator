@@ -339,12 +339,11 @@
 
         public static class Networking
         {
-            public const string HOST = "localhost";
+            public const int BYTE_SIZE = 8;
             public const string GOOGLE_DNS_PRIMARY = "8.8.8.8";
-            public const string GOOGLE_DNS_SECONDARY = "8.8.4.4";
             public const int SOCKET_CONNECT_PORT = 65530;
             public const string FALLBACK_IP = "127.0.0.1";
-            public const int DATA_PREVIEW_BYTES = 16;
+            public const long TRUE_VALUE = 1;
         }
     }
 }

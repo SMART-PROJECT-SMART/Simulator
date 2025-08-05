@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Simulation.Common.constants;
 using Simulation.Dto.ICD;
 using Simulation.Models.Channels;
 using Simulation.Services.Helpers;
@@ -44,7 +45,13 @@ namespace Simulation.Services
 
         private async Task GenerateICDFilesIfNotExist()
         {
-            await _icdGenerator.GenerateTwoICDDocuments();
+            string northFilePath = Path.Combine(SimulationConstants.ICDGeneration.ICD_DIRECTORY, "north_telemetry_icd.json");
+            string southFilePath = Path.Combine(SimulationConstants.ICDGeneration.ICD_DIRECTORY, "south_telemetry_icd.json");
+
+            if (!File.Exists(northFilePath) || !File.Exists(southFilePath))
+            {
+                await _icdGenerator.GenerateTwoICDDocuments();
+            }
         }
     }
 }

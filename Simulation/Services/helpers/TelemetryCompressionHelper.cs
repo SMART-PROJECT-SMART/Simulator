@@ -20,24 +20,24 @@ namespace Simulation.Services.Helpers
         {
             var telemetryData = icd.Document.ToDictionary(item => item.Name, item => item.Value);
             BitArray compressed = _compressionStrategy.Compress(telemetryData);
-            uint checksum = CalculateLinearCongruentialChecksum(compressed);
+            uint checksum = CalculateChecksum(compressed);
             return AppendChecksum(compressed, checksum);
         }
-        private static uint CalculateLinearCongruentialChecksum(BitArray data)
+        private static uint CalculateChecksum(BitArray data)
         {
             uint checksum = SimulationConstants.TelemetryCompression.CHECKSUM_SEED;
 
-            int byteCount = (data.Length + 7) / 8; 
+            int byteCount = (data.Length + SimulationConstants.Networking.BYTE_SIZE -1) / SimulationConstants.Networking.BYTE_SIZE; 
 
             for (int byteIndex = 0; byteIndex < byteCount; byteIndex++)
             {
                 byte dataByte = 0;
 
-                int bitsInThisByte = Math.Min(8, data.Length - (byteIndex * 8));
+                int bitsInThisByte = Math.Min(SimulationConstants.Networking.BYTE_SIZE, data.Length - (byteIndex * SimulationConstants.Networking.BYTE_SIZE));
 
                 for (int bitIndex = 0; bitIndex < bitsInThisByte; bitIndex++)
                 {
-                    int absoluteBitIndex = (byteIndex * 8) + bitIndex;
+                    int absoluteBitIndex = (byteIndex * SimulationConstants.Networking.BYTE_SIZE) + bitIndex;
                     if (absoluteBitIndex < data.Length && data[absoluteBitIndex])
                     {
                         dataByte |= (byte)(1 << bitIndex);
@@ -64,15 +64,10 @@ namespace Simulation.Services.Helpers
 
             for (int i = 0; i < checksumBits; i++)
             {
-                result[data.Length + i] = (checksum & (1u << i)) != 0;
+                result[data.Length + i] = (checksum & (SimulationConstants.Networking.TRUE_VALUE << i)) != 0;
             }
 
             return result;
-        }
-
-        public static BitArray CompressTelemetryData(Dictionary<TelemetryFields, double> telemetryData)
-        {
-            return _compressionStrategy.Compress(telemetryData);
         }
     }
 }
