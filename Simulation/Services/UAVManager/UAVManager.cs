@@ -7,6 +7,7 @@ using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
+using Simulation.Services.ICDManagment.ICDDirectory;
 using Simulation.Services.Quartz;
 
 namespace Simulation.Services.UAVManager
@@ -19,13 +20,15 @@ namespace Simulation.Services.UAVManager
         private readonly IOrientationCalculator _orientationCalculator;
         private readonly ILogger<FlightPathService> _logger;
         private readonly IQuartzManager _quartzManager;
+        private readonly IICDDirectory _icdDirectory;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
             ISpeedController speedController,
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
-            IQuartzManager quartzManager
+            IQuartzManager quartzManager,
+            IICDDirectory icdDirectory
         )
         {
             _uavs = new ConcurrentDictionary<int, UAVMissionContext>();
@@ -34,6 +37,7 @@ namespace Simulation.Services.UAVManager
             _orientationCalculator = orientationCalculator;
             _logger = logger;
             _quartzManager = quartzManager;
+            _icdDirectory = icdDirectory;
         }
 
         public void AddUAV(UAV uav)
@@ -42,7 +46,8 @@ namespace Simulation.Services.UAVManager
                 _motionCalculator,
                 _speedController,
                 _orientationCalculator,
-                _logger
+                _logger,
+                _icdDirectory
             );
 
             _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));

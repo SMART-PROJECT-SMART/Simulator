@@ -9,6 +9,8 @@ using Simulation.Services.Flight_Path.helpers;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
+using Simulation.Services.Helpers;
+using Simulation.Services.ICDManagment.ICDDirectory;
 
 namespace Simulation.Services.Flight_Path;
 
@@ -21,6 +23,7 @@ public class FlightPathService : IDisposable
     private readonly IMotionCalculator _motionCalculator;
     private readonly ISpeedController _speedController;
     private readonly IOrientationCalculator _orientationCalculator;
+    private readonly IICDDirectory _icdDirectory;
     private bool _isRunning;
     private bool _missionCompleted;
     private Location _previousLocation;
@@ -33,13 +36,15 @@ public class FlightPathService : IDisposable
         IMotionCalculator motionCalculator,
         ISpeedController speedController,
         IOrientationCalculator orientationCalculator,
-        ILogger<FlightPathService> logger
+        ILogger<FlightPathService> logger,
+        IICDDirectory icdDirectory
     )
     {
         _motionCalculator = motionCalculator;
         _speedController = speedController;
         _orientationCalculator = orientationCalculator;
         _logger = logger;
+        _icdDirectory = icdDirectory;
     }
 
     public void Initialize(UAV uav, Location destination)
@@ -206,9 +211,11 @@ public class FlightPathService : IDisposable
         _previousLocation = currentLoc;
         telemetry[TelemetryFields.FlightTimeSec] += SimulationConstants.FlightPath.DELTA_SECONDS;
         _uav.UpdateRpm();
-        //uav ready
-        //for icd in icds
-        // byte[] result= compress(uavstate,icd)
+        foreach (var icd in _icdDirectory.GetAllICDs())
+        {
+            var compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(telemetry, icd);
+
+        }
         // sendtochnnell(result)
         _logger.LogInformation(
             "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg | Destination {lat},{lon},{alt}",

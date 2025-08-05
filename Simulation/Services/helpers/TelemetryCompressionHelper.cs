@@ -1,26 +1,40 @@
 ﻿using System.Collections;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
-using Simulation.Services.Helpers.TelemetryCompression;
-using Simulation.Services.Helpers.TelemetryCompression.Strategies;
+using Simulation.Models.ICD;
 
 namespace Simulation.Services.Helpers
 {
     public static class TelemetryCompressionHelper
     {
-        private static readonly ITelemetryCompressionStrategy _compressionStrategy;
 
-        static TelemetryCompressionHelper()
+        public static BitArray CompressTelemetryDataByICD(Dictionary<TelemetryFields,double> telemetryData, ICD icd)
         {
-            _compressionStrategy = new BitPackingCompressionStrategy();
-        }
-
-        public static BitArray CompressTelemetryData(Dictionary<TelemetryFields,double> telemetryData)
-        {
-            BitArray compressed = _compressionStrategy.Compress(telemetryData);
+            BitArray compressed = new BitArray(icd.GetSizeInBites());
+            
+            foreach (var item in icd)
+            {
+                int startBit = item.StartBitArrayIndex;
+                int bitLength = item.BitLength;
+                
+                ulong value = 0;
+                
+                if (telemetryData.TryGetValue(item.Name, out double telemetryValue))
+                {
+                    value = (ulong)Math.Clamp(Math.Round(telemetryValue), 0, (1UL << bitLength) - 1);
+                }
+                
+                for (int i = 0; i < bitLength; i++)
+                {
+                    compressed[startBit + i] = (value & (1UL << i)) != 0;
+                }
+            }
+            
             uint checksum = CalculateChecksum(compressed);
             return AppendChecksum(compressed, checksum);
         }
+
+        
 
         private static uint CalculateChecksum(BitArray data)
         {
@@ -79,5 +93,6 @@ namespace Simulation.Services.Helpers
 
             return result;
         }
+
     }
 }

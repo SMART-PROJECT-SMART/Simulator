@@ -4,7 +4,7 @@
     {
         public int TailId { get; set; }
         public int PortNumber { get; set; }
-        public ICD.ICD ICD { get; set; }
+        public ICD ICD { get; set; }
 
         public Channel(int tailId, int portNumber)
         {

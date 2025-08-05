@@ -39,6 +39,11 @@ namespace Simulation.Services.ICDManagment.ICDDirectory
             _icds.Add(icd);
         }
 
+        public List<ICD> GetAllICDs()
+        {
+            return _icds;
+        }
+
         /*
         public BitArray DecodeICD(string icdName)
         {

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Reflection.Metadata.Ecma335;
 using Newtonsoft.Json;
 
 namespace Simulation.Models.ICD
@@ -23,6 +24,11 @@ namespace Simulation.Models.ICD
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public int GetSizeInBites()
+        {
+            return Document[^1].StartBitArrayIndex + Document[^1].BitLength;
         }
     }
 }
