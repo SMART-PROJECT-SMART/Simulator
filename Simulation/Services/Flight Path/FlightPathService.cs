@@ -23,8 +23,7 @@ public class FlightPathService : IDisposable
     private readonly IMotionCalculator _motionCalculator;
     private readonly ISpeedController _speedController;
     private readonly IOrientationCalculator _orientationCalculator;
-            private readonly IICDDirectory _icdDirectory;
-        private readonly ChannelManager _channelManager;
+    
         private bool _isRunning;
         private bool _missionCompleted;
         private Location _previousLocation;
@@ -32,22 +31,19 @@ public class FlightPathService : IDisposable
 
     public event Action<Location>? LocationUpdated;
     public event Action? MissionCompleted;
+    public event Action<Dictionary<TelemetryFields, double>>? TelemetryUpdated;
 
             public FlightPathService(
             IMotionCalculator motionCalculator,
             ISpeedController speedController,
             IOrientationCalculator orientationCalculator,
-            ILogger<FlightPathService> logger,
-            IICDDirectory icdDirectory,
-            ChannelManager channelManager
+            ILogger<FlightPathService> logger
         )
     {
-        _motionCalculator = motionCalculator;
+                _motionCalculator = motionCalculator;
         _speedController = speedController;
         _orientationCalculator = orientationCalculator;
-                    _logger = logger;
-            _icdDirectory = icdDirectory;
-            _channelManager = channelManager;
+        _logger = logger;
     }
 
     public void Initialize(UAV uav, Location destination)
@@ -214,11 +210,8 @@ public class FlightPathService : IDisposable
         _previousLocation = currentLoc;
         telemetry[TelemetryFields.FlightTimeSec] += SimulationConstants.FlightPath.DELTA_SECONDS;
         _uav.UpdateRpm();
-        foreach (var icd in _icdDirectory.GetAllICDs())
-        {
-            var compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(telemetry, icd);
-            _channelManager.SendCompressedToChannel(_uav.TailId, icd, compressed);
-        }
+        
+        TelemetryUpdated?.Invoke(telemetry);
         _logger.LogInformation(
             "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg | Destination {lat},{lon},{alt}",
             _uav.TailId,
@@ -278,4 +271,6 @@ public class FlightPathService : IDisposable
     {
         _isRunning = false;
     }
+
+
 }

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using Quartz;
 using Simulation.Common.constants;
+using Simulation.Common.Enums;
 using Simulation.Models;
 using Simulation.Models.Channels;
 using Simulation.Models.UAVs;
@@ -9,6 +10,7 @@ using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
+using Simulation.Services.Helpers;
 using Simulation.Services.ICDManagment.ICDDirectory;
 using Simulation.Services.Quartz;
 
@@ -51,10 +53,10 @@ namespace Simulation.Services.UAVManager
                 _motionCalculator,
                 _speedController,
                 _orientationCalculator,
-                _logger,
-                _icdDirectory,
-                _channelManager
+                _logger
             );
+
+            flightService.TelemetryUpdated += (telemetry) => SendTelemetryToChannels(uav.TailId, telemetry);
 
             _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
             
@@ -201,9 +203,18 @@ namespace Simulation.Services.UAVManager
             return _channelManager.GetChannels(tailId);
         }
 
-        public void SendCompressedDataToUAV(int tailId, BitArray compressedData)
+            public void SendCompressedDataToUAV(int tailId, BitArray compressedData)
+    {
+        _channelManager.SendCompressed(tailId, compressedData);
+    }
+
+    private void SendTelemetryToChannels(int tailId, Dictionary<TelemetryFields, double> telemetry)
+    {
+        foreach (var icd in _icdDirectory.GetAllICDs())
         {
-            _channelManager.SendCompressed(tailId, compressedData);
+            var compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(telemetry, icd);
+            _channelManager.SendCompressedToChannel(tailId, icd, compressed);
         }
     }
+}
 }
