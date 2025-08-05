@@ -246,6 +246,7 @@
             public const int ENGINE_DEGREES_BITS = 19;
             public const int NEAREST_SLEEVE_ID_BITS = 16;
             public const int CHECKSUM_BITS = 32;
+            public const string TELEMETRY_DATA_TYPE = "Double";
         }
 
         public static class Units

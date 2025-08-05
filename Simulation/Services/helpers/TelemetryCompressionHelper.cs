@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
-using Simulation.Models.ICD;
 using Simulation.Services.Helpers.TelemetryCompression;
 using Simulation.Services.Helpers.TelemetryCompression.Strategies;
 
@@ -16,9 +15,8 @@ namespace Simulation.Services.Helpers
             _compressionStrategy = new BitPackingCompressionStrategy();
         }
 
-        public static BitArray CompressTelemetryData(Models.ICD.ICD icd)
+        public static BitArray CompressTelemetryData(Dictionary<TelemetryFields,double> telemetryData)
         {
-            var telemetryData = icd.Document.ToDictionary(item => item.Name, item => item.Value);
             BitArray compressed = _compressionStrategy.Compress(telemetryData);
             uint checksum = CalculateChecksum(compressed);
             return AppendChecksum(compressed, checksum);

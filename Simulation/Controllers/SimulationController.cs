@@ -4,7 +4,6 @@ using Simulation.Common.Enums;
 using Simulation.Dto.FlightPath;
 using Simulation.Models;
 using Simulation.Models.UAVs.SurveillanceUAV;
-using Simulation.Services.ICD;
 using Simulation.Services.UAVManager;
 
 namespace Simulation.Controllers

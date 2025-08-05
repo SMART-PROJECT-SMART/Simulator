@@ -206,7 +206,10 @@ public class FlightPathService : IDisposable
         _previousLocation = currentLoc;
         telemetry[TelemetryFields.FlightTimeSec] += SimulationConstants.FlightPath.DELTA_SECONDS;
         _uav.UpdateRpm();
-
+        //uav ready
+        //for icd in icds
+        // byte[] result= compress(uavstate,icd)
+        // sendtochnnell(result)
         _logger.LogInformation(
             "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg | Destination {lat},{lon},{alt}",
             _uav.TailId,

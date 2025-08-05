@@ -11,6 +11,7 @@ namespace Simulation.Models.UAVs
         public Dictionary<UAVProperties, double> Properties { get; set; }
         public Dictionary<TelemetryFields, double> TelemetryData { get; set; }
         public string CurrentMissionId { get; set; }
+        //        public Channelsconfig
 
         protected UAV(
             Location startLocation,

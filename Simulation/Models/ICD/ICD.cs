@@ -1,10 +1,19 @@
 ﻿using System.Collections;
+using Newtonsoft.Json;
 
 namespace Simulation.Models.ICD
 {
-    public class ICD(List<ICDItem> document) : IEnumerable<ICDItem>
+    public class ICD : IEnumerable<ICDItem>
     {
-        public List<ICDItem> Document { get; set; } = document;
+        [JsonProperty]
+        public List<ICDItem> Document { get; set; } = new List<ICDItem>();
+
+        public ICD() { }
+
+        public ICD(List<ICDItem> document)
+        {
+            Document = document;
+        }
 
         public IEnumerator<ICDItem> GetEnumerator()
         {
