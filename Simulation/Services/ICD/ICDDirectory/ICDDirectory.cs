@@ -5,7 +5,7 @@ using Simulation.Common.Enums;
 using Simulation.Models.ICD;
 using Simulation.Services.Helpers;
 
-namespace Simulation.Services.ICD
+namespace Simulation.Services.ICD.ICDDirectory
 {
     public class ICDDirectory : IICDDirectory
     {

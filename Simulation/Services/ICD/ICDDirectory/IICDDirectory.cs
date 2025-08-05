@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Simulation.Services.ICD
+namespace Simulation.Services.ICD.ICDDirectory
 {
     public interface IICDDirectory
     {

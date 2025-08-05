@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models.ICD;
-using Simulation.Services.ICD.Interfaces;
+using Simulation.Services.ICD.Factories;
 
 namespace Simulation.Services.ICD.Strategies
 {

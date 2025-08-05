@@ -2,8 +2,9 @@
 using Simulation.Common.constants;
 using Simulation.Dto.ICD;
 using Simulation.Models.Channels;
-using Simulation.Services.Helpers;
+using Simulation.Services.Helpers.ICDNetworking;
 using Simulation.Services.ICD;
+using Simulation.Services.ICD.ICDDirectory;
 
 namespace Simulation.Services
 {
@@ -24,13 +25,21 @@ namespace Simulation.Services
             _icdGenerator = icdGenerator;
         }
 
-        public void LoadAndSendICD(StartUpLoadDto dto)
+        private void LoadAndSendICD(StartUpLoadDto dto)
         {
             BitArray icdDataBitArray = _directory.DecodeICD(dto.ICDName);
             _networking.SendICDByteArray(dto.Channel, icdDataBitArray);
         }
 
-        public async Task LoadAndSendICDsOnStartup()
+        public async Task LoadAndSendICDOnStartUp(List<StartUpLoadDto> dtos)
+        {
+            foreach (var dto in dtos)
+            {
+                LoadAndSendICD(dto);
+            }
+        }
+
+        public async Task LoadAndSendICDsOnStartupMock()
         {
             await GenerateICDFilesIfNotExist();
 
@@ -42,9 +51,8 @@ namespace Simulation.Services
 
             var northDto = new StartUpLoadDto("north_telemetry_icd.json", northChannel);
             var southDto = new StartUpLoadDto("south_telemetry_icd.json", southChannel);
-
-            LoadAndSendICD(northDto);
-            LoadAndSendICD(southDto);
+            var dtos = new List<StartUpLoadDto> { northDto, southDto };
+            LoadAndSendICDOnStartUp(dtos);
         }
 
         private async Task GenerateICDFilesIfNotExist()

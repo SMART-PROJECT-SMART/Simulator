@@ -4,8 +4,9 @@ using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
-using Simulation.Services.Helpers;
+using Simulation.Services.Helpers.ICDNetworking;
 using Simulation.Services.ICD;
+using Simulation.Services.ICD.ICDDirectory;
 using Simulation.Services.Quartz;
 using Simulation.Services.UAVManager;
 
@@ -38,7 +39,7 @@ builder.Services.AddSingleton<StartUp>();
 var app = builder.Build();
 
 var startupService = app.Services.GetRequiredService<StartUp>();
-_ = startupService.LoadAndSendICDsOnStartup();
+_ = startupService.LoadAndSendICDsOnStartupMock();
 
 if (app.Environment.IsDevelopment())
 {

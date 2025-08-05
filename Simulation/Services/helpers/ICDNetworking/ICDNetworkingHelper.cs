@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using Simulation.Common.constants;
 using Simulation.Models.Channels;
 
-namespace Simulation.Services.Helpers
+namespace Simulation.Services.Helpers.ICDNetworking
 {
     public class ICDNetworkingHelper : IICDNetworking
     {

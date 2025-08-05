@@ -1,7 +1,7 @@
 using Simulation.Common.Enums;
 using Simulation.Models.ICD;
 
-namespace Simulation.Services.ICD.Interfaces
+namespace Simulation.Services.ICD.Factories
 {
     public interface IICDItemFactory
     {

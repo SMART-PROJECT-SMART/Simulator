@@ -1,6 +1,6 @@
 using Simulation.Models.ICD;
 
-namespace Simulation.Services.ICD.Interfaces
+namespace Simulation.Services.ICD.Strategies
 {
     public interface IICDGenerationStrategy
     {
