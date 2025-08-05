@@ -7,4 +7,4 @@ namespace Simulation.Services.ICD.Interfaces
     {
         ICDItem CreateItem(TelemetryFields field, int bitOffset, int bitLength);
     }
-} 
+}

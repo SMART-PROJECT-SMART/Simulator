@@ -1,5 +1,5 @@
-using Simulation.Common.Enums;
 using Simulation.Common.constants;
+using Simulation.Common.Enums;
 
 namespace Simulation.Services.Helpers.TelemetryCompression.Encoders
 {
@@ -9,7 +9,9 @@ namespace Simulation.Services.Helpers.TelemetryCompression.Encoders
 
         public ulong Encode(double value, int bits)
         {
-            return value > SimulationConstants.TelemetryData.WHEELS_UP ? SimulationConstants.TelemetryCompression.BOOLEAN_TRUE_VALUE : SimulationConstants.TelemetryCompression.BOOLEAN_FALSE_VALUE;
+            return value > SimulationConstants.TelemetryData.WHEELS_UP
+                ? SimulationConstants.TelemetryCompression.BOOLEAN_TRUE_VALUE
+                : SimulationConstants.TelemetryCompression.BOOLEAN_FALSE_VALUE;
         }
     }
-} 
+}

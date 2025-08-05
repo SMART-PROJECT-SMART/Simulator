@@ -14,11 +14,13 @@ namespace Simulation.Services.Helpers
             {
                 var byteArray = data.ToByteArray();
 
-                string targetHost = SimulationConstants.Networking.FALLBACK_IP;
-
-                client.Send(byteArray, byteArray.Length, targetHost, channel.PortNumber);
+                client.Send(
+                    byteArray,
+                    byteArray.Length,
+                    SimulationConstants.Networking.FALLBACK_IP,
+                    channel.PortNumber
+                );
             }
         }
-
     }
 }

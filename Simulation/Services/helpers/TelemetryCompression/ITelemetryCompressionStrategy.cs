@@ -7,4 +7,4 @@ namespace Simulation.Services.Helpers.TelemetryCompression
     {
         BitArray Compress(Dictionary<TelemetryFields, double> telemetryData);
     }
-} 
+}

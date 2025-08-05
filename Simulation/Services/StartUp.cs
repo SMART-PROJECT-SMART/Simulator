@@ -13,7 +13,11 @@ namespace Simulation.Services
         private readonly IICDNetworking _networking;
         private readonly ICDGenerator _icdGenerator;
 
-        public StartUp(IICDDirectory directory, IICDNetworking networking, ICDGenerator icdGenerator)
+        public StartUp(
+            IICDDirectory directory,
+            IICDNetworking networking,
+            ICDGenerator icdGenerator
+        )
         {
             _directory = directory;
             _networking = networking;
@@ -45,8 +49,14 @@ namespace Simulation.Services
 
         private async Task GenerateICDFilesIfNotExist()
         {
-            string northFilePath = Path.Combine(SimulationConstants.ICDGeneration.ICD_DIRECTORY, "north_telemetry_icd.json");
-            string southFilePath = Path.Combine(SimulationConstants.ICDGeneration.ICD_DIRECTORY, "south_telemetry_icd.json");
+            string northFilePath = Path.Combine(
+                SimulationConstants.ICDGeneration.ICD_DIRECTORY,
+                "north_telemetry_icd.json"
+            );
+            string southFilePath = Path.Combine(
+                SimulationConstants.ICDGeneration.ICD_DIRECTORY,
+                "south_telemetry_icd.json"
+            );
 
             if (!File.Exists(northFilePath) || !File.Exists(southFilePath))
             {

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
-using Simulation.Common.Enums;
 using Simulation.Common.constants;
+using Simulation.Common.Enums;
 using Simulation.Models.ICD;
 using Simulation.Services.ICD.Interfaces;
 
@@ -15,31 +15,81 @@ namespace Simulation.Services.ICD.Strategies
         public TelemetryICDGenerationStrategy(IICDItemFactory itemFactory)
         {
             _itemFactory = itemFactory;
-            _dataFields = Enum.GetValues<TelemetryFields>()
-                .ToArray();
-            
+            _dataFields = Enum.GetValues<TelemetryFields>().ToArray();
+
             _sizeInBits = new Dictionary<TelemetryFields, int>
             {
-                { TelemetryFields.DragCoefficient, SimulationConstants.TelemetryCompression.DRAG_COEFFICIENT_BITS },
-                { TelemetryFields.LiftCoefficient, SimulationConstants.TelemetryCompression.LIFT_COEFFICIENT_BITS },
-                { TelemetryFields.ThrottlePercent, SimulationConstants.TelemetryCompression.THROTTLE_PERCENT_BITS },
-                { TelemetryFields.CruiseAltitude, SimulationConstants.TelemetryCompression.CRUISE_ALTITUDE_BITS },
-                { TelemetryFields.Latitude, SimulationConstants.TelemetryCompression.LATITUDE_BITS },
-                { TelemetryFields.LandingGearStatus, SimulationConstants.TelemetryCompression.LANDING_GEAR_STATUS_BITS },
-                { TelemetryFields.Longitude, SimulationConstants.TelemetryCompression.LONGITUDE_BITS },
-                { TelemetryFields.Altitude, SimulationConstants.TelemetryCompression.ALTITUDE_BITS },
-                { TelemetryFields.CurrentSpeedKmph, SimulationConstants.TelemetryCompression.CURRENT_SPEED_KMPH_BITS },
+                {
+                    TelemetryFields.DragCoefficient,
+                    SimulationConstants.TelemetryCompression.DRAG_COEFFICIENT_BITS
+                },
+                {
+                    TelemetryFields.LiftCoefficient,
+                    SimulationConstants.TelemetryCompression.LIFT_COEFFICIENT_BITS
+                },
+                {
+                    TelemetryFields.ThrottlePercent,
+                    SimulationConstants.TelemetryCompression.THROTTLE_PERCENT_BITS
+                },
+                {
+                    TelemetryFields.CruiseAltitude,
+                    SimulationConstants.TelemetryCompression.CRUISE_ALTITUDE_BITS
+                },
+                {
+                    TelemetryFields.Latitude,
+                    SimulationConstants.TelemetryCompression.LATITUDE_BITS
+                },
+                {
+                    TelemetryFields.LandingGearStatus,
+                    SimulationConstants.TelemetryCompression.LANDING_GEAR_STATUS_BITS
+                },
+                {
+                    TelemetryFields.Longitude,
+                    SimulationConstants.TelemetryCompression.LONGITUDE_BITS
+                },
+                {
+                    TelemetryFields.Altitude,
+                    SimulationConstants.TelemetryCompression.ALTITUDE_BITS
+                },
+                {
+                    TelemetryFields.CurrentSpeedKmph,
+                    SimulationConstants.TelemetryCompression.CURRENT_SPEED_KMPH_BITS
+                },
                 { TelemetryFields.YawDeg, SimulationConstants.TelemetryCompression.YAW_DEG_BITS },
-                { TelemetryFields.PitchDeg, SimulationConstants.TelemetryCompression.PITCH_DEG_BITS },
+                {
+                    TelemetryFields.PitchDeg,
+                    SimulationConstants.TelemetryCompression.PITCH_DEG_BITS
+                },
                 { TelemetryFields.RollDeg, SimulationConstants.TelemetryCompression.ROLL_DEG_BITS },
-                { TelemetryFields.ThrustAfterInfluence, SimulationConstants.TelemetryCompression.THRUST_AFTER_INFLUENCE_BITS },
-                { TelemetryFields.FuelAmount, SimulationConstants.TelemetryCompression.FUEL_AMOUNT_BITS },
-                { TelemetryFields.DataStorageUsedGB, SimulationConstants.TelemetryCompression.DATA_STORAGE_USED_GB_BITS },
-                { TelemetryFields.FlightTimeSec, SimulationConstants.TelemetryCompression.FLIGHT_TIME_SEC_BITS },
-                { TelemetryFields.SignalStrength, SimulationConstants.TelemetryCompression.SIGNAL_STRENGTH_BITS },
+                {
+                    TelemetryFields.ThrustAfterInfluence,
+                    SimulationConstants.TelemetryCompression.THRUST_AFTER_INFLUENCE_BITS
+                },
+                {
+                    TelemetryFields.FuelAmount,
+                    SimulationConstants.TelemetryCompression.FUEL_AMOUNT_BITS
+                },
+                {
+                    TelemetryFields.DataStorageUsedGB,
+                    SimulationConstants.TelemetryCompression.DATA_STORAGE_USED_GB_BITS
+                },
+                {
+                    TelemetryFields.FlightTimeSec,
+                    SimulationConstants.TelemetryCompression.FLIGHT_TIME_SEC_BITS
+                },
+                {
+                    TelemetryFields.SignalStrength,
+                    SimulationConstants.TelemetryCompression.SIGNAL_STRENGTH_BITS
+                },
                 { TelemetryFields.Rpm, SimulationConstants.TelemetryCompression.RPM_BITS },
-                { TelemetryFields.EngineDegrees, SimulationConstants.TelemetryCompression.ENGINE_DEGREES_BITS },
-                { TelemetryFields.NearestSleeveId, SimulationConstants.TelemetryCompression.NEAREST_SLEEVE_ID_BITS },
+                {
+                    TelemetryFields.EngineDegrees,
+                    SimulationConstants.TelemetryCompression.ENGINE_DEGREES_BITS
+                },
+                {
+                    TelemetryFields.NearestSleeveId,
+                    SimulationConstants.TelemetryCompression.NEAREST_SLEEVE_ID_BITS
+                },
             };
         }
 
@@ -63,16 +113,20 @@ namespace Simulation.Services.ICD.Strategies
             var settings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
-                ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+                ContractResolver =
+                    new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
             };
 
             var icdDocument = new { TelemetryFields = icdItems };
             string jsonContent = JsonConvert.SerializeObject(icdDocument, settings);
-            
+
             Directory.CreateDirectory(SimulationConstants.ICDGeneration.ICD_DIRECTORY);
-            string jsonFilePath = Path.Combine(SimulationConstants.ICDGeneration.ICD_DIRECTORY, filename);
-            
+            string jsonFilePath = Path.Combine(
+                SimulationConstants.ICDGeneration.ICD_DIRECTORY,
+                filename
+            );
+
             await File.WriteAllTextAsync(jsonFilePath, jsonContent);
         }
     }
-} 
+}

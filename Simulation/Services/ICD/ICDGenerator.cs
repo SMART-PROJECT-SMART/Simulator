@@ -1,5 +1,5 @@
-﻿using Simulation.Common.Enums;
-using Simulation.Common.constants;
+﻿using Simulation.Common.constants;
+using Simulation.Common.Enums;
 using Simulation.Services.ICD.Factories;
 using Simulation.Services.ICD.Interfaces;
 using Simulation.Services.ICD.Strategies;
@@ -22,7 +22,10 @@ namespace Simulation.Services.ICD
         {
             var generator = new ICDGenerator();
             generator.GenerateTwoICDDocuments().Wait();
-            return Path.Combine(SimulationConstants.ICDGeneration.ICD_DIRECTORY, "north_telemetry_icd.json");
+            return Path.Combine(
+                SimulationConstants.ICDGeneration.ICD_DIRECTORY,
+                "north_telemetry_icd.json"
+            );
         }
 
         public async Task GenerateTwoICDDocuments()

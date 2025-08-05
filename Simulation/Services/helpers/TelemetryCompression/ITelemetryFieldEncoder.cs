@@ -7,4 +7,4 @@ namespace Simulation.Services.Helpers.TelemetryCompression
         ulong Encode(double value, int bits);
         bool CanHandle(TelemetryFields field);
     }
-} 
+}

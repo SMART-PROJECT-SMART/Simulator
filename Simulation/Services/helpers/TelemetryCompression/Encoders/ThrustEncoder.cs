@@ -1,16 +1,26 @@
-using Simulation.Common.Enums;
 using Simulation.Common.constants;
+using Simulation.Common.Enums;
 
 namespace Simulation.Services.Helpers.TelemetryCompression.Encoders
 {
     public class ThrustEncoder : ITelemetryFieldEncoder
     {
-        public bool CanHandle(TelemetryFields field) => field == TelemetryFields.ThrustAfterInfluence;
+        public bool CanHandle(TelemetryFields field) =>
+            field == TelemetryFields.ThrustAfterInfluence;
 
         public ulong Encode(double value, int bits)
         {
-            ulong maxValue = ((SimulationConstants.TelemetryCompression.BIT_SHIFT_BASE << bits) - 1);
-            return (ulong)Math.Clamp(Math.Round(value * SimulationConstants.TelemetryCompression.PRECISION_SCALE_FACTOR), 0, maxValue);
+            ulong maxValue = (
+                (SimulationConstants.TelemetryCompression.BIT_SHIFT_BASE << bits) - 1
+            );
+            return (ulong)
+                Math.Clamp(
+                    Math.Round(
+                        value * SimulationConstants.TelemetryCompression.PRECISION_SCALE_FACTOR
+                    ),
+                    0,
+                    maxValue
+                );
         }
     }
-} 
+}

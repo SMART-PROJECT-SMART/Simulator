@@ -7,4 +7,4 @@ namespace Simulation.Services.ICD.Interfaces
         List<ICDItem> GenerateICDItems();
         Task SaveICDAsync(List<ICDItem> icdItems, string filename);
     }
-} 
+}
