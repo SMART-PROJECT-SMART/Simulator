@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Simulation.Configuration;
 using Simulation.Services.ICDManagment;
 using Simulation.Services.ICDManagment.ICDDirectory;
+using Simulation.Services.PortManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,8 @@ builder.Services.AddSingleton(provider =>
 builder.Services.AddSingleton<IQuartzManager, QuartzManager>();
 builder.Services.AddSingleton<IUAVManager, UAVManager>();
 builder.Services.AddSingleton<IICDNetworking, ICDNetworkingHelper>();
+builder.Services.AddSingleton<IPortManager, PortManager>();
+builder.Services.AddSingleton<ChannelManager>();
 
 var app = builder.Build();
 

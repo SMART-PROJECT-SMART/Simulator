@@ -213,8 +213,8 @@ public class FlightPathService : IDisposable
         _uav.UpdateRpm();
         foreach (var icd in _icdDirectory.GetAllICDs())
         {
-            var compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(telemetry, icd);
 
+            var compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(telemetry, icd);
         }
         // sendtochnnell(result)
         _logger.LogInformation(

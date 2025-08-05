@@ -345,6 +345,9 @@
             public const int SOCKET_CONNECT_PORT = 65530;
             public const string FALLBACK_IP = "127.0.0.1";
             public const long TRUE_VALUE = 1;
+            public const int STARTING_PORT_NUMBER = 8000;
+            public const int MAX_PORT_NUMBER = 8999;
+            public const int PORT_INCREMENT = 1;
         }
     }
 }

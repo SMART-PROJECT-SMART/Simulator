@@ -1,5 +1,7 @@
 ﻿using Simulation.Common.Enums;
 
+namespace Simulation.Models.ICDModels;
+
 public class ICDItem
 {
     public TelemetryFields Name { get; set; }

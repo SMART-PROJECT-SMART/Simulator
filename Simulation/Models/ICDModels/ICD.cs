@@ -1,8 +1,7 @@
 ﻿using System.Collections;
-using System.Reflection.Metadata.Ecma335;
 using Newtonsoft.Json;
 
-namespace Simulation.Models.ICD
+namespace Simulation.Models.ICDModels
 {
     public class ICD : IEnumerable<ICDItem>
     {

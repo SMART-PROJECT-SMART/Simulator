@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Configuration;
-using Simulation.Models.ICD;
+using Simulation.Models.ICDModels;
 using Simulation.Services.Helpers;
 
 namespace Simulation.Services.ICDManagment.ICDDirectory

@@ -1,7 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using Quartz;
 using Simulation.Common.constants;
 using Simulation.Models;
+using Simulation.Models.Channels;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
@@ -21,6 +23,7 @@ namespace Simulation.Services.UAVManager
         private readonly ILogger<FlightPathService> _logger;
         private readonly IQuartzManager _quartzManager;
         private readonly IICDDirectory _icdDirectory;
+        private readonly ChannelManager _channelManager;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
@@ -28,7 +31,8 @@ namespace Simulation.Services.UAVManager
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
             IQuartzManager quartzManager,
-            IICDDirectory icdDirectory
+            IICDDirectory icdDirectory,
+            ChannelManager channelManager
         )
         {
             _uavs = new ConcurrentDictionary<int, UAVMissionContext>();
@@ -38,6 +42,7 @@ namespace Simulation.Services.UAVManager
             _logger = logger;
             _quartzManager = quartzManager;
             _icdDirectory = icdDirectory;
+            _channelManager = channelManager;
         }
 
         public void AddUAV(UAV uav)
@@ -51,6 +56,21 @@ namespace Simulation.Services.UAVManager
             );
 
             _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
+            
+            CreateChannelsForUAV(uav.TailId);
+        }
+
+        private void CreateChannelsForUAV(int tailId)
+        {
+            var icds = _icdDirectory.GetAllICDs();
+            
+            foreach (var icd in icds)
+            {
+                var channel = new Channel(tailId, 0, icd);
+                _channelManager.AddChannel(tailId, channel);
+            }
+            
+            _logger.LogInformation("Created {ChannelCount} channels for UAV {TailId}", icds.Count, tailId);
         }
 
         public void RemoveUAV(int tailId)
@@ -58,6 +78,7 @@ namespace Simulation.Services.UAVManager
             if (_uavs.TryRemove(tailId, out var uavData))
             {
                 uavData.Service.Dispose();
+                _channelManager.RemoveAllChannels(tailId);
             }
         }
 
@@ -173,5 +194,15 @@ namespace Simulation.Services.UAVManager
         public int ActiveUAVCount => _uavs.Count;
 
         public IEnumerable<int> GetActiveTailIds => _uavs.Keys;
+
+        public List<Channel> GetUAVChannels(int tailId)
+        {
+            return _channelManager.GetChannels(tailId);
+        }
+
+        public void SendCompressedDataToUAV(int tailId, BitArray compressedData)
+        {
+            _channelManager.SendCompressed(tailId, compressedData);
+        }
     }
 }

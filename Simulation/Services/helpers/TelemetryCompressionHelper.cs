@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
-using Simulation.Models.ICD;
+using Simulation.Models.ICDModels;
 
 namespace Simulation.Services.Helpers
 {

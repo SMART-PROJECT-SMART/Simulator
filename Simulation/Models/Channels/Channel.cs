@@ -1,4 +1,6 @@
-﻿namespace Simulation.Models.Channels
+﻿using Simulation.Models.ICDModels;
+
+namespace Simulation.Models.Channels
 {
     public class Channel
     {
@@ -6,10 +8,11 @@
         public int PortNumber { get; set; }
         public ICD ICD { get; set; }
 
-        public Channel(int tailId, int portNumber)
+        public Channel(int tailId, int portNumber,ICD icd)
         {
             TailId = tailId;
             PortNumber = portNumber;
+            ICD = icd;
         }
     }
 }
