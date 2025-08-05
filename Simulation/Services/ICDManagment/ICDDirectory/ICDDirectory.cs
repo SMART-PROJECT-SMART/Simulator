@@ -9,7 +9,7 @@ using Simulation.Services.Helpers;
 
 namespace Simulation.Services.ICDManagment.ICDDirectory
 {
-    public class ICDDirectory
+    public class ICDDirectory : IICDDirectory
     {
         private readonly List<ICD> _icds = new List<ICD>();
         private readonly string _directoryPath;

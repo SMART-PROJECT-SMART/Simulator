@@ -52,7 +52,8 @@ namespace Simulation.Services.UAVManager
                 _speedController,
                 _orientationCalculator,
                 _logger,
-                _icdDirectory
+                _icdDirectory,
+                _channelManager
             );
 
             _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));

@@ -70,6 +70,18 @@ namespace Simulation.Services
             }
         }
 
+        public void SendCompressedToChannel(int tailId, Simulation.Models.ICDModels.ICD icd, BitArray compressedData)
+        {
+            if (_uavChannels.TryGetValue(tailId, out var channels))
+            {
+                var channel = channels.FirstOrDefault(c => c.ICD == icd);
+                if (channel != null)
+                {
+                    _icdNetworking.SendICDByteArray(channel, compressedData);
+                }
+            }
+        }
+
         public List<Channel> GetChannels(int tailId)
         {
             return _uavChannels.TryGetValue(tailId, out var channels) ? channels : new List<Channel>();

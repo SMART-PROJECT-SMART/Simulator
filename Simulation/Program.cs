@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.Configure<ICDSettings>(builder.Configuration.GetSection("ICD"));
-builder.Services.AddSingleton<ICDDirectory>();
+builder.Services.AddSingleton<IICDDirectory, ICDDirectory>();
 builder.Services.AddSingleton<IMotionCalculator, MotionCalculator>();
 builder.Services.AddSingleton<ISpeedController, SpeedCalculator>();
 builder.Services.AddSingleton<IOrientationCalculator, OrientationCalculator>();
@@ -39,7 +39,7 @@ builder.Services.AddSingleton<ChannelManager>();
 
 var app = builder.Build();
 
-var directory = app.Services.GetRequiredService<ICDDirectory>();
+var directory = app.Services.GetRequiredService<IICDDirectory>();
 directory.LoadAllICDs();
 
 if (app.Environment.IsDevelopment())
