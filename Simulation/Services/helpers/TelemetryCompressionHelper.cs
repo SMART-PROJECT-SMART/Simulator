@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using Simulation.Common.constants;
+﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models.ICDModels;
+using System.Collections;
 
 namespace Simulation.Services.Helpers
 {
@@ -26,14 +26,19 @@ namespace Simulation.Services.Helpers
                     value = doubleBits;
                 }
                 
-                for (int i = 0; i < bitLength; i++)
+                for (int offset = 0; offset < bitLength; offset++)
                 {
-                    compressed[startBit + i] = (value & (SimulationConstants.TelemetryCompression.BIT_SHIFT_BASE << i)) != 0;
+                    compressed[startBit + offset] = GetValueByOffset(value, offset);
                 }
             }
             
             uint checksum = CalculateChecksum(compressed);
             return AppendChecksum(compressed, checksum);
+        }
+
+        private static bool GetValueByOffset(ulong value, int offset)
+        {
+            return (value & (1UL << offset)) != 0;
         }
 
         private static uint CalculateChecksum(BitArray data)
@@ -45,21 +50,7 @@ namespace Simulation.Services.Helpers
 
             for (int byteIndex = 0; byteIndex < byteCount; byteIndex++)
             {
-                byte dataByte = 0;
-
-                int bitsInThisByte = Math.Min(
-                    SimulationConstants.Networking.BYTE_SIZE,
-                    data.Length - (byteIndex * SimulationConstants.Networking.BYTE_SIZE)
-                );
-
-                for (int bitIndex = 0; bitIndex < bitsInThisByte; bitIndex++)
-                {
-                    int absoluteBitIndex = (byteIndex * SimulationConstants.Networking.BYTE_SIZE) + bitIndex;
-                    if (absoluteBitIndex < data.Length && data[absoluteBitIndex])
-                    {
-                        dataByte |= (byte)(SimulationConstants.TelemetryCompression.BIT_MASK_SINGLE << bitIndex);
-                    }
-                }
+                byte dataByte = GetByteValue(data, byteIndex);
 
                 checksum = ((checksum * SimulationConstants.TelemetryCompression.CHECKSUM_MULTIPLIER
                            + SimulationConstants.TelemetryCompression.CHECKSUM_INCREMENT
@@ -67,6 +58,24 @@ namespace Simulation.Services.Helpers
             }
 
             return checksum;
+        }
+
+        private static byte GetByteValue(BitArray data,int byteIndex)
+        {
+            byte dataByte = 0;
+            int bitsInThisByte = Math.Min(
+                SimulationConstants.Networking.BYTE_SIZE,
+                data.Length - (byteIndex * SimulationConstants.Networking.BYTE_SIZE)
+            );
+            for (int bitIndex = 0; bitIndex < bitsInThisByte; bitIndex++)
+            {
+                int absoluteBitIndex = (byteIndex * SimulationConstants.Networking.BYTE_SIZE) + bitIndex;
+                if (absoluteBitIndex < data.Length && data[absoluteBitIndex])
+                {
+                    dataByte |= (byte)(1<< bitIndex);
+                }
+            }
+            return dataByte;
         }
 
         private static BitArray AppendChecksum(BitArray data, uint checksum)
