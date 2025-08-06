@@ -27,7 +27,8 @@ namespace Simulation.Models.ICDModels
 
         public int GetSizeInBites()
         {
-            return Document[^1].StartBitArrayIndex + Document[^1].BitLength;
+            var lastICDItem = Document[^1];
+            return lastICDItem.StartBitArrayIndex + lastICDItem.BitLength;
         }
     }
 }

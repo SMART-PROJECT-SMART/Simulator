@@ -11,24 +11,24 @@ namespace Simulation.Services.Helpers
         {
             BitArray compressed = new BitArray(icd.GetSizeInBites());
             
-            foreach (var item in icd)
+            foreach (ICDItem telemetryParameter in icd)
             {
-                int startBit = item.StartBitArrayIndex;
-                int bitLength = item.BitLength;
+                int startBit = telemetryParameter.StartBitArrayIndex;
+                int bitLength = telemetryParameter.BitLength;
                 
-                ulong value = SimulationConstants.TelemetryCompression.CLAMP_MIN_VALUE;
+                ulong valueInBits = 0;
                 
-                if (telemetryData.TryGetValue(item.Name, out double telemetryValue))
+                if (telemetryData.TryGetValue(telemetryParameter.Name, out double telemetryValue))
                 {
                     byte[] doubleBytes = BitConverter.GetBytes(telemetryValue);
                     ulong doubleBits = BitConverter.ToUInt64(doubleBytes, 0);
                     
-                    value = doubleBits;
+                    valueInBits = doubleBits;
                 }
                 
                 for (int offset = 0; offset < bitLength; offset++)
                 {
-                    compressed[startBit + offset] = GetValueByOffset(value, offset);
+                    compressed[startBit + offset] = GetValueByOffset(valueInBits, offset);
                 }
             }
             
