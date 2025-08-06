@@ -5,11 +5,12 @@ using Simulation.Services.PortManager;
 
 namespace Simulation.Services
 {
-    public class ChannelManager
+    public class ChannelManager : IDisposable
     {
         private readonly Dictionary<int, List<Channel>> _uavChannels = new Dictionary<int, List<Channel>>();
         private readonly IICDNetworking _icdNetworking;
         private readonly IPortManager _portManager;
+        private bool _disposed = false;
 
         public ChannelManager(IICDNetworking icdNetworking, IPortManager portManager)
         {
@@ -25,7 +26,7 @@ namespace Simulation.Services
             }
 
             _portManager.ReservePort(tailId, channel.PortNumber);
-            
+
             if (!_uavChannels.ContainsKey(tailId))
             {
                 _uavChannels[tailId] = new List<Channel>();
@@ -37,8 +38,10 @@ namespace Simulation.Services
         {
             if (_uavChannels.ContainsKey(tailId))
             {
-                _portManager.ReleasePort(tailId, channel.PortNumber);
                 _uavChannels[tailId].Remove(channel);
+
+                _icdNetworking.RemoveChannelConnection(tailId, channel.PortNumber);
+
                 if (_uavChannels[tailId].Count == 0)
                 {
                     _uavChannels.Remove(tailId);
@@ -48,14 +51,16 @@ namespace Simulation.Services
 
         public void RemoveAllChannels(int tailId)
         {
-            if (_uavChannels.ContainsKey(tailId))
+            if (_uavChannels.TryGetValue(tailId, out var uavChannel))
             {
-                foreach (var channel in _uavChannels[tailId])
+                foreach (var channel in uavChannel)
                 {
                     _portManager.ReleasePort(tailId, channel.PortNumber);
                 }
+
+                _icdNetworking.RemoveUAVConnections(tailId);
             }
-            
+
             _uavChannels.Remove(tailId);
         }
 
@@ -87,8 +92,23 @@ namespace Simulation.Services
             return _uavChannels.TryGetValue(tailId, out var channels) ? channels : new List<Channel>();
         }
 
+        public int GetActiveConnectionCount(int tailId)
+        {
+            return _icdNetworking.GetActiveConnectionCount(tailId);
+        }
 
+        public int GetTotalActiveConnections()
+        {
+            return _icdNetworking.GetTotalActiveConnections();
+        }
 
-
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                _icdNetworking?.Dispose();
+                _disposed = true;
+            }
+        }
     }
 }

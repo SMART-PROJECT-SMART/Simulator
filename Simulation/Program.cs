@@ -36,7 +36,6 @@ builder.Services.AddSingleton<IUAVManager, UAVManager>();
 builder.Services.AddSingleton<IICDNetworking, ICDNetworkingHelper>();
 builder.Services.AddSingleton<IPortManager, PortManager>();
 builder.Services.AddSingleton<ChannelManager>();
-
 var app = builder.Build();
 
 var directory = app.Services.GetRequiredService<IICDDirectory>();

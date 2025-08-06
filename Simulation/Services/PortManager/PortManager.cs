@@ -9,10 +9,7 @@ namespace Simulation.Services.PortManager
 
         public int GetNextAvailablePort(int tailId)
         {
-            if (!_nextPortNumbers.ContainsKey(tailId))
-            {
-                _nextPortNumbers[tailId] = SimulationConstants.Networking.STARTING_PORT_NUMBER;
-            }
+            _nextPortNumbers.TryAdd(tailId, SimulationConstants.Networking.STARTING_PORT_NUMBER);
 
             int portNumber = _nextPortNumbers[tailId];
             
@@ -40,9 +37,9 @@ namespace Simulation.Services.PortManager
 
         public void ReleasePort(int tailId, int portNumber)
         {
-            if (_usedPorts.ContainsKey(tailId))
+            if (_usedPorts.TryGetValue(tailId, out var port))
             {
-                _usedPorts[tailId].Remove(portNumber);
+                port.Remove(portNumber);
             }
         }
 

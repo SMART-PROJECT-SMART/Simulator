@@ -26,7 +26,6 @@ namespace Simulation.Services.ICDManagment.ICDDirectory
             var jsonFiles = Directory.GetFiles(_directoryPath, "*.json", SearchOption.TopDirectoryOnly);
             foreach (var filePath in jsonFiles)
             {
-                Console.WriteLine($"Loading ICD from file: {filePath}");
                 LoadICD(filePath);
             }
         }
@@ -43,12 +42,5 @@ namespace Simulation.Services.ICDManagment.ICDDirectory
         {
             return _icds;
         }
-
-        /*
-        public BitArray DecodeICD(string icdName)
-        {
-            var icd = DeSerializeICD(icdName);
-            return TelemetryCompressionHelper.CompressTelemetryData(icd);
-        }*/
     }
 }

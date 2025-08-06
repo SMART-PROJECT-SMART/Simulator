@@ -203,11 +203,6 @@ namespace Simulation.Services.UAVManager
             return _channelManager.GetChannels(tailId);
         }
 
-            public void SendCompressedDataToUAV(int tailId, BitArray compressedData)
-    {
-        _channelManager.SendCompressed(tailId, compressedData);
-    }
-
     private void SendTelemetryToChannels(int tailId, Dictionary<TelemetryFields, double> telemetry)
     {
         foreach (var icd in _icdDirectory.GetAllICDs())

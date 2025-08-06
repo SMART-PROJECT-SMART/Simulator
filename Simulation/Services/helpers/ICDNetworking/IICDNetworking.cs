@@ -5,6 +5,11 @@ namespace Simulation.Services.Helpers.ICDNetworking
 {
     public interface IICDNetworking
     {
-        public void SendICDByteArray(Channel channel, BitArray data);
+        void SendICDByteArray(Channel channel, BitArray data);
+        void RemoveUAVConnections(int tailId);
+        void RemoveChannelConnection(int tailId, int portNumber);
+        int GetActiveConnectionCount(int tailId);
+        int GetTotalActiveConnections();
+        void Dispose();
     }
 }
