@@ -349,5 +349,10 @@
             public const int MAX_PORT_NUMBER = 8999;
             public const int PORT_INCREMENT = 1;
         }
+
+        public static class Config
+        {
+            public const string ICD_DIRECTORY = "ICD";
+        }
     }
 }

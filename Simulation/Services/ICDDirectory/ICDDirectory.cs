@@ -7,7 +7,7 @@ using Simulation.Configuration;
 using Simulation.Models.ICDModels;
 using Simulation.Services.Helpers;
 
-namespace Simulation.Services.ICDManagment.ICDDirectory
+namespace Simulation.Services.ICDDirectory
 {
     public class ICDDirectory : IICDDirectory
     {

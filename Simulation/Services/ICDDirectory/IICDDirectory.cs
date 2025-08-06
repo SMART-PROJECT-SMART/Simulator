@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Simulation.Models.ICDModels;
 
-namespace Simulation.Services.ICDManagment.ICDDirectory
+namespace Simulation.Services.ICDDirectory
 {
     public interface IICDDirectory
     {

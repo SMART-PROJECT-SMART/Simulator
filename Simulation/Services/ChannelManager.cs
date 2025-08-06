@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Simulation.Models.Channels;
+using Simulation.Models.ICDModels;
 using Simulation.Services.Helpers.ICDNetworking;
 using Simulation.Services.PortManager;
 
@@ -75,7 +76,7 @@ namespace Simulation.Services
             }
         }
 
-        public void SendCompressedToChannel(int tailId, Simulation.Models.ICDModels.ICD icd, BitArray compressedData)
+        public void SendCompressedToChannel(int tailId, ICD icd, BitArray compressedData)
         {
             if (_uavChannels.TryGetValue(tailId, out var channels))
             {

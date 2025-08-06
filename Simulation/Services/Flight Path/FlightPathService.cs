@@ -10,7 +10,6 @@ using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.Helpers;
-using Simulation.Services.ICDManagment.ICDDirectory;
 
 namespace Simulation.Services.Flight_Path;
 

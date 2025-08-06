@@ -1,4 +1,5 @@
 using Quartz;
+using Simulation.Common.constants;
 using Simulation.Services;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
@@ -7,17 +8,15 @@ using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.Helpers.ICDNetworking;
 using Simulation.Services.Quartz;
 using Simulation.Services.UAVManager;
-using Microsoft.Extensions.Options;
 using Simulation.Configuration;
-using Simulation.Services.ICDManagment;
-using Simulation.Services.ICDManagment.ICDDirectory;
 using Simulation.Services.PortManager;
+using Simulation.Services.ICDDirectory;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.Configure<ICDSettings>(builder.Configuration.GetSection("ICD"));
+builder.Services.Configure<ICDSettings>(builder.Configuration.GetSection(SimulationConstants.Config.ICD_DIRECTORY));
 builder.Services.AddSingleton<IICDDirectory, ICDDirectory>();
 builder.Services.AddSingleton<IMotionCalculator, MotionCalculator>();
 builder.Services.AddSingleton<ISpeedController, SpeedCalculator>();
