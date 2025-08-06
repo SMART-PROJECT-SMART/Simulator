@@ -22,8 +22,8 @@ namespace Simulation.Services.Helpers
                 {
                     byte[] doubleBytes = BitConverter.GetBytes(telemetryValue);
                     ulong doubleBits = BitConverter.ToUInt64(doubleBytes, 0);
-                    ulong mask = (SimulationConstants.TelemetryCompression.BIT_SHIFT_BASE << bitLength) - 1;
-                    value = doubleBits & mask;
+                    
+                    value = doubleBits;
                 }
                 
                 for (int i = 0; i < bitLength; i++)

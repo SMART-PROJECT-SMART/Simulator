@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Simulation.Models.ICDModels;
+﻿using Simulation.Models.ICDModels;
 
 namespace Simulation.Services.ICDDirectory
 {

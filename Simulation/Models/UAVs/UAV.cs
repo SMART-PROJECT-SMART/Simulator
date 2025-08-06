@@ -1,6 +1,6 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
-using Simulation.Ro.FlightPath;
+using Simulation.Models.Channels;
 using Simulation.Services.Flight_Path.helpers;
 
 namespace Simulation.Models.UAVs
@@ -11,38 +11,37 @@ namespace Simulation.Models.UAVs
         public Dictionary<UAVProperties, double> Properties { get; set; }
         public Dictionary<TelemetryFields, double> TelemetryData { get; set; }
         public string CurrentMissionId { get; set; }
-        //        public Channelsconfig
+        public List<Channel> Channels { get; set; }
 
         protected UAV(
             Location startLocation,
             int tailId,
             double fuelAmount,
-            Dictionary<UAVProperties, double> properties
-        )
+            Dictionary<UAVProperties, double> properties,
+            List<Channel> channels)
         {
             TailId = tailId;
             Properties = properties;
 
             CurrentMissionId = string.Empty;
+            Channels = channels;
 
             TelemetryData = new Dictionary<TelemetryFields, double>
             {
                 [TelemetryFields.Latitude] = startLocation.Latitude,
                 [TelemetryFields.Longitude] = startLocation.Longitude,
                 [TelemetryFields.Altitude] = startLocation.Altitude,
+                [TelemetryFields.FuelAmount] = fuelAmount,
+                [TelemetryFields.ThrottlePercent] = 0.0,
+                [TelemetryFields.CurrentSpeedKmph] = 0.0,
+                [TelemetryFields.YawDeg] = 0.0,
+                [TelemetryFields.PitchDeg] = 0.0,
+                [TelemetryFields.RollDeg] = 0.0,
+                [TelemetryFields.LandingGearStatus] = SimulationConstants
+                    .TelemetryData
+                    .WHEELS_DOWN,
+                [TelemetryFields.NearestSleeveId] = 0
             };
-
-            TelemetryData[TelemetryFields.FuelAmount] = fuelAmount;
-
-            TelemetryData[TelemetryFields.ThrottlePercent] = 0.0;
-            TelemetryData[TelemetryFields.CurrentSpeedKmph] = 0.0;
-            TelemetryData[TelemetryFields.YawDeg] = 0.0;
-            TelemetryData[TelemetryFields.PitchDeg] = 0.0;
-            TelemetryData[TelemetryFields.RollDeg] = 0.0;
-            TelemetryData[TelemetryFields.LandingGearStatus] = SimulationConstants
-                .TelemetryData
-                .WHEELS_DOWN;
-            TelemetryData[TelemetryFields.NearestSleeveId] = 0;
         }
 
         public void ConsumeFuel(double deltaSec)

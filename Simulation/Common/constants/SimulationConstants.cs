@@ -249,87 +249,6 @@
             public const string TELEMETRY_DATA_TYPE = "Double";
         }
 
-        public static class Units
-        {
-            public const string KILOMETERS_PER_HOUR = "kmph";
-            public const string METERS_PER_SECOND = "mps";
-
-            public const string METERS = "m";
-            public const string KILOMETERS = "km";
-            public const string DEGREES = "deg";
-
-            public const string DEGREES_PER_SECOND = "deg/s";
-            public const string REVOLUTIONS_PER_MINUTE = "rpm";
-
-            public const string CELSIUS = "°C";
-            public const string FAHRENHEIT = "°F";
-
-            public const string PERCENTAGE = "%";
-            public const string COEFFICIENT = "coeff";
-
-            public const string SECONDS = "sec";
-            public const string MINUTES = "min";
-            public const string HOURS = "hr";
-
-            public const string GIGABYTES = "GB";
-            public const string MEGABYTES = "MB";
-
-            public const string DECIBELS = "dB";
-            public const string DECIBEL_MILLIWATTS = "dBm";
-
-            public const string NEWTONS = "N";
-
-            public const string UNITLESS = "unitless";
-            public const string COUNT = "count";
-            public const string ID = "id";
-            public const string BOOLEAN = "bool";
-            public const string CHECKSUM = "checksum";
-        }
-
-        public static class ICDGeneration
-        {
-            public const string ICD_DIRECTORY = "files/icd";
-            public const string TELEMETRY_ICD_JSON_FILENAME = "telemetry_icd.json";
-            public const string TELEMETRY_ICD_HTML_FILENAME = "telemetry_icd.html";
-            public const string COMPRESSION_ICD_JSON_FILENAME = "compression_icd.json";
-            public const string COMPRESSION_ICD_HTML_FILENAME = "compression_icd.html";
-
-            public const string DOCUMENT_VERSION = "1.0";
-            public const string TELEMETRY_ICD_TITLE = "UAV Telemetry Interface Control Document";
-            public const string COMPRESSION_ICD_TITLE =
-                "UAV Telemetry Compression Interface Control Document";
-            public const string ICD_DESCRIPTION =
-                "Interface specification for UAV telemetry data compression and transmission";
-            public const string COMPRESSION_DESCRIPTION =
-                "Compression constants and parameters for UAV telemetry data";
-            public const string COMPRESSION_TYPE = "Bit-level packing with precision scaling";
-            public const string CHECKSUM_ALGORITHM = "Simple linear congruential checksum";
-
-            public const double DEFAULT_VALUE = 0.0;
-            public const double COEFFICIENT_MAX_VALUE = 6.5535;
-            public const double PERCENTAGE_MAX_VALUE = 100.0;
-            public const double ALTITUDE_MAX_VALUE = 65535.0;
-            public const double COORDINATE_LATITUDE_MIN = -90.0;
-            public const double COORDINATE_LATITUDE_MAX = 90.0;
-            public const double COORDINATE_LONGITUDE_MIN = -180.0;
-            public const double COORDINATE_LONGITUDE_MAX = 180.0;
-            public const double SPEED_MAX_VALUE = 4095.0;
-            public const double ANGLE_FULL_ROTATION = 360.0;
-            public const double ANGLE_HALF_ROTATION_NEGATIVE = -90.0;
-            public const double ANGLE_HALF_ROTATION_POSITIVE = 90.0;
-            public const double THRUST_MAX_VALUE = 1048575.0;
-            public const double DATA_STORAGE_MAX_VALUE = 10485.75;
-            public const double FLIGHT_TIME_MAX_VALUE = 1048575.0;
-            public const double SIGNAL_STRENGTH_MIN = -200.0;
-            public const double SIGNAL_STRENGTH_MAX = 200.0;
-            public const double RPM_MAX_VALUE = 65535.0;
-            public const double ENGINE_TEMPERATURE_MAX = 524.287;
-            public const double SLEEVE_ID_MAX_VALUE = 65535.0;
-            public const double CHECKSUM_MAX_VALUE = 4294967295.0;
-
-            public const int BITS_TO_BYTES_CONVERSION = 7;
-            public const int BITS_PER_BYTE_CALCULATION = 8;
-        }
 
         public static class Quartz
         {
@@ -353,6 +272,7 @@
         public static class Config
         {
             public const string ICD_DIRECTORY = "ICD";
+            public const string JSON_SEARCH_PATTERN = "*.json";
         }
     }
 }

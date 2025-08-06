@@ -5,7 +5,6 @@ using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
-using Simulation.Services.Helpers.ICDNetworking;
 using Simulation.Services.Quartz;
 using Simulation.Services.UAVManager;
 using Simulation.Configuration;
@@ -32,7 +31,6 @@ builder.Services.AddSingleton(provider =>
 );
 builder.Services.AddSingleton<IQuartzManager, QuartzManager>();
 builder.Services.AddSingleton<IUAVManager, UAVManager>();
-builder.Services.AddSingleton<IICDNetworking, ICDNetworkingHelper>();
 builder.Services.AddSingleton<IPortManager, PortManager>();
 builder.Services.AddSingleton<ChannelManager>();
 var app = builder.Build();

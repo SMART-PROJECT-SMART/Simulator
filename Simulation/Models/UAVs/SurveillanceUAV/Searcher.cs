@@ -1,5 +1,6 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
+using Simulation.Models.Channels;
 
 namespace Simulation.Models.UAVs.SurveillanceUAV
 {
@@ -10,21 +11,33 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
                 startLocation,
                 tailId,
                 BuildProperties(),
-                SimulationConstants.Searcher_Constants.DataStorageCapacityGB
+                SimulationConstants.Searcher_Constants.DataStorageCapacityGB,
+                new List<Channel>()
+            ) { }
+
+        public Searcher(int tailId, Location startLocation, List<Channel> channels)
+            : this(
+                startLocation,
+                tailId,
+                BuildProperties(),
+                SimulationConstants.Searcher_Constants.DataStorageCapacityGB,
+                channels
             ) { }
 
         public Searcher(
             Location startLocation,
             int tailId,
             Dictionary<UAVProperties, double> properties,
-            double dataStorageCapacityGB
+            double dataStorageCapacityGB,
+            List<Channel> channels
         )
             : base(
                 startLocation,
                 tailId,
                 SimulationConstants.Searcher_Constants.FuelTankCapacity,
                 properties,
-                dataStorageCapacityGB
+                dataStorageCapacityGB,
+                channels
             )
         {
             TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants

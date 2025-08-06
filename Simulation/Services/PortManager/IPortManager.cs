@@ -2,8 +2,8 @@ namespace Simulation.Services.PortManager
 {
     public interface IPortManager
     {
-        int GetNextAvailablePort(int tailId);
-        void ReservePort(int tailId, int portNumber);
-        void ReleasePort(int tailId, int portNumber);
+        public bool isUsed(int portNumber);
+        public void switchPorts(int tailId,int usedPort,int targetPort);
+        public void AssignPort(int tailId, int portNumber);
     }
 } 

@@ -3,7 +3,9 @@ using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Dto.FlightPath;
 using Simulation.Models;
+using Simulation.Models.Channels;
 using Simulation.Models.UAVs.SurveillanceUAV;
+using Simulation.Services.ICDDirectory;
 using Simulation.Services.UAVManager;
 
 namespace Simulation.Controllers
@@ -13,10 +15,11 @@ namespace Simulation.Controllers
     public class SimulationController : ControllerBase
     {
         private readonly IUAVManager _uavManager;
-
-        public SimulationController(IUAVManager uavManager)
+        private readonly IICDDirectory _ICDDirectory;
+        public SimulationController(IUAVManager uavManager,IICDDirectory _icdDirectory)
         {
             _uavManager = uavManager;
+            _ICDDirectory = _icdDirectory;
         }
 
         [HttpPost("simulate")]
@@ -94,6 +97,13 @@ namespace Simulation.Controllers
         {
             var startLocation = new Location(40.6413, -73.7781, 10.0);
             var uav = new Searcher(tailId: 1, startLocation: startLocation);
+            uav.Channels = new List<Channel>();
+            int portNumber = 8000;
+            foreach (var icd in _ICDDirectory.GetAllICDs())
+            {
+                uav.Channels.Add(new Channel(uav.TailId,portNumber,icd));
+                portNumber++;
+            }
             uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
             var destination = new Location(40.6460, -73.77850, 100.0);
             var request = new SimulateDto(uav, destination);
@@ -106,13 +116,23 @@ namespace Simulation.Controllers
         {
             var uav1StartLocation = new Location(40.6413, -73.7781, 10.0);
             var uav1 = new Searcher(tailId: 1, startLocation: uav1StartLocation);
+            uav1.Channels = new List<Channel>();
             uav1.TelemetryData[TelemetryFields.YawDeg] = 270.0;
             var uav1Destination = new Location(40.6450, -73.7750, 120.0);
 
             var uav2StartLocation = new Location(40.6400, -73.7800, 15.0);
             var uav2 = new Searcher(tailId: 2, startLocation: uav2StartLocation);
+            uav2.Channels = new List<Channel>();
             uav2.TelemetryData[TelemetryFields.YawDeg] = 90.0;
             var uav2Destination = new Location(40.6480, -73.7720, 150.0);
+
+            int portNumber = 8000;
+            foreach (var icd in _ICDDirectory.GetAllICDs())
+            {
+                uav1.Channels.Add(new Channel(uav1.TailId,portNumber,icd));
+                uav2.Channels.Add(new Channel(uav1.TailId, portNumber+_ICDDirectory.GetAllICDs().Count, icd));
+                portNumber++;
+            }
 
             var request1 = new SimulateDto(uav1, uav1Destination);
             var request2 = new SimulateDto(uav2, uav2Destination);

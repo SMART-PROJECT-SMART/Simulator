@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Simulation.Common.Enums;
+using Simulation.Models.Channels;
 
 namespace Simulation.Models.UAVs.SurveillanceUAV
 {
@@ -12,9 +13,9 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             int tailId,
             double fuelAmount,
             Dictionary<UAVProperties, double> properties,
-            double dataStorageCapacityGB
-        )
-            : base(startLocation, tailId, fuelAmount, properties)
+            double dataStorageCapacityGB,
+            List<Channel> channels)
+            : base(startLocation, tailId, fuelAmount, properties,channels)
         {
             TelemetryData[TelemetryFields.DataStorageUsedGB] = 0.0;
 

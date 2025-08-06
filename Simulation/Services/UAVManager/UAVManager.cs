@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
-using Quartz;
+﻿using Quartz;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
@@ -13,6 +11,10 @@ using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.Helpers;
 using Simulation.Services.ICDDirectory;
 using Simulation.Services.Quartz;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Threading.Channels;
+using Channel = Simulation.Models.Channels.Channel;
 
 namespace Simulation.Services.UAVManager
 {
@@ -60,20 +62,6 @@ namespace Simulation.Services.UAVManager
 
             _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
             
-            CreateChannelsForUAV(uav.TailId);
-        }
-
-        private void CreateChannelsForUAV(int tailId)
-        {
-            var icds = _icdDirectory.GetAllICDs();
-            
-            foreach (var icd in icds)
-            {
-                var channel = new Channel(tailId, 0, icd);
-                _channelManager.AddChannel(tailId, channel);
-            }
-            
-            _logger.LogInformation("Created {ChannelCount} channels for UAV {TailId}", icds.Count, tailId);
         }
 
         public void RemoveUAV(int tailId)
@@ -81,7 +69,6 @@ namespace Simulation.Services.UAVManager
             if (_uavs.TryRemove(tailId, out var uavData))
             {
                 uavData.Service.Dispose();
-                _channelManager.RemoveAllChannels(tailId);
             }
         }
 
@@ -198,17 +185,12 @@ namespace Simulation.Services.UAVManager
 
         public IEnumerable<int> GetActiveTailIds => _uavs.Keys;
 
-        public List<Channel> GetUAVChannels(int tailId)
-        {
-            return _channelManager.GetChannels(tailId);
-        }
-
     private void SendTelemetryToChannels(int tailId, Dictionary<TelemetryFields, double> telemetry)
     {
-        foreach (var icd in _icdDirectory.GetAllICDs())
+        foreach (var channel in _uavs[tailId].UAV.Channels)
         {
-            var compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(telemetry, icd);
-            _channelManager.SendCompressedToChannel(tailId, icd, compressed);
+            BitArray compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(telemetry, channel.ICD);
+            channel.SendICDByteArray(compressed);
         }
     }
 }

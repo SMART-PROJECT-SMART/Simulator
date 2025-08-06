@@ -12,17 +12,4 @@ public static class BitPacker
         bits.CopyTo(bytes, 0);
         return bytes;
     }
-
-    public static BitArray FromByteArray(this byte[] bytes, int originalBitCount)
-    {
-        var bits = new BitArray(bytes);
-        if (bits.Length != originalBitCount)
-        {
-            var trimmed = new BitArray(originalBitCount);
-            for (int i = 0; i < originalBitCount; i++)
-                trimmed[i] = bits[i];
-            return trimmed;
-        }
-        return bits;
-    }
 }

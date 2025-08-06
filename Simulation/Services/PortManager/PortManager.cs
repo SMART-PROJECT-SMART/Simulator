@@ -1,48 +1,36 @@
+using System;
+using System.Collections.Concurrent;
 using Simulation.Common.constants;
 
 namespace Simulation.Services.PortManager
 {
     public class PortManager : IPortManager
     {
-        private readonly Dictionary<int, HashSet<int>> _usedPorts = new Dictionary<int, HashSet<int>>();
-        private readonly Dictionary<int, int> _nextPortNumbers = new Dictionary<int, int>();
+       private readonly Dictionary<int,int> _portUavs = new Dictionary<int,int>();
 
-        public int GetNextAvailablePort(int tailId)
-        {
-            _nextPortNumbers.TryAdd(tailId, SimulationConstants.Networking.STARTING_PORT_NUMBER);
+       public bool isUsed(int portNumber)
+       {
+           return !_portUavs.ContainsKey(portNumber);
+       }
 
-            int portNumber = _nextPortNumbers[tailId];
-            
-            while (_usedPorts.ContainsKey(tailId) && _usedPorts[tailId].Contains(portNumber))
-            {
-                portNumber += SimulationConstants.Networking.PORT_INCREMENT;
-                if (portNumber > SimulationConstants.Networking.MAX_PORT_NUMBER)
-                {
-                    portNumber = SimulationConstants.Networking.STARTING_PORT_NUMBER;
-                }
-            }
+       public void switchPorts(int tailId, int usedPort, int targetPort)
+       {
+           if (!isUsed(usedPort))
+           {
+                _portUavs[targetPort] = tailId;
+                _portUavs.Remove(usedPort);
+           }
+           else
+           {
+               int prevPortTailId = _portUavs[targetPort];
+               _portUavs[targetPort] = tailId;
+               _portUavs[usedPort] = prevPortTailId;
+           }
+       }
 
-            _nextPortNumbers[tailId] = portNumber + SimulationConstants.Networking.PORT_INCREMENT;
-            return portNumber;
-        }
-
-        public void ReservePort(int tailId, int portNumber)
-        {
-            if (!_usedPorts.ContainsKey(tailId))
-            {
-                _usedPorts[tailId] = new HashSet<int>();
-            }
-            _usedPorts[tailId].Add(portNumber);
-        }
-
-        public void ReleasePort(int tailId, int portNumber)
-        {
-            if (_usedPorts.TryGetValue(tailId, out var port))
-            {
-                port.Remove(portNumber);
-            }
-        }
-
-
+       public void AssignPort(int tailId, int portNumber)
+       {
+           _portUavs.TryAdd(portNumber, tailId);
+       }
     }
-} 
+}

@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Simulation.Common.constants;
-using Simulation.Common.Enums;
 using Simulation.Configuration;
 using Simulation.Models.ICDModels;
-using Simulation.Services.Helpers;
 
 namespace Simulation.Services.ICDDirectory
 {
@@ -23,7 +20,7 @@ namespace Simulation.Services.ICDDirectory
         
         public void LoadAllICDs()
         {
-            var jsonFiles = Directory.GetFiles(_directoryPath, "*.json", SearchOption.TopDirectoryOnly);
+            var jsonFiles = Directory.GetFiles(_directoryPath, SimulationConstants.Config.JSON_SEARCH_PATTERN, SearchOption.TopDirectoryOnly);
             foreach (var filePath in jsonFiles)
             {
                 LoadICD(filePath);
