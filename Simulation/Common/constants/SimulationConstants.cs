@@ -200,27 +200,31 @@
             public const int BITS_PER_BYTE = 8;
             public const int BIT_MASK_SINGLE = 1;
             public const int BYTE_MASK = 0xFF;
-            
+
             public const uint CHECKSUM_SEED = 0x5A5A5A5A;
             public const uint CHECKSUM_MULTIPLIER = 1103515245;
             public const uint CHECKSUM_INCREMENT = 12345;
             public const uint CHECKSUM_MODULO = 0xFFFFFFFF;
-            
+
             public const int PRECISION_SCALE_FACTOR = 10000;
             public const int PERCENTAGE_SCALE = 100;
             public const int ANGLE_SCALE = 1000;
             public const int COORDINATE_SCALE = 1000000;
-            
+
             public const double LATITUDE_OFFSET = 90.0;
             public const double LONGITUDE_OFFSET = 180.0;
             public const double ANGLE_OFFSET = 90.0;
             public const double SIGNAL_STRENGTH_OFFSET = 200.0;
             public const double SIGNAL_STRENGTH_SCALE = 10.0;
-            
+
             public const ulong CLAMP_MIN_VALUE = 0;
             public const ulong BOOLEAN_TRUE_VALUE = 1;
             public const ulong BOOLEAN_FALSE_VALUE = 0;
-            
+
+            public const double DEFAULT_TELEMETRY_VALUE = 0.0;
+            public const double EPSILON_COMPARISON = 0.0001;
+            public const ulong BIT_SHIFT_BASE = 1UL;
+
             public const int DRAG_COEFFICIENT_BITS = 16;
             public const int LIFT_COEFFICIENT_BITS = 16;
             public const int THROTTLE_PERCENT_BITS = 7;
@@ -242,6 +246,7 @@
             public const int ENGINE_DEGREES_BITS = 19;
             public const int NEAREST_SLEEVE_ID_BITS = 16;
             public const int CHECKSUM_BITS = 32;
+            public const string TELEMETRY_DATA_TYPE = "Double";
         }
 
         public static class Quartz
@@ -249,6 +254,24 @@
             public const string UAV_ID = "UAVId";
             public const string IDENTITY_PREFIX = "FlightPath-";
             public const string JOB_GROUP = "FlightPathJob";
+        }
+
+        public static class Networking
+        {
+            public const int BYTE_SIZE = 8;
+            public const string GOOGLE_DNS_PRIMARY = "8.8.8.8";
+            public const int SOCKET_CONNECT_PORT = 65530;
+            public const string FALLBACK_IP = "127.0.0.1";
+            public const long TRUE_VALUE = 1;
+            public const int STARTING_PORT_NUMBER = 8000;
+            public const int MAX_PORT_NUMBER = 8999;
+            public const int PORT_INCREMENT = 1;
+        }
+
+        public static class Config
+        {
+            public const string ICD_DIRECTORY = "ICD";
+            public const string JSON_SEARCH_PATTERN = "*.json";
         }
     }
 }

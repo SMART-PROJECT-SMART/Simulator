@@ -1,24 +1,30 @@
 ﻿using System.Collections.Generic;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
+using Simulation.Models.Channels;
 
 namespace Simulation.Models.UAVs.ArmedUav
 {
     public class Hermes900 : ArmedUAV
     {
         public Hermes900(int tailId, Location startLocation)
-            : this(startLocation, tailId, BuildProperties()) { }
+            : this(startLocation, tailId, BuildProperties(), new List<Channel>()) { }
+
+        public Hermes900(int tailId, Location startLocation, List<Channel> channels)
+            : this(startLocation, tailId, BuildProperties(), channels) { }
 
         public Hermes900(
             Location startLocation,
             int tailId,
-            Dictionary<UAVProperties, double> properties
+            Dictionary<UAVProperties, double> properties,
+            List<Channel> channels
         )
             : base(
                 startLocation,
                 tailId,
                 SimulationConstants.Hermes900_Constants.FuelTankCapacity,
-                properties
+                properties,
+                channels
             )
         {
             TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants

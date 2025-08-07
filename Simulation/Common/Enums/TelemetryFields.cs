@@ -1,5 +1,9 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace Simulation.Common.Enums
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum TelemetryFields
     {
         DragCoefficient,
@@ -41,7 +45,5 @@ namespace Simulation.Common.Enums
         EngineDegrees,
 
         NearestSleeveId,
-
-        Checksum,
     }
 }

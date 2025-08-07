@@ -1,24 +1,30 @@
 ﻿using System.Collections.Generic;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
+using Simulation.Models.Channels;
 
 namespace Simulation.Models.UAVs.ArmedUav
 {
     public class HeronTp : ArmedUAV
     {
         public HeronTp(int tailId, Location startLocation)
-            : this(startLocation, tailId, BuildProperties()) { }
+            : this(startLocation, tailId, BuildProperties(), new List<Channel>()) { }
+
+        public HeronTp(int tailId, Location startLocation, List<Channel> channels)
+            : this(startLocation, tailId, BuildProperties(), channels) { }
 
         public HeronTp(
             Location startLocation,
             int tailId,
-            Dictionary<UAVProperties, double> properties
+            Dictionary<UAVProperties, double> properties,
+            List<Channel> channels
         )
             : base(
                 startLocation,
                 tailId,
                 SimulationConstants.HeronTP_Constants.FuelTankCapacity,
-                properties
+                properties,
+                channels
             )
         {
             TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants

@@ -1,6 +1,6 @@
 namespace Simulation.Services.Quartz
 {
-    public interface IQuartzManager
+    public interface IQuartzFlightJobManager
     {
         Task<bool> ScheduleUAVFlightPathJob(int uavId, int intervalSeconds);
         Task<bool> DeleteUAVFlightPathJob(int uavId);

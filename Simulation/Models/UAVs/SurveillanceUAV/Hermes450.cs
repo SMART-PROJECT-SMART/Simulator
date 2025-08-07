@@ -1,32 +1,43 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
+using Simulation.Models.Channels;
 
 namespace Simulation.Models.UAVs.SurveillanceUAV
 {
     public class Hermes450 : SurveillanceUAV
     {
-        // Overload: uses type constants automatically
         public Hermes450(int tailId, Location startLocation)
             : this(
                 startLocation,
                 tailId,
                 BuildProperties(),
-                SimulationConstants.Hermes450_Constants.DataStorageCapacityGB
+                SimulationConstants.Hermes450_Constants.DataStorageCapacityGB,
+                new List<Channel>()
             ) { }
 
-        // Main constructor
+        public Hermes450(int tailId, Location startLocation, List<Channel> channels)
+            : this(
+                startLocation,
+                tailId,
+                BuildProperties(),
+                SimulationConstants.Hermes450_Constants.DataStorageCapacityGB,
+                channels
+            ) { }
+
         public Hermes450(
             Location startLocation,
             int tailId,
             Dictionary<UAVProperties, double> properties,
-            double dataStorageCapacityGB
+            double dataStorageCapacityGB,
+            List<Channel> channels
         )
             : base(
                 startLocation,
                 tailId,
                 SimulationConstants.Hermes450_Constants.FuelTankCapacity,
                 properties,
-                dataStorageCapacityGB
+                dataStorageCapacityGB,
+                channels
             )
         {
             TelemetryData[TelemetryFields.DragCoefficient] = SimulationConstants
