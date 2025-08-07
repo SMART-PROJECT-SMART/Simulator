@@ -10,19 +10,27 @@ namespace Simulation.Services.Helpers
         public static BitArray CompressTelemetryDataByICD(Dictionary<TelemetryFields, double> telemetryData, ICD icd)
         {
             BitArray compressed = new BitArray(icd.GetSizeInBites());
-            
+            List<bool> signBits = new List<bool>();
+
+
             foreach (ICDItem telemetryParameter in icd)
             {
                 int startBit = telemetryParameter.StartBitArrayIndex;
                 int bitLength = telemetryParameter.BitLength;
                 
                 ulong valueInBits = 0;
+                bool isNegative = false;
                 
                 if (telemetryData.TryGetValue(telemetryParameter.Name, out double telemetryValue))
                 {
+                    if (telemetryParameter.IsSigned && telemetryValue < 0)
+                    {
+                        isNegative = true;
+                        telemetryValue = Math.Abs(telemetryValue); 
+                    }
+                    
                     byte[] doubleBytes = BitConverter.GetBytes(telemetryValue);
                     ulong doubleBits = BitConverter.ToUInt64(doubleBytes, 0);
-                    
                     valueInBits = doubleBits;
                 }
                 
@@ -30,10 +38,38 @@ namespace Simulation.Services.Helpers
                 {
                     compressed[startBit + offset] = GetValueByOffset(valueInBits, offset);
                 }
+                
+                if (telemetryParameter.IsSigned)
+                {
+                    signBits.Add(isNegative);
+                }
             }
             
-            uint checksum = CalculateChecksum(compressed);
-            return AppendChecksum(compressed, checksum);
+            // Append all sign bits at the end
+            BitArray compressedWithSigns = AppendSignBits(compressed, signBits);
+            
+            uint checksum = CalculateChecksum(compressedWithSigns);
+            return AppendChecksum(compressedWithSigns, checksum);
+        }
+
+        private static BitArray AppendSignBits(BitArray data, List<bool> signBits)
+        {
+            if (signBits.Count == 0)
+                return data;
+                
+            var result = new BitArray(data.Length + signBits.Count);
+            
+            for (int i = 0; i < data.Length; i++)
+            {
+                result[i] = data[i];
+            }
+            
+            for (int i = 0; i < signBits.Count; i++)
+            {
+                result[data.Length + i] = signBits[i];
+            }
+            
+            return result;
         }
 
         private static bool GetValueByOffset(ulong value, int offset)
@@ -60,7 +96,7 @@ namespace Simulation.Services.Helpers
             return checksum;
         }
 
-        private static byte GetByteValue(BitArray data,int byteIndex)
+        private static byte GetByteValue(BitArray data, int byteIndex)
         {
             byte dataByte = 0;
             int bitsInThisByte = Math.Min(
@@ -72,7 +108,7 @@ namespace Simulation.Services.Helpers
                 int absoluteBitIndex = (byteIndex * SimulationConstants.Networking.BYTE_SIZE) + bitIndex;
                 if (absoluteBitIndex < data.Length && data[absoluteBitIndex])
                 {
-                    dataByte |= (byte)(1<< bitIndex);
+                    dataByte |= (byte)(1 << bitIndex);
                 }
             }
             return dataByte;
