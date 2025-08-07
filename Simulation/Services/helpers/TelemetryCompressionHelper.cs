@@ -12,40 +12,38 @@ namespace Simulation.Services.Helpers
             BitArray compressed = new BitArray(icd.GetSizeInBites());
             List<bool> signBits = new List<bool>();
 
-
             foreach (ICDItem telemetryParameter in icd)
             {
                 int startBit = telemetryParameter.StartBitArrayIndex;
                 int bitLength = telemetryParameter.BitLength;
                 
                 ulong valueInBits = 0;
-                bool isNegative = false;
                 
                 if (telemetryData.TryGetValue(telemetryParameter.Name, out double telemetryValue))
                 {
-                    if (telemetryParameter.IsSigned && telemetryValue < 0)
+                    bool isNegative = telemetryValue < 0;
+                    signBits.Add(isNegative);
+                    
+                    if (isNegative)
                     {
-                        isNegative = true;
-                        telemetryValue = Math.Abs(telemetryValue); 
+                        telemetryValue = Math.Abs(telemetryValue);
                     }
                     
                     byte[] doubleBytes = BitConverter.GetBytes(telemetryValue);
                     ulong doubleBits = BitConverter.ToUInt64(doubleBytes, 0);
                     valueInBits = doubleBits;
                 }
+                else
+                {
+                    signBits.Add(false);
+                }
                 
                 for (int offset = 0; offset < bitLength; offset++)
                 {
                     compressed[startBit + offset] = GetValueByOffset(valueInBits, offset);
                 }
-                
-                if (telemetryParameter.IsSigned)
-                {
-                    signBits.Add(isNegative);
-                }
             }
             
-            // Append all sign bits at the end
             BitArray compressedWithSigns = AppendSignBits(compressed, signBits);
             
             uint checksum = CalculateChecksum(compressedWithSigns);

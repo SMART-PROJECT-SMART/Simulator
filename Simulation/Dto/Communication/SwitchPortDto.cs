@@ -1,6 +1,4 @@
-﻿using Simulation.Models.Channels;
-
-namespace Simulation.Dto.Communication
+﻿namespace Simulation.Dto.Communication
 {
     public class SwitchPortDto
     {
