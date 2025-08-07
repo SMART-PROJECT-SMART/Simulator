@@ -21,7 +21,7 @@ namespace Simulation.Services.UAVManager
 {
     public class UAVManager : IUAVManager
     {
-        private readonly ConcurrentDictionary<int, UAVMissionContext> _uavs;
+        private readonly ConcurrentDictionary<int, UAVMissionContext> _uavMissionContexts;
         private readonly IMotionCalculator _motionCalculator;
         private readonly ISpeedController _speedController;
         private readonly IOrientationCalculator _orientationCalculator;
@@ -38,7 +38,7 @@ namespace Simulation.Services.UAVManager
             IPortManager portManager
         )
         {
-            _uavs = new ConcurrentDictionary<int, UAVMissionContext>();
+            _uavMissionContexts = new ConcurrentDictionary<int, UAVMissionContext>();
             _motionCalculator = motionCalculator;
             _speedController = speedController;
             _orientationCalculator = orientationCalculator;
@@ -58,7 +58,7 @@ namespace Simulation.Services.UAVManager
 
             flightService.TelemetryUpdated += (telemetry) => SendTelemetryToChannels(uav.TailId, telemetry);
 
-            _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
+            _uavMissionContexts.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
             foreach (var channel in uav.Channels)
             {
                 _portManager.AssignPort(channel, channel.PortNumber);
@@ -67,7 +67,7 @@ namespace Simulation.Services.UAVManager
 
         public void RemoveUAV(int tailId)
         {
-            if (_uavs.TryRemove(tailId, out var uavData))
+            if (_uavMissionContexts.TryRemove(tailId, out var uavData))
             {
                 uavData.Service.Dispose();
             }
@@ -75,7 +75,7 @@ namespace Simulation.Services.UAVManager
 
         public UAVMissionContext GetUAVContext(int tailId)
         {
-            return _uavs[tailId];
+            return _uavMissionContexts[tailId];
         }
 
         public bool SwitchUAVs(int tailId1, int tailId2)
@@ -90,12 +90,12 @@ namespace Simulation.Services.UAVManager
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
         {
             uav.CurrentMissionId = missionId;
-            if (!_uavs.ContainsKey(uav.TailId))
+            if (!_uavMissionContexts.ContainsKey(uav.TailId))
             {
                 AddUAV(uav);
             }
 
-            UAVMissionContext context = _uavs[uav.TailId];
+            UAVMissionContext context = _uavMissionContexts[uav.TailId];
             context.Service.Initialize(uav, destination);
             context.Service.StartFlightPath();
 
@@ -122,24 +122,21 @@ namespace Simulation.Services.UAVManager
 
         private void RemoveUAV(UAV uav)
         {
-            _uavs.TryRemove(uav.TailId, out _);
+            _uavMissionContexts.TryRemove(uav.TailId, out _);
             uav.CurrentMissionId = string.Empty;
             uav.Channels.ForEach(channel => _portManager.RemovePort(channel.PortNumber));
         }
 
         public bool SwitchDestination(int tailId, Location newDestination)
         {
-            if (_uavs.TryGetValue(tailId, out var uavData))
-            {
-                uavData.Service.SwitchDestination(newDestination);
-                return true;
-            }
-            return false;
+            if (!_uavMissionContexts.TryGetValue(tailId, out var uavData)) return false;
+            uavData.Service.SwitchDestination(newDestination);
+            return true;
         }
 
         public async Task<bool> PauseMission(int tailId)
         {
-            if (_uavs.ContainsKey(tailId))
+            if (_uavMissionContexts.ContainsKey(tailId))
             {
                 return await _quartzFlightJobManager.PauseUAVFlightPathJob(tailId);
             }
@@ -148,7 +145,7 @@ namespace Simulation.Services.UAVManager
 
         public async Task<bool> ResumeMission(int tailId)
         {
-            if (_uavs.ContainsKey(tailId))
+            if (_uavMissionContexts.ContainsKey(tailId))
             {
                 return await _quartzFlightJobManager.ResumeUAVFlightPathJob(tailId);
             }
@@ -157,7 +154,7 @@ namespace Simulation.Services.UAVManager
 
         public async Task<bool> AbortMission(int tailId)
         {
-            if (!_uavs.TryGetValue(tailId, out var uavData)) return false;
+            if (!_uavMissionContexts.TryGetValue(tailId, out var uavData)) return false;
             var jobDeleted = await _quartzFlightJobManager.DeleteUAVFlightPathJob(tailId);
 
             uavData.UAV.CurrentMissionId = string.Empty;
@@ -171,13 +168,13 @@ namespace Simulation.Services.UAVManager
         {
             var allJobsDeleted = await _quartzFlightJobManager.DeleteAllJobs();
 
-            foreach (var kvp in _uavs)
+            foreach (var kvp in _uavMissionContexts)
             {
                 kvp.Value.UAV.CurrentMissionId = string.Empty;
                 kvp.Value.Service.Dispose();
             }
 
-            _uavs.Clear();
+            _uavMissionContexts.Clear();
             _portManager.ClearPorts();
             return allJobsDeleted;
         }
@@ -187,13 +184,13 @@ namespace Simulation.Services.UAVManager
             return await _quartzFlightJobManager.GetActiveJobCount();
         }
 
-        public int ActiveUAVCount => _uavs.Count;
+        public int ActiveUAVCount => _uavMissionContexts.Count;
 
-        public IEnumerable<int> GetActiveTailIds => _uavs.Keys;
+        public IEnumerable<int> GetActiveTailIds => _uavMissionContexts.Keys;
 
     private void SendTelemetryToChannels(int tailId, Dictionary<TelemetryFields, double> telemetry)
     {
-        foreach (var channel in _uavs[tailId].UAV.Channels)
+        foreach (var channel in _uavMissionContexts[tailId].UAV.Channels)
         {
             BitArray compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(telemetry, channel.ICD);
             channel.SendICDByteArray(compressed);
