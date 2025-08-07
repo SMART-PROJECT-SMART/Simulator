@@ -29,10 +29,9 @@ builder.Services.AddSingleton(provider =>
         .GetAwaiter()
         .GetResult()
 );
-builder.Services.AddSingleton<IQuartzManager, QuartzManager>();
+builder.Services.AddSingleton<IQuartzFlightJobManager, QuartzFlightJobManager>();
 builder.Services.AddSingleton<IUAVManager, UAVManager>();
 builder.Services.AddSingleton<IPortManager, PortManager>();
-builder.Services.AddSingleton<ChannelManager>();
 var app = builder.Build();
 
 var directory = app.Services.GetRequiredService<IICDDirectory>();

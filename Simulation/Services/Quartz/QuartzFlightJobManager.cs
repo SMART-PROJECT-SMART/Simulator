@@ -5,12 +5,12 @@ using Simulation.Services.Quartz.Jobs;
 
 namespace Simulation.Services.Quartz
 {
-    public class QuartzManager : IQuartzManager
+    public class QuartzFlightJobManager : IQuartzFlightJobManager
     {
         private readonly IScheduler _scheduler;
-        private readonly ILogger<QuartzManager> _logger;
+        private readonly ILogger<QuartzFlightJobManager> _logger;
 
-        public QuartzManager(IScheduler scheduler, ILogger<QuartzManager> logger)
+        public QuartzFlightJobManager(IScheduler scheduler, ILogger<QuartzFlightJobManager> logger)
         {
             _scheduler = scheduler;
             _logger = logger;

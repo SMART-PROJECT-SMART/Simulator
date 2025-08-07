@@ -10,8 +10,9 @@ namespace Simulation.Services.Helpers
         public static BitArray CompressTelemetryDataByICD(Dictionary<TelemetryFields, double> telemetryData, ICD icd)
         {
             BitArray compressed = new BitArray(icd.GetSizeInBites());
-            List<bool> signBits = new List<bool>();
+            BitArray signBits = new BitArray(icd.Document.Count);
 
+            int fieldIndex = 0;
             foreach (ICDItem telemetryParameter in icd)
             {
                 int startBit = telemetryParameter.StartBitArrayIndex;
@@ -22,12 +23,7 @@ namespace Simulation.Services.Helpers
                 if (telemetryData.TryGetValue(telemetryParameter.Name, out double telemetryValue))
                 {
                     bool isNegative = telemetryValue < 0;
-                    signBits.Add(isNegative);
-                    
-                    if (isNegative)
-                    {
-                        telemetryValue = Math.Abs(telemetryValue);
-                    }
+                    signBits[fieldIndex] = isNegative;
                     
                     byte[] doubleBytes = BitConverter.GetBytes(telemetryValue);
                     ulong doubleBits = BitConverter.ToUInt64(doubleBytes, 0);
@@ -35,13 +31,15 @@ namespace Simulation.Services.Helpers
                 }
                 else
                 {
-                    signBits.Add(false);
+                    signBits[fieldIndex] = false;
                 }
                 
                 for (int offset = 0; offset < bitLength; offset++)
                 {
                     compressed[startBit + offset] = GetValueByOffset(valueInBits, offset);
                 }
+                
+                fieldIndex++;
             }
             
             BitArray compressedWithSigns = AppendSignBits(compressed, signBits);
@@ -50,19 +48,19 @@ namespace Simulation.Services.Helpers
             return AppendChecksum(compressedWithSigns, checksum);
         }
 
-        private static BitArray AppendSignBits(BitArray data, List<bool> signBits)
+        private static BitArray AppendSignBits(BitArray data, BitArray signBits)
         {
-            if (signBits.Count == 0)
+            if (signBits.Length == 0)
                 return data;
                 
-            var result = new BitArray(data.Length + signBits.Count);
+            var result = new BitArray(data.Length + signBits.Length);
             
             for (int i = 0; i < data.Length; i++)
             {
                 result[i] = data[i];
             }
             
-            for (int i = 0; i < signBits.Count; i++)
+            for (int i = 0; i < signBits.Length; i++)
             {
                 result[data.Length + i] = signBits[i];
             }

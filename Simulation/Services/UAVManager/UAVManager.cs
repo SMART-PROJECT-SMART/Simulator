@@ -26,7 +26,7 @@ namespace Simulation.Services.UAVManager
         private readonly ISpeedController _speedController;
         private readonly IOrientationCalculator _orientationCalculator;
         private readonly ILogger<FlightPathService> _logger;
-        private readonly IQuartzManager _quartzManager;
+        private readonly IQuartzFlightJobManager _quartzFlightJobManager;
         private readonly IPortManager _portManager;
 
         public UAVManager(
@@ -34,7 +34,7 @@ namespace Simulation.Services.UAVManager
             ISpeedController speedController,
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
-            IQuartzManager quartzManager,
+            IQuartzFlightJobManager quartzFlightJobManager,
             IPortManager portManager
         )
         {
@@ -43,7 +43,7 @@ namespace Simulation.Services.UAVManager
             _speedController = speedController;
             _orientationCalculator = orientationCalculator;
             _logger = logger;
-            _quartzManager = quartzManager;
+            _quartzFlightJobManager = quartzFlightJobManager;
             _portManager = portManager;
         }
 
@@ -99,7 +99,7 @@ namespace Simulation.Services.UAVManager
             context.Service.Initialize(uav, destination);
             context.Service.StartFlightPath();
 
-            var jobScheduled = await _quartzManager.ScheduleUAVFlightPathJob(
+            var jobScheduled = await _quartzFlightJobManager.ScheduleUAVFlightPathJob(
                 uav.TailId,
                 (int)SimulationConstants.FlightPath.DELTA_SECONDS
             );
@@ -112,12 +112,19 @@ namespace Simulation.Services.UAVManager
 
             context.Service.MissionCompleted += async () =>
             {
-                await _quartzManager.DeleteUAVFlightPathJob(uav.TailId);
+                await _quartzFlightJobManager.DeleteUAVFlightPathJob(uav.TailId);
                 uav.CurrentMissionId = string.Empty;
                 context.Service.Dispose();
-                _uavs.TryRemove(uav.TailId, out _);
+                RemoveUAV(uav);
             };
             return true;
+        }
+
+        private void RemoveUAV(UAV uav)
+        {
+            _uavs.TryRemove(uav.TailId, out _);
+            uav.CurrentMissionId = string.Empty;
+            uav.Channels.ForEach(channel => _portManager.RemovePort(channel.PortNumber));
         }
 
         public bool SwitchDestination(int tailId, Location newDestination)
@@ -134,7 +141,7 @@ namespace Simulation.Services.UAVManager
         {
             if (_uavs.ContainsKey(tailId))
             {
-                return await _quartzManager.PauseUAVFlightPathJob(tailId);
+                return await _quartzFlightJobManager.PauseUAVFlightPathJob(tailId);
             }
             return false;
         }
@@ -143,29 +150,26 @@ namespace Simulation.Services.UAVManager
         {
             if (_uavs.ContainsKey(tailId))
             {
-                return await _quartzManager.ResumeUAVFlightPathJob(tailId);
+                return await _quartzFlightJobManager.ResumeUAVFlightPathJob(tailId);
             }
             return false;
         }
 
         public async Task<bool> AbortMission(int tailId)
         {
-            if (_uavs.TryGetValue(tailId, out var uavData))
-            {
-                var jobDeleted = await _quartzManager.DeleteUAVFlightPathJob(tailId);
+            if (!_uavs.TryGetValue(tailId, out var uavData)) return false;
+            var jobDeleted = await _quartzFlightJobManager.DeleteUAVFlightPathJob(tailId);
 
-                uavData.UAV.CurrentMissionId = string.Empty;
-                uavData.Service.Dispose();
-                _uavs.TryRemove(tailId, out _);
+            uavData.UAV.CurrentMissionId = string.Empty;
+            uavData.Service.Dispose();
+            RemoveUAV(uavData.UAV);
 
-                return jobDeleted;
-            }
-            return false;
+            return jobDeleted;
         }
 
         public async Task<bool> AbortAllMissions()
         {
-            var allJobsDeleted = await _quartzManager.DeleteAllJobs();
+            var allJobsDeleted = await _quartzFlightJobManager.DeleteAllJobs();
 
             foreach (var kvp in _uavs)
             {
@@ -174,12 +178,13 @@ namespace Simulation.Services.UAVManager
             }
 
             _uavs.Clear();
+            _portManager.ClearPorts();
             return allJobsDeleted;
         }
 
         public async Task<int> GetActiveJobCount()
         {
-            return await _quartzManager.GetActiveJobCount();
+            return await _quartzFlightJobManager.GetActiveJobCount();
         }
 
         public int ActiveUAVCount => _uavs.Count;

@@ -39,13 +39,20 @@ namespace Simulation.Services.PortManager
                 _portChannels.Remove(sourcePort);
             }
         }
-
+        public void ClearPorts()
+        {
+            _portChannels.Clear();
+        }
 
         public void AssignPort(Channel channel, int portNumber)
         {
 
             channel.PortNumber = portNumber;
             _portChannels[portNumber] = channel;
+        }
+        public void RemovePort(int portNumber)
+        {
+            _portChannels.Remove(portNumber, out var _);
         }
 
         private void SwitchPortNumbers(Channel channel1, Channel channel2)
