@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Simulation.Common.constants;
 using Simulation.Models.Channels;
 
 namespace Simulation.Services.PortManager
@@ -9,12 +6,12 @@ namespace Simulation.Services.PortManager
     {
         private readonly Dictionary<int, Channel> _portChannels = new Dictionary<int, Channel>();
 
-        public bool isUsed(int portNumber)
+        public bool IsUsed(int portNumber)
         {
             return _portChannels.ContainsKey(portNumber);
         }
 
-        public void switchPorts(int sourcePort, int targetPort)
+        public void SwitchPorts(int sourcePort, int targetPort)
         {
             if (sourcePort == targetPort)
             {

@@ -18,7 +18,7 @@ namespace Simulation.Controllers
         [HttpPost("switch-ports")]
         public IActionResult SwitchPorts([FromBody] SwitchPortDto dto)
         {
-            _portManager.switchPorts(dto.SourcePort, dto.TargetPort);
+            _portManager.SwitchPorts(dto.SourcePort, dto.TargetPort);
             return Ok();
         }
     }
