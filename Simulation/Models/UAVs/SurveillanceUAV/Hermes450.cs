@@ -30,7 +30,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             Dictionary<UAVProperties, double> properties,
             double dataStorageCapacityGB,
             List<Channel> channels
-                )
+        )
             : base(
                 startLocation,
                 tailId,

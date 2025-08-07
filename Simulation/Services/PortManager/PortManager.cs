@@ -24,12 +24,11 @@ namespace Simulation.Services.PortManager
             _portChannels.TryGetValue(sourcePort, out var sourceChannel);
             bool targetExists = _portChannels.TryGetValue(targetPort, out var targetChannel);
 
-
             if (targetExists)
             {
                 _portChannels[sourcePort] = targetChannel;
                 _portChannels[targetPort] = sourceChannel;
-                
+
                 SwitchPortNumbers(sourceChannel, targetChannel);
             }
             else
@@ -39,6 +38,7 @@ namespace Simulation.Services.PortManager
                 _portChannels.Remove(sourcePort);
             }
         }
+
         public void ClearPorts()
         {
             _portChannels.Clear();
@@ -46,10 +46,10 @@ namespace Simulation.Services.PortManager
 
         public void AssignPort(Channel channel, int portNumber)
         {
-
             channel.PortNumber = portNumber;
             _portChannels[portNumber] = channel;
         }
+
         public void RemovePort(int portNumber)
         {
             _portChannels.Remove(portNumber, out var _);
@@ -59,6 +59,5 @@ namespace Simulation.Services.PortManager
         {
             (channel1.PortNumber, channel2.PortNumber) = (channel2.PortNumber, channel1.PortNumber);
         }
-
     }
 }

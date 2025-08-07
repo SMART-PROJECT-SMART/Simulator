@@ -1,21 +1,23 @@
 using Quartz;
 using Simulation.Common.constants;
+using Simulation.Configuration;
 using Simulation.Services;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
+using Simulation.Services.ICDDirectory;
+using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
 using Simulation.Services.UAVManager;
-using Simulation.Configuration;
-using Simulation.Services.PortManager;
-using Simulation.Services.ICDDirectory;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.Configure<ICDSettings>(builder.Configuration.GetSection(SimulationConstants.Config.ICD_DIRECTORY));
+builder.Services.Configure<ICDSettings>(
+    builder.Configuration.GetSection(SimulationConstants.Config.ICD_DIRECTORY)
+);
 builder.Services.AddSingleton<IICDDirectory, ICDDirectory>();
 builder.Services.AddSingleton<IMotionCalculator, MotionCalculator>();
 builder.Services.AddSingleton<ISpeedController, SpeedCalculator>();
@@ -24,10 +26,7 @@ builder.Services.AddTransient<FlightPathService>();
 builder.Services.AddQuartz();
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 builder.Services.AddSingleton(provider =>
-    provider.GetRequiredService<ISchedulerFactory>()
-        .GetScheduler()
-        .GetAwaiter()
-        .GetResult()
+    provider.GetRequiredService<ISchedulerFactory>().GetScheduler().GetAwaiter().GetResult()
 );
 builder.Services.AddSingleton<IQuartzFlightJobManager, QuartzFlightJobManager>();
 builder.Services.AddSingleton<IUAVManager, UAVManager>();

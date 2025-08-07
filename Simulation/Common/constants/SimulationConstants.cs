@@ -249,7 +249,6 @@
             public const string TELEMETRY_DATA_TYPE = "Double";
         }
 
-
         public static class Quartz
         {
             public const string UAV_ID = "UAVId";

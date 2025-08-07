@@ -13,8 +13,9 @@ namespace Simulation.Models.UAVs.ArmedUav
             int tailId,
             double fuelAmount,
             Dictionary<UAVProperties, double> properties,
-            List<Channel> channels)
-            : base(startLocation, tailId, fuelAmount, properties,channels)
+            List<Channel> channels
+        )
+            : base(startLocation, tailId, fuelAmount, properties, channels)
         {
             WeaponAmmo = new Dictionary<WeaponType, int>();
             properties[UAVProperties.IsWeaponSystemArmed] = 0.0;

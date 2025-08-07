@@ -16,7 +16,8 @@ namespace Simulation.Controllers
     {
         private readonly IUAVManager _uavManager;
         private readonly IICDDirectory _ICDDirectory;
-        public SimulationController(IUAVManager uavManager,IICDDirectory _icdDirectory)
+
+        public SimulationController(IUAVManager uavManager, IICDDirectory _icdDirectory)
         {
             _uavManager = uavManager;
             _ICDDirectory = _icdDirectory;
@@ -101,7 +102,7 @@ namespace Simulation.Controllers
             int portNumber = 8000;
             foreach (var icd in _ICDDirectory.GetAllICDs())
             {
-                uav.Channels.Add(new Channel(uav.TailId,portNumber,icd));
+                uav.Channels.Add(new Channel(uav.TailId, portNumber, icd));
                 portNumber++;
             }
             uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
@@ -129,8 +130,10 @@ namespace Simulation.Controllers
             int portNumber = 8000;
             foreach (var icd in _ICDDirectory.GetAllICDs())
             {
-                uav1.Channels.Add(new Channel(uav1.TailId,portNumber,icd));
-                uav2.Channels.Add(new Channel(uav1.TailId, portNumber+_ICDDirectory.GetAllICDs().Count, icd));
+                uav1.Channels.Add(new Channel(uav1.TailId, portNumber, icd));
+                uav2.Channels.Add(
+                    new Channel(uav1.TailId, portNumber + _ICDDirectory.GetAllICDs().Count, icd)
+                );
                 portNumber++;
             }
 

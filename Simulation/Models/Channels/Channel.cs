@@ -1,7 +1,7 @@
-﻿using Simulation.Common.constants;
-using Simulation.Models.ICDModels;
-using System.Collections;
+﻿using System.Collections;
 using System.Net.Sockets;
+using Simulation.Common.constants;
+using Simulation.Models.ICDModels;
 using Simulation.Services.Helpers;
 
 namespace Simulation.Models.Channels
@@ -13,7 +13,7 @@ namespace Simulation.Models.Channels
         public ICD ICD { get; set; }
         public UdpClient UdpClient { get; set; }
 
-        public Channel(int tailId, int portNumber,ICD icd)
+        public Channel(int tailId, int portNumber, ICD icd)
         {
             TailId = tailId;
             PortNumber = portNumber;
@@ -24,7 +24,12 @@ namespace Simulation.Models.Channels
         public void SendICDByteArray(BitArray data)
         {
             var byteArray = data.ToByteArray();
-            UdpClient.Send(byteArray, byteArray.Length, SimulationConstants.Networking.FALLBACK_IP, PortNumber);
+            UdpClient.Send(
+                byteArray,
+                byteArray.Length,
+                SimulationConstants.Networking.FALLBACK_IP,
+                PortNumber
+            );
         }
     }
 }

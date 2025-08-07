@@ -18,7 +18,8 @@ namespace Simulation.Models.UAVs
             int tailId,
             double fuelAmount,
             Dictionary<UAVProperties, double> properties,
-            List<Channel> channels)
+            List<Channel> channels
+        )
         {
             TailId = tailId;
             Properties = properties;
@@ -37,10 +38,8 @@ namespace Simulation.Models.UAVs
                 [TelemetryFields.YawDeg] = 0.0,
                 [TelemetryFields.PitchDeg] = 0.0,
                 [TelemetryFields.RollDeg] = 0.0,
-                [TelemetryFields.LandingGearStatus] = SimulationConstants
-                    .TelemetryData
-                    .WHEELS_DOWN,
-                [TelemetryFields.NearestSleeveId] = 0
+                [TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_DOWN,
+                [TelemetryFields.NearestSleeveId] = 0,
             };
         }
 

@@ -21,7 +21,8 @@ public class ICDItem
         double minValue,
         double maxValue,
         int startBitArrayIndex,
-        int bitLength)
+        int bitLength
+    )
     {
         Name = name;
         Type = type;

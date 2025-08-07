@@ -1,13 +1,16 @@
-﻿using Simulation.Common.constants;
+﻿using System.Collections;
+using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models.ICDModels;
-using System.Collections;
 
 namespace Simulation.Services.Helpers
 {
     public static class TelemetryCompressionHelper
     {
-        public static BitArray CompressTelemetryDataByICD(Dictionary<TelemetryFields, double> telemetryData, ICD icd)
+        public static BitArray CompressTelemetryDataByICD(
+            Dictionary<TelemetryFields, double> telemetryData,
+            ICD icd
+        )
         {
             BitArray compressed = new BitArray(icd.GetSizeInBites());
             BitArray signBits = new BitArray(icd.Document.Count);
@@ -17,14 +20,14 @@ namespace Simulation.Services.Helpers
             {
                 int startBit = telemetryParameter.StartBitArrayIndex;
                 int bitLength = telemetryParameter.BitLength;
-                
+
                 ulong valueInBits = 0;
-                
+
                 if (telemetryData.TryGetValue(telemetryParameter.Name, out double telemetryValue))
                 {
                     bool isNegative = telemetryValue < 0;
                     signBits[fieldIndex] = isNegative;
-                    
+
                     byte[] doubleBytes = BitConverter.GetBytes(telemetryValue);
                     ulong doubleBits = BitConverter.ToUInt64(doubleBytes, 0);
                     valueInBits = doubleBits;
@@ -33,17 +36,17 @@ namespace Simulation.Services.Helpers
                 {
                     signBits[fieldIndex] = false;
                 }
-                
+
                 for (int offset = 0; offset < bitLength; offset++)
                 {
                     compressed[startBit + offset] = GetValueByOffset(valueInBits, offset);
                 }
-                
+
                 fieldIndex++;
             }
-            
+
             BitArray compressedWithSigns = AppendSignBits(compressed, signBits);
-            
+
             uint checksum = CalculateChecksum(compressedWithSigns);
             return AppendChecksum(compressedWithSigns, checksum);
         }
@@ -52,19 +55,19 @@ namespace Simulation.Services.Helpers
         {
             if (signBits.Length == 0)
                 return data;
-                
+
             var result = new BitArray(data.Length + signBits.Length);
-            
+
             for (int i = 0; i < data.Length; i++)
             {
                 result[i] = data[i];
             }
-            
+
             for (int i = 0; i < signBits.Length; i++)
             {
                 result[data.Length + i] = signBits[i];
             }
-            
+
             return result;
         }
 
@@ -77,16 +80,21 @@ namespace Simulation.Services.Helpers
         {
             uint checksum = SimulationConstants.TelemetryCompression.CHECKSUM_SEED;
 
-            int byteCount = (data.Length + SimulationConstants.Networking.BYTE_SIZE - 1) 
-                          / SimulationConstants.Networking.BYTE_SIZE;
+            int byteCount =
+                (data.Length + SimulationConstants.Networking.BYTE_SIZE - 1)
+                / SimulationConstants.Networking.BYTE_SIZE;
 
             for (int byteIndex = 0; byteIndex < byteCount; byteIndex++)
             {
                 byte dataByte = GetByteValue(data, byteIndex);
 
-                checksum = ((checksum * SimulationConstants.TelemetryCompression.CHECKSUM_MULTIPLIER
-                           + SimulationConstants.TelemetryCompression.CHECKSUM_INCREMENT
-                           + dataByte) & SimulationConstants.TelemetryCompression.CHECKSUM_MODULO);
+                checksum = (
+                    (
+                        checksum * SimulationConstants.TelemetryCompression.CHECKSUM_MULTIPLIER
+                        + SimulationConstants.TelemetryCompression.CHECKSUM_INCREMENT
+                        + dataByte
+                    ) & SimulationConstants.TelemetryCompression.CHECKSUM_MODULO
+                );
             }
 
             return checksum;
@@ -101,7 +109,8 @@ namespace Simulation.Services.Helpers
             );
             for (int bitIndex = 0; bitIndex < bitsInThisByte; bitIndex++)
             {
-                int absoluteBitIndex = (byteIndex * SimulationConstants.Networking.BYTE_SIZE) + bitIndex;
+                int absoluteBitIndex =
+                    (byteIndex * SimulationConstants.Networking.BYTE_SIZE) + bitIndex;
                 if (absoluteBitIndex < data.Length && data[absoluteBitIndex])
                 {
                     dataByte |= (byte)(1 << bitIndex);
@@ -122,7 +131,9 @@ namespace Simulation.Services.Helpers
 
             for (int i = 0; i < checksumBits; i++)
             {
-                result[data.Length + i] = (checksum & (SimulationConstants.TelemetryCompression.BIT_SHIFT_BASE << i)) != 0;
+                result[data.Length + i] =
+                    (checksum & (SimulationConstants.TelemetryCompression.BIT_SHIFT_BASE << i))
+                    != 0;
             }
 
             return result;

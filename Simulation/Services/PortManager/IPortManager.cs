@@ -10,4 +10,4 @@ namespace Simulation.Services.PortManager
         public void RemovePort(int portNumber);
         public void ClearPorts();
     }
-} 
+}

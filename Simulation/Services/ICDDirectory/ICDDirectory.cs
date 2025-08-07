@@ -17,10 +17,14 @@ namespace Simulation.Services.ICDDirectory
                 ? opts.Value.ICDFilePath
                 : throw new DirectoryNotFoundException();
         }
-        
+
         public void LoadAllICDs()
         {
-            var jsonFiles = Directory.GetFiles(_directoryPath, SimulationConstants.Config.JSON_SEARCH_PATTERN, SearchOption.TopDirectoryOnly);
+            var jsonFiles = Directory.GetFiles(
+                _directoryPath,
+                SimulationConstants.Config.JSON_SEARCH_PATTERN,
+                SearchOption.TopDirectoryOnly
+            );
             foreach (var filePath in jsonFiles)
             {
                 LoadICD(filePath);
