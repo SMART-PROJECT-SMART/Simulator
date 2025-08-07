@@ -10,10 +10,15 @@ namespace Simulation.Controllers
     {
         private readonly IPortManager _portManager;
 
+        public CommunicationController(IPortManager portManager)
+        {
+            _portManager = portManager;
+        }
+
         [HttpPost("switch-ports")]
         public IActionResult SwitchPorts([FromBody] SwitchPortDto dto)
         {
-            _portManager.switchPorts(dto.TailId, dto.TargetPort, dto.TargetPort);
+            _portManager.switchPorts(dto.SourcePort,dto.TargetPort);
             return Ok();
         }
     }

@@ -1,16 +1,18 @@
-﻿namespace Simulation.Dto.Communication
+﻿using Simulation.Models.Channels;
+
+namespace Simulation.Dto.Communication
 {
     public class SwitchPortDto
     {
-        public int TailId { get; set; }
+        public int SourcePort { get; set; }
         public int TargetPort { get; set; }
-        public int UsedPort { get; set; }
 
-        public SwitchPortDto(int tailId, int targetPort, int usedPort)
+        public SwitchPortDto() { }
+
+        public SwitchPortDto(int sourcePort, int targetPort)
         {
-            TailId = tailId;
+            SourcePort = sourcePort;
             TargetPort = targetPort;
-            UsedPort = usedPort;
         }
     }
 }

@@ -1,36 +1,57 @@
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Simulation.Common.constants;
+using Simulation.Models.Channels;
 
 namespace Simulation.Services.PortManager
 {
     public class PortManager : IPortManager
     {
-       private readonly Dictionary<int,int> _portUavs = new Dictionary<int,int>();
+        private readonly Dictionary<int, Channel> _portChannels = new Dictionary<int, Channel>();
 
-       public bool isUsed(int portNumber)
-       {
-           return !_portUavs.ContainsKey(portNumber);
-       }
+        public bool isUsed(int portNumber)
+        {
+            return _portChannels.ContainsKey(portNumber);
+        }
 
-       public void switchPorts(int tailId, int usedPort, int targetPort)
-       {
-           if (!isUsed(usedPort))
-           {
-                _portUavs[targetPort] = tailId;
-                _portUavs.Remove(usedPort);
-           }
-           else
-           {
-               int prevPortTailId = _portUavs[targetPort];
-               _portUavs[targetPort] = tailId;
-               _portUavs[usedPort] = prevPortTailId;
-           }
-       }
+        public void switchPorts(int sourcePort, int targetPort)
+        {
+            if (sourcePort == targetPort)
+            {
+                return;
+            }
 
-       public void AssignPort(int tailId, int portNumber)
-       {
-           _portUavs.TryAdd(portNumber, tailId);
-       }
+            _portChannels.TryGetValue(sourcePort, out var sourceChannel);
+            bool targetExists = _portChannels.TryGetValue(targetPort, out var targetChannel);
+
+
+            if (targetExists)
+            {
+                _portChannels[sourcePort] = targetChannel;
+                _portChannels[targetPort] = sourceChannel;
+                
+                SwitchPortNumbers(sourceChannel, targetChannel);
+            }
+            else
+            {
+                sourceChannel.PortNumber = targetPort;
+                _portChannels[targetPort] = sourceChannel;
+                _portChannels.Remove(sourcePort);
+            }
+        }
+
+
+        public void AssignPort(Channel channel, int portNumber)
+        {
+
+            channel.PortNumber = portNumber;
+            _portChannels[portNumber] = channel;
+        }
+
+        private void SwitchPortNumbers(Channel channel1, Channel channel2)
+        {
+            (channel1.PortNumber, channel2.PortNumber) = (channel2.PortNumber, channel1.PortNumber);
+        }
+
     }
 }

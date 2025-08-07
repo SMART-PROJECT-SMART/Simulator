@@ -14,6 +14,7 @@ using Simulation.Services.Quartz;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Threading.Channels;
+using Simulation.Services.PortManager;
 using Channel = Simulation.Models.Channels.Channel;
 
 namespace Simulation.Services.UAVManager
@@ -26,8 +27,7 @@ namespace Simulation.Services.UAVManager
         private readonly IOrientationCalculator _orientationCalculator;
         private readonly ILogger<FlightPathService> _logger;
         private readonly IQuartzManager _quartzManager;
-        private readonly IICDDirectory _icdDirectory;
-        private readonly ChannelManager _channelManager;
+        private readonly IPortManager _portManager;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
@@ -35,8 +35,7 @@ namespace Simulation.Services.UAVManager
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
             IQuartzManager quartzManager,
-            IICDDirectory icdDirectory,
-            ChannelManager channelManager
+            IPortManager portManager
         )
         {
             _uavs = new ConcurrentDictionary<int, UAVMissionContext>();
@@ -45,8 +44,7 @@ namespace Simulation.Services.UAVManager
             _orientationCalculator = orientationCalculator;
             _logger = logger;
             _quartzManager = quartzManager;
-            _icdDirectory = icdDirectory;
-            _channelManager = channelManager;
+            _portManager = portManager;
         }
 
         public void AddUAV(UAV uav)
@@ -61,7 +59,10 @@ namespace Simulation.Services.UAVManager
             flightService.TelemetryUpdated += (telemetry) => SendTelemetryToChannels(uav.TailId, telemetry);
 
             _uavs.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
-            
+            foreach (var channel in uav.Channels)
+            {
+                _portManager.AssignPort(channel, channel.PortNumber);
+            }
         }
 
         public void RemoveUAV(int tailId)
