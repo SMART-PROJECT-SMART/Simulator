@@ -50,6 +50,7 @@ public class FlightPathService : IDisposable
         _uav = uav;
         _destination = destination;
         _cruiseAltitude = _uav.TelemetryData[TelemetryFields.CruiseAltitude];
+        _uav.TelemetryData[TelemetryFields.TailId] = _uav.TailId;
 
         var t = _uav.TelemetryData;
         t.TryGetValue(TelemetryFields.Latitude, out double lat);
@@ -113,13 +114,8 @@ public class FlightPathService : IDisposable
             currentLoc
         );
 
-        bool horizontalReached =
-            remainingMeters <= SimulationConstants.FlightPath.MISSION_COMPLETION_RADIUS_M;
-        bool altitudeReached =
-            Math.Abs(currentLoc.Altitude - _destination.Altitude)
-            <= SimulationConstants.FlightPath.ALTITUDE_PRECISION_M;
 
-        if (horizontalReached && altitudeReached)
+        if (remainingMeters <=SimulationConstants.FlightPath.MISSION_COMPLETION_RADIUS_M)
         {
             _uav.Land();
             _missionCompleted = true;
