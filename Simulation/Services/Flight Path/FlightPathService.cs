@@ -115,7 +115,7 @@ public class FlightPathService : IDisposable
         );
 
 
-        if (remainingMeters <=SimulationConstants.FlightPath.MISSION_COMPLETION_RADIUS_M)
+        if (remainingMeters <SimulationConstants.FlightPath.MISSION_COMPLETION_RADIUS_M)
         {
             _uav.Land();
             _missionCompleted = true;
