@@ -178,5 +178,14 @@
     "maxValue": 65535.0,
     "startBitArrayIndex": 302,
     "bitLength": 16
+  },
+  {
+    "name": "TailId",
+    "type": "Double",
+    "unit": "id",
+    "minValue": 0.0,
+    "maxValue": 999.0,
+    "startBitArrayIndex": 318,
+    "bitLength": 10
   }
 ]
