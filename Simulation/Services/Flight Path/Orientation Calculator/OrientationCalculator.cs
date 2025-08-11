@@ -10,6 +10,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
     {
         private double _lastYaw = double.NaN;
         private double _lastRoll = 0.0;
+        private double _lastPitch = 0.0;
 
         public AxisDegrees ComputeOrientation(
             Dictionary<TelemetryFields, double> telemetry,
@@ -19,19 +20,86 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             double deltaSec
         )
         {
-            double pitch = CalculatePhysicsBasedPitch(telemetry, current, destination);
+            double targetPitch = CalculatePhysicsBasedPitch(telemetry, current, destination);
+            double smoothedPitch = ApplyAxisSmoothing(
+                targetPitch,
+                _lastPitch,
+                SimulationConstants.FlightPath.MAX_PITCH_RATE_DEG_PER_SEC,
+                deltaSec
+            );
+
             double currentYaw = telemetry.GetValueOrDefault(TelemetryFields.YawDeg, 0.0);
             double bearing = FlightPathMathHelper.CalculateBearing(current, destination);
-            double newYaw = CalculateNewYaw(currentYaw, bearing, deltaSec);
-            double roll = CalculatePhysicsBasedRoll(
+            double targetYaw = CalculateNewYaw(currentYaw, bearing, deltaSec);
+            double smoothedYaw = ApplyYawSmoothing(targetYaw, deltaSec);
+
+            double targetRoll = CalculatePhysicsBasedRoll(
                 telemetry,
                 current,
                 destination,
                 deltaSec,
-                newYaw
+                smoothedYaw
             );
-            _lastYaw = newYaw;
-            return new AxisDegrees(newYaw, pitch, roll);
+            double smoothedRoll = ApplyAxisSmoothing(
+                targetRoll,
+                _lastRoll,
+                SimulationConstants.FlightPath.MAX_ROLL_RATE_DEG_PER_SEC * SimulationConstants.FlightPath.ROLL_SMOOTHING_FACTOR,
+                deltaSec
+            );
+
+            _lastYaw = smoothedYaw;
+            _lastPitch = smoothedPitch;
+            _lastRoll = smoothedRoll;
+
+            return new AxisDegrees(smoothedYaw, smoothedPitch, smoothedRoll);
+        }
+
+        private double ApplyAxisSmoothing(double targetValue, double lastValue, double maxRate, double deltaSec)
+        {
+            double maxDelta = maxRate * deltaSec;
+            double diff = targetValue - lastValue;
+
+            if (Math.Abs(diff) <= SimulationConstants.Mathematical.EPSILON * 1000)
+            {
+                return lastValue;
+            }
+
+            if (Math.Abs(diff) <= maxDelta)
+            {
+                return targetValue;
+            }
+            else
+            {
+                return lastValue + Math.Sign(diff) * maxDelta;
+            }
+        }
+
+        private double ApplyYawSmoothing(double targetYaw, double deltaSec)
+        {
+            if (double.IsNaN(_lastYaw))
+            {
+                return targetYaw;
+            }
+
+            double maxYawRate = SimulationConstants.FlightPath.MAX_TURN_RATE_DEG_PER_SEC * SimulationConstants.FlightPath.YAW_SMOOTHING_FACTOR;
+            double maxYawDelta = maxYawRate * deltaSec;
+
+            double yawDiff = FlightPathMathHelper.CalculateAngleDifference(_lastYaw, targetYaw);
+
+            if (Math.Abs(yawDiff) <= SimulationConstants.FlightPath.MIN_RELEVENT_YAW)
+            {
+                return _lastYaw;
+            }
+
+            if (Math.Abs(yawDiff) <= maxYawDelta)
+            {
+                return targetYaw;
+            }
+            else
+            {
+                double newYaw = _lastYaw + Math.Sign(yawDiff) * maxYawDelta;
+                return newYaw.NormalizeAngle();
+            }
         }
 
         private double CalculatePhysicsBasedPitch(
@@ -148,6 +216,12 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             if (speedMps <= SimulationConstants.FlightPath.MIN_SPEED_MPS)
                 return 0.0;
 
+            double remainingDistance = FlightPathMathHelper.CalculateDistance(current, destination);
+            if (remainingDistance <= SimulationConstants.FlightPath.CLOSE_DISTANCE_M)
+            {
+                return 0.0;
+            }
+
             double targetRoll = 0.0;
             if (!double.IsNaN(_lastYaw))
             {
@@ -167,20 +241,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 targetRoll = CalculateCurveRoll(current, destination, newYaw, targetRoll);
             }
 
-            double maxRollRate = SimulationConstants.FlightPath.MAX_ROLL_RATE_DEG_PER_SEC;
-            double maxRollDelta = maxRollRate * deltaSec;
-            double rollDiff = targetRoll - _lastRoll;
-
-            if (Math.Abs(rollDiff) <= maxRollDelta)
-            {
-                _lastRoll = targetRoll;
-            }
-            else
-            {
-                _lastRoll += Math.Sign(rollDiff) * maxRollDelta;
-            }
-
-            return _lastRoll;
+            return targetRoll;
         }
 
         private double CalculateNewYaw(double currentYaw, double targetYaw, double deltaSec)

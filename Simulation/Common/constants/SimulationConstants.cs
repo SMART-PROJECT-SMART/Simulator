@@ -159,9 +159,12 @@
             public const double PITCH_REDUCTION_RATE = 0.3;
             public const double ALTITUDE_HOLD_THRESHOLD = 2.0;
             public const double ALTITUDE_HOLD_GAIN = 8.0;
-            public const double MISSION_COMPLETION_RADIUS_M = 10.0;
+            public const double MISSION_COMPLETION_RADIUS_M = 1.5;
             public const double ALTITUDE_HOLD_TIME_TO_TARGET_SEC = 0.5;
             public const int OVERHEAT = 300;
+            public const double YAW_SMOOTHING_FACTOR = 0.8;
+            public const double ROLL_SMOOTHING_FACTOR = 0.7;
+            public const double MAX_PITCH_RATE_DEG_PER_SEC = 5.0;
 
             public const string ABORT_REASON_FUEL_DEPLETION =
                 "FUEL DEPLETION - Critical fuel exhaustion";
@@ -247,6 +250,7 @@
             public const int NEAREST_SLEEVE_ID_BITS = 16;
             public const int CHECKSUM_BITS = 32;
             public const string TELEMETRY_DATA_TYPE = "Double";
+       
         }
 
         public static class Quartz
