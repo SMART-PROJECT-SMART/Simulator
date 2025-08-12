@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Net.Sockets;
+using Shared.Models.ICDModels;
 using Simulation.Common.constants;
-using Simulation.Models.ICDModels;
 using Simulation.Services.Helpers;
 
 namespace Simulation.Models.Channels

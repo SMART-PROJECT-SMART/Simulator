@@ -1,7 +1,8 @@
 ﻿using System.Collections;
+using Shared.Common.Enums;
+using Shared.Models.ICDModels;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
-using Simulation.Models.ICDModels;
 
 namespace Simulation.Services.Helpers
 {
