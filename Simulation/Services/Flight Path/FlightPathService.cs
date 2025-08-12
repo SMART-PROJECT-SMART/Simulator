@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using Microsoft.Extensions.Logging;
-using Simulation.Common.constants;
+﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
 using Simulation.Models.UAVs;
@@ -9,7 +6,6 @@ using Simulation.Services.Flight_Path.helpers;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
-using Simulation.Services.Helpers;
 
 namespace Simulation.Services.Flight_Path;
 

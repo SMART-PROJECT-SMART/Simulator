@@ -1,21 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
-using System.Threading.Channels;
-using Quartz;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
-using Simulation.Models.Channels;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
 using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.Helpers;
-using Simulation.Services.ICDDirectory;
 using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
-using Channel = Simulation.Models.Channels.Channel;
 
 namespace Simulation.Services.UAVManager
 {

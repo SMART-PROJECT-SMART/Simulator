@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Simulation.Common.Enums;
+﻿using Simulation.Common.Enums;
 using Simulation.Models.Channels;
 
 namespace Simulation.Models.UAVs.ArmedUav

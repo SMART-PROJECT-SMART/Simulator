@@ -1,6 +1,4 @@
-﻿// File: Extensions/ServiceCollectionExtensions.cs
-
-using Quartz;
+﻿using Quartz;
 using Simulation.Common.constants;
 using Simulation.Configuration;
 using Simulation.Services.Flight_Path;

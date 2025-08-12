@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Dto.FlightPath;
 using Simulation.Models;

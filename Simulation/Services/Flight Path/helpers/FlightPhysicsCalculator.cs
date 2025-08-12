@@ -1,6 +1,5 @@
 ﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
-using Simulation.Models;
 using Simulation.Services.helpers;
 
 namespace Simulation.Services.Flight_Path.helpers;

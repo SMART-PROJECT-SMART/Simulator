@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Simulation.Common.constants;
+﻿using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models.Channels;
 

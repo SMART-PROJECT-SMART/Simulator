@@ -1,8 +1,6 @@
-﻿using Simulation.Common.constants;
-using Simulation.Common.Enums;
+﻿using Simulation.Common.Enums;
 using Simulation.Models;
 using Simulation.Services.Flight_Path.helpers;
-using Simulation.Services.helpers;
 
 namespace Simulation.Services.Flight_Path.Motion_Calculator
 {
