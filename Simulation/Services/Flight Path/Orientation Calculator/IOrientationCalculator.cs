@@ -1,4 +1,5 @@
-﻿using Simulation.Common.Enums;
+﻿using Shared.Common.Enums;
+using Simulation.Common.Enums;
 using Simulation.Models;
 
 namespace Simulation.Services.Flight_Path.Orientation_Calculator

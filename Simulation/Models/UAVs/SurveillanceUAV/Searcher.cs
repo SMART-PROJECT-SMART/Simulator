@@ -1,4 +1,5 @@
-﻿using Simulation.Common.constants;
+﻿using Shared.Common.Enums;
+using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models.Channels;
 
