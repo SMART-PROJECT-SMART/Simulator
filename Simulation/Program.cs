@@ -8,7 +8,8 @@ builder.Services.AddFlightPathCalculators();
 builder.Services.AddFlightPathServices();
 builder.Services.AddQuartzServices();
 builder.Services.AddManagementServices();
-builder.Services.AddSharedServices();
+builder.Services.AddIcdDirectory();
+builder.Services.AddSharedConfiguration(builder.Configuration);
 
 var app = builder.Build();
 

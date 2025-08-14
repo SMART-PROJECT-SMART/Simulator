@@ -1,4 +1,6 @@
 ﻿using Quartz;
+using Shared.Common;
+using Shared.Configuration;
 using Simulation.Common.constants;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
@@ -12,6 +14,13 @@ namespace Simulation.Services
 {
     public static class ServiceCollectionExtensions
     {
+        public static IServiceCollection AddWebApi(this IServiceCollection services)
+        {
+            services.AddControllers();
+            services.AddOpenApi();
+            services.AddLogging();
+            return services;
+        }
         public static IServiceCollection AddFlightPathCalculators(this IServiceCollection services)
         {
             services.AddSingleton<IMotionCalculator, MotionCalculator>();
@@ -42,6 +51,11 @@ namespace Simulation.Services
         {
             services.AddSingleton<IUAVManager, UAVManager.UAVManager>();
             services.AddSingleton<IPortManager, PortManager.PortManager>();
+            return services;
+        }
+        public static IServiceCollection AddSharedConfiguration(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<ICDSettings>(config.GetSection(SimulationConstants.Config.ICD_DIRECTORY));
             return services;
         }
     }
