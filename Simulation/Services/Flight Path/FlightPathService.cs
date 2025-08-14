@@ -47,7 +47,7 @@ public class FlightPathService : IDisposable
         _uav = uav;
         _destination = destination;
         _cruiseAltitude = _uav.TelemetryData[TelemetryFields.CruiseAltitude];
-        _uav.TelemetryData[TelemetryFields.TailId] = _uav.TailId;
+        _uav.TelemetryData[TelemetryFields.TailId] = (double)_uav.TailId;
 
         var t = _uav.TelemetryData;
         t.TryGetValue(TelemetryFields.Latitude, out double lat);
