@@ -126,7 +126,7 @@ This simulation system models realistic UAV operations including:
 
 #### **Start a Mission**
 
-```json
+```jsonc
 POST /api/simulation/simulate
 {
   "UAV": {
@@ -148,7 +148,7 @@ POST /api/simulation/simulate
 
 #### **Switch Communication Ports**
 
-```json
+```jsonc
 POST /api/communication/switch-ports
 {
   "SourcePort": 8001,
@@ -158,7 +158,7 @@ POST /api/communication/switch-ports
 
 #### **Get System Status**
 
-```json
+```jsonc
 GET /api/simulation/status
 
 Response:
@@ -393,3 +393,4 @@ The system uses **Serilog** for comprehensive logging:
 ---
 
 **Built for advanced UAV simulation and research applications** 🚁✈️
+
