@@ -200,6 +200,13 @@
 
         public static class TelemetryCompression
         {
+            public const ulong IEEE754_SIGN_MASK = 0x8000000000000000UL;
+            public const ulong IEEE754_EXPONENT_MASK = 0x7FF0000000000000UL;
+            public const ulong IEEE754_MANTISSA_MASK = 0x000FFFFFFFFFFFFFUL;
+            public const int IEEE754_MANTISSA_BITS = 52;
+            public const int IEEE754_EXPONENT_BIAS = 1023;
+            public const int MAX_EXPONENT_BITS = 8;
+            public const int EXPONENT_BITS_DIVISOR = 4;
             public const int BITS_PER_BYTE = 8;
             public const int BIT_MASK_SINGLE = 1;
             public const int BYTE_MASK = 0xFF;

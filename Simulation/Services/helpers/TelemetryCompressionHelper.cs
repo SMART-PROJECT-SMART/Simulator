@@ -29,9 +29,7 @@ namespace Simulation.Services.Helpers
                     bool isNegative = telemetryValue < 0;
                     signBits[fieldIndex] = isNegative;
 
-                    byte[] doubleBytes = BitConverter.GetBytes(telemetryValue);
-                    ulong doubleBits = BitConverter.ToUInt64(doubleBytes, 0);
-                    valueInBits = doubleBits;
+                    valueInBits = ConvertToMeaningfulBits(Math.Abs(telemetryValue), bitLength);
                 }
                 else
                 {
@@ -47,10 +45,39 @@ namespace Simulation.Services.Helpers
             }
 
             BitArray compressedWithSigns = AppendSignBits(compressed, signBits);
-
             uint checksum = CalculateChecksum(compressedWithSigns);
             return AppendChecksum(compressedWithSigns, checksum);
         }
+
+        private static ulong ConvertToMeaningfulBits(double value, int bitLength)
+        {
+            if (value == 0.0) return 0;
+
+            byte[] doubleBytes = BitConverter.GetBytes(value);
+            ulong doubleBits = BitConverter.ToUInt64(doubleBytes, 0);
+
+            bool sign = (doubleBits & SimulationConstants.TelemetryCompression.IEEE754_SIGN_MASK) != 0;
+            int exponent = (int)((doubleBits & SimulationConstants.TelemetryCompression.IEEE754_EXPONENT_MASK) >> SimulationConstants.TelemetryCompression.IEEE754_MANTISSA_BITS) - SimulationConstants.TelemetryCompression.IEEE754_EXPONENT_BIAS;
+            ulong mantissa = doubleBits & SimulationConstants.TelemetryCompression.IEEE754_MANTISSA_MASK;
+
+            double significand = 1.0 + (double)mantissa / (1UL << SimulationConstants.TelemetryCompression.IEEE754_MANTISSA_BITS);
+
+            double actualValue = significand * Math.Pow(2, exponent);
+
+            int exponentBits = Math.Min(SimulationConstants.TelemetryCompression.MAX_EXPONENT_BITS, bitLength / SimulationConstants.TelemetryCompression.EXPONENT_BITS_DIVISOR);
+            int significandBits = bitLength - exponentBits;
+
+            int ourBias = (1 << (exponentBits - 1)) - 1;
+            int storedExponent = Math.Max(0, Math.Min((1 << exponentBits) - 1, exponent + ourBias));
+
+            ulong storedSignificand = (ulong)Math.Min(
+                (1UL << significandBits) - 1,
+                (significand - 1.0) * (1UL << significandBits)
+            );
+
+            return ((ulong)storedExponent << significandBits) | storedSignificand;
+        }
+
 
         private static BitArray AppendSignBits(BitArray data, BitArray signBits)
         {

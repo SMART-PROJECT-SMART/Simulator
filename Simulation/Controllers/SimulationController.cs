@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shared.Common.Enums;
-using Shared.Services.ICDDirectory;
+using Shared.Services.ICDsDirectory;
 using Simulation.Common.Enums;
 using Simulation.Dto.FlightPath;
 using Simulation.Models;
@@ -96,7 +96,7 @@ namespace Simulation.Controllers
         [HttpGet("run")]
         public async Task<IActionResult> Run()
         {
-            var startLocation = new Location(40.6413, -73.7781, 10.0);
+            var startLocation = new Location(40.6413, -73.7781, 100.0);
             var uav = new Searcher(tailId: 1, startLocation: startLocation);
             uav.Channels = new List<Channel>();
             int portNumber = 8000;
@@ -106,7 +106,7 @@ namespace Simulation.Controllers
                 portNumber++;
             }
             uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
-            var destination = new Location(40.6460, -73.77850, 100.0);
+            var destination = new Location(40.6460, -73.77850, 10.0);
             var request = new SimulateDto(uav, destination);
 
             return await CalculateFlightPath(request);
