@@ -1,6 +1,6 @@
 ﻿using Quartz;
-using Shared.Common;
-using Shared.Configuration;
+using Core.Common;
+using Core.Configuration;
 using Simulation.Common.constants;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;

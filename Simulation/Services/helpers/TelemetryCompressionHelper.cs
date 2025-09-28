@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using Shared.Common.Enums;
-using Shared.Models.ICDModels;
+using Core.Common.Enums;
+using Core.Models.ICDModels;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 

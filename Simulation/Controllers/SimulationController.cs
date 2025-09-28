@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Shared.Common.Enums;
-using Shared.Services.ICDsDirectory;
+using Core.Common.Enums;
+using Core.Services.ICDsDirectory;
 using Simulation.Common.Enums;
 using Simulation.Dto.FlightPath;
 using Simulation.Models;

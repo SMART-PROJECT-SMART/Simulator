@@ -1,4 +1,4 @@
-using Shared.Services;
+using Core.Services;
 using Simulation.Services;
 
 var builder = WebApplication.CreateBuilder(args);
