@@ -18,6 +18,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
         )
             : base(startLocation, tailId, fuelAmount, properties, channels)
         {
+            TelemetryData[TelemetryFields.UAVTypeValue] = (double)UAVType.Surveillance;
             TelemetryData[TelemetryFields.DataStorageUsedGB] = 0.0;
 
             properties[UAVProperties.DataStorageCapacityGB] = dataStorageCapacityGB;
