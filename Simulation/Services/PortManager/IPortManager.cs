@@ -9,5 +9,6 @@ namespace Simulation.Services.PortManager
         public void AssignPort(Channel channel, int portNumber);
         public void RemovePort(int portNumber);
         public void ClearPorts();
+        public IEnumerable<int> AllocatePorts(int count);
     }
 }
