@@ -26,8 +26,11 @@ namespace Simulation.Controllers
         [HttpPost("simulate")]
         public async Task<IActionResult> CalculateFlightPath([FromBody] SimulateDto dto)
         {
-            _uavManager.AddUAV(dto.UAV);
-            var success = await _uavManager.StartMission(dto.UAV, dto.Destination, dto.MissionId);
+            Location startLocation = new Location(40.6413, -73.7781, 100.0);
+            Searcher uav = new Searcher(tailId: dto.TailId, startLocation: startLocation);
+            uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
+
+            bool success = await _uavManager.StartMission(uav, dto.Destination, dto.MissionId);
             return success
                 ? Ok("Mission started successfully")
                 : BadRequest("Mission failed to start");
@@ -96,18 +99,8 @@ namespace Simulation.Controllers
         [HttpGet("run")]
         public async Task<IActionResult> Run()
         {
-            var startLocation = new Location(40.6413, -73.7781, 100.0);
-            var uav = new Searcher(tailId: 1, startLocation: startLocation);
-            uav.Channels = new List<Channel>();
-            int portNumber = 8000;
-            foreach (var icd in _ICDDirectory.GetAllICDs())
-            {
-                uav.Channels.Add(new Channel(uav.TailId, portNumber, icd));
-                portNumber++;
-            }
-            uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
-            var destination = new Location(40.6460, -73.77850, 10.0);
-            var request = new SimulateDto(uav, destination);
+            Location destination = new Location(40.6460, -73.77850, 10.0);
+            SimulateDto request = new SimulateDto(tailId: 1, destination, missionId: "test-mission-1");
 
             return await CalculateFlightPath(request);
         }
@@ -115,33 +108,14 @@ namespace Simulation.Controllers
         [HttpGet("run-multi")]
         public async Task<IActionResult> RunMultipleUAVs()
         {
-            var uav1StartLocation = new Location(40.6413, -73.7781, 10.0);
-            var uav1 = new Searcher(tailId: 1, startLocation: uav1StartLocation);
-            uav1.Channels = new List<Channel>();
-            uav1.TelemetryData[TelemetryFields.YawDeg] = 270.0;
-            var uav1Destination = new Location(40.6450, -73.7750, 120.0);
+            Location uav1Destination = new Location(40.6450, -73.7750, 120.0);
+            Location uav2Destination = new Location(40.6480, -73.7720, 150.0);
 
-            var uav2StartLocation = new Location(40.6400, -73.7800, 15.0);
-            var uav2 = new Searcher(tailId: 2, startLocation: uav2StartLocation);
-            uav2.Channels = new List<Channel>();
-            uav2.TelemetryData[TelemetryFields.YawDeg] = 90.0;
-            var uav2Destination = new Location(40.6480, -73.7720, 150.0);
+            SimulateDto request1 = new SimulateDto(tailId: 1, uav1Destination, missionId: "test-mission-1");
+            SimulateDto request2 = new SimulateDto(tailId: 2, uav2Destination, missionId: "test-mission-2");
 
-            int portNumber = 8000;
-            foreach (var icd in _ICDDirectory.GetAllICDs())
-            {
-                uav1.Channels.Add(new Channel(uav1.TailId, portNumber, icd));
-                uav2.Channels.Add(
-                    new Channel(uav1.TailId, portNumber + _ICDDirectory.GetAllICDs().Count, icd)
-                );
-                portNumber++;
-            }
-
-            var request1 = new SimulateDto(uav1, uav1Destination);
-            var request2 = new SimulateDto(uav2, uav2Destination);
-
-            var task1 = CalculateFlightPath(request1);
-            var task2 = CalculateFlightPath(request2);
+            Task<IActionResult> task1 = CalculateFlightPath(request1);
+            Task<IActionResult> task2 = CalculateFlightPath(request2);
 
             await Task.WhenAll(task1, task2);
 
