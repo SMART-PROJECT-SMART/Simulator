@@ -4,6 +4,7 @@ using Simulation.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddWebApi();
+builder.Services.AddHttpClients(builder.Configuration);
 builder.Services.AddFlightPathCalculators();
 builder.Services.AddFlightPathServices();
 builder.Services.AddQuartzServices();

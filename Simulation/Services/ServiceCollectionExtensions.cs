@@ -8,6 +8,7 @@ using Simulation.Services.Flight_Path.Orientation_Calculator;
 using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
+using Simulation.Services.TelemetryDeviceClient;
 using Simulation.Services.UAVManager;
 
 namespace Simulation.Services
@@ -19,6 +20,27 @@ namespace Simulation.Services
             services.AddControllers();
             services.AddOpenApi();
             services.AddLogging();
+            return services;
+        }
+
+        public static IServiceCollection AddHttpClients(
+            this IServiceCollection services,
+            IConfiguration configuration
+        )
+        {
+            string telemetryDeviceBaseUrl = configuration[
+                $"{SimulationConstants.Config.TELEMETRY_DEVICE_SECTION}:BaseUrl"
+            ];
+
+            services
+                .AddHttpClient(
+                    SimulationConstants.HttpClients.TELEMETRY_DEVICE_HTTP_CLIENT,
+                    client =>
+                    {
+                        client.BaseAddress = new Uri(telemetryDeviceBaseUrl);
+                    }
+                );
+
             return services;
         }
         public static IServiceCollection AddFlightPathCalculators(this IServiceCollection services)
@@ -51,6 +73,7 @@ namespace Simulation.Services
         {
             services.AddSingleton<IUAVManager, UAVManager.UAVManager>();
             services.AddSingleton<IPortManager, PortManager.PortManager>();
+            services.AddSingleton<ITelemetryDeviceClient, TelemetryDeviceClient.TelemetryDeviceClient>();
             return services;
         }
         public static IServiceCollection AddSharedConfiguration(this IServiceCollection services, IConfiguration config)
