@@ -283,6 +283,17 @@
         {
             public const string ICD_DIRECTORY = "ICD";
             public const string JSON_SEARCH_PATTERN = "*.json";
+            public const string TELEMETRY_DEVICE_SECTION = "TelemetryDevice";
+        }
+
+        public static class HttpClients
+        {
+            public const string TELEMETRY_DEVICE_HTTP_CLIENT = "TelemetryDeviceHttpClient";
+        }
+
+        public static class TelemetryDeviceApiEndpoints
+        {
+            public const string ADD_TELEMETRY_DEVICE = "api/telemetry-device/add-telemetry-device";
         }
     }
 }
