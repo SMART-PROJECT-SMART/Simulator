@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using Core.Common.Enums;
+using Core.Models.ICDModels;
 using Core.Services.ICDsDirectory;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
@@ -134,20 +135,20 @@ namespace Simulation.Services.UAVManager
 
         private async Task SetupUAVChannelsAndTelemetryDeviceAsync(UAV uav)
         {
-            IEnumerable<ICD.ICD> icds = _icdDirectory.GetAllICDs();
+            IEnumerable<ICD> icds = _icdDirectory.GetAllICDs();
             int channelCount = icds.Count();
             IEnumerable<int> allocatedPorts = _portManager.AllocatePorts(channelCount);
 
             uav.Channels = new List<Channel>();
             int portIndex = 0;
-            foreach (ICD.ICD icd in icds)
+            foreach (ICD icd in icds)
             {
                 int portNumber = allocatedPorts.ElementAt(portIndex);
                 uav.Channels.Add(new Channel(uav.TailId, portNumber, icd));
                 portIndex++;
             }
 
-            Location fixedLocation = new Location(0.0, 0.0);
+            Location fixedLocation = new Location(0.0, 0.0, 0.0);
             bool telemetryDeviceCreated = await _telemetryDeviceClient.CreateTelemetryDeviceAsync(
                 uav.TailId,
                 allocatedPorts,
@@ -156,10 +157,7 @@ namespace Simulation.Services.UAVManager
 
             if (!telemetryDeviceCreated)
             {
-                _logger.LogError(
-                    "Failed to create telemetry device for UAV {TailId}",
-                    uav.TailId
-                );
+                _logger.LogError("Failed to create telemetry device for UAV {TailId}", uav.TailId);
                 throw new InvalidOperationException(
                     $"Failed to create telemetry device for UAV {uav.TailId}"
                 );
