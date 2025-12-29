@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using Core.Common.Enums;
+using Core.Services.ICDsDirectory;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
+using Simulation.Models.Channels;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
@@ -12,6 +14,7 @@ using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.Helpers;
 using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
+using Simulation.Services.TelemetryDeviceClient;
 
 namespace Simulation.Services.UAVManager
 {
@@ -24,6 +27,8 @@ namespace Simulation.Services.UAVManager
         private readonly ILogger<FlightPathService> _logger;
         private readonly IQuartzFlightJobManager _quartzFlightJobManager;
         private readonly IPortManager _portManager;
+        private readonly ITelemetryDeviceClient _telemetryDeviceClient;
+        private readonly IICDDirectory _icdDirectory;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
@@ -31,7 +36,9 @@ namespace Simulation.Services.UAVManager
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
             IQuartzFlightJobManager quartzFlightJobManager,
-            IPortManager portManager
+            IPortManager portManager,
+            ITelemetryDeviceClient telemetryDeviceClient,
+            IICDDirectory icdDirectory
         )
         {
             _uavMissionContexts = new ConcurrentDictionary<int, UAVMissionContext>();
@@ -41,6 +48,8 @@ namespace Simulation.Services.UAVManager
             _logger = logger;
             _quartzFlightJobManager = quartzFlightJobManager;
             _portManager = portManager;
+            _telemetryDeviceClient = telemetryDeviceClient;
+            _icdDirectory = icdDirectory;
         }
 
         public void AddUAV(UAV uav)
@@ -87,6 +96,12 @@ namespace Simulation.Services.UAVManager
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
         {
             uav.CurrentMissionId = missionId;
+
+            if (uav.Channels == null || !uav.Channels.Any())
+            {
+                await SetupUAVChannelsAndTelemetryDeviceAsync(uav);
+            }
+
             if (!_uavMissionContexts.ContainsKey(uav.TailId))
             {
                 AddUAV(uav);
@@ -115,6 +130,40 @@ namespace Simulation.Services.UAVManager
                 RemoveUAV(uav);
             };
             return true;
+        }
+
+        private async Task SetupUAVChannelsAndTelemetryDeviceAsync(UAV uav)
+        {
+            IEnumerable<ICD.ICD> icds = _icdDirectory.GetAllICDs();
+            int channelCount = icds.Count();
+            IEnumerable<int> allocatedPorts = _portManager.AllocatePorts(channelCount);
+
+            uav.Channels = new List<Channel>();
+            int portIndex = 0;
+            foreach (ICD.ICD icd in icds)
+            {
+                int portNumber = allocatedPorts.ElementAt(portIndex);
+                uav.Channels.Add(new Channel(uav.TailId, portNumber, icd));
+                portIndex++;
+            }
+
+            Location fixedLocation = new Location(0.0, 0.0);
+            bool telemetryDeviceCreated = await _telemetryDeviceClient.CreateTelemetryDeviceAsync(
+                uav.TailId,
+                allocatedPorts,
+                fixedLocation
+            );
+
+            if (!telemetryDeviceCreated)
+            {
+                _logger.LogError(
+                    "Failed to create telemetry device for UAV {TailId}",
+                    uav.TailId
+                );
+                throw new InvalidOperationException(
+                    $"Failed to create telemetry device for UAV {uav.TailId}"
+                );
+            }
         }
 
         private void RemoveUAV(UAV uav)
