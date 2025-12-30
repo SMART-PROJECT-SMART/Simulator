@@ -126,7 +126,6 @@ namespace Simulation.Services.UAVManager
 
             if (!jobScheduled)
             {
-                _logger.LogError("Failed to schedule flight path job for UAV {TailId}", uav.TailId);
                 return false;
             }
 
@@ -166,7 +165,6 @@ namespace Simulation.Services.UAVManager
 
             if (!telemetryDeviceCreated)
             {
-                _logger.LogError("Failed to create telemetry device for UAV {TailId}", uav.TailId);
                 throw new InvalidOperationException(
                     $"Failed to create telemetry device for UAV {uav.TailId}"
                 );
