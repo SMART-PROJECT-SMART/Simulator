@@ -293,7 +293,7 @@
 
         public static class TelemetryDeviceApiEndpoints
         {
-            public const string ADD_TELEMETRY_DEVICE = "api/telemetry-device/add-telemetry-device";
+            public const string ADD_TELEMETRY_DEVICE = "api/TelemetryDevice/add-telemetry-device";
         }
     }
 }

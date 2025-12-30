@@ -66,9 +66,16 @@ namespace Simulation.Services.UAVManager
                 SendTelemetryToChannels(uav.TailId, telemetry);
 
             _uavMissionContexts.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
-            foreach (var channel in uav.Channels)
+
+            if (uav.Channels != null && uav.Channels.Any())
             {
-                _portManager.AssignPort(channel, channel.PortNumber);
+                foreach (var channel in uav.Channels)
+                {
+                    if (!_portManager.IsUsed(channel.PortNumber))
+                    {
+                        _portManager.AssignPort(channel, channel.PortNumber);
+                    }
+                }
             }
         }
 
@@ -144,7 +151,9 @@ namespace Simulation.Services.UAVManager
             foreach (ICD icd in icds)
             {
                 int portNumber = allocatedPorts.ElementAt(portIndex);
-                uav.Channels.Add(new Channel(uav.TailId, portNumber, icd));
+                Channel channel = new Channel(uav.TailId, portNumber, icd);
+                uav.Channels.Add(channel);
+                _portManager.AssignPort(channel, portNumber);
                 portIndex++;
             }
 
