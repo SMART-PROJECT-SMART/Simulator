@@ -16,6 +16,7 @@ using Simulation.Services.Helpers;
 using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
 using Simulation.Services.TelemetryDeviceClient;
+using Simulation.Services.MissionServiceClient;
 
 namespace Simulation.Services.UAVManager
 {
@@ -29,6 +30,7 @@ namespace Simulation.Services.UAVManager
         private readonly IQuartzFlightJobManager _quartzFlightJobManager;
         private readonly IPortManager _portManager;
         private readonly ITelemetryDeviceClient _telemetryDeviceClient;
+        private readonly IMissionServiceClient _missionServiceClient;
         private readonly IICDDirectory _icdDirectory;
 
         public UAVManager(
@@ -39,6 +41,7 @@ namespace Simulation.Services.UAVManager
             IQuartzFlightJobManager quartzFlightJobManager,
             IPortManager portManager,
             ITelemetryDeviceClient telemetryDeviceClient,
+            IMissionServiceClient missionServiceClient,
             IICDDirectory icdDirectory
         )
         {
@@ -50,6 +53,7 @@ namespace Simulation.Services.UAVManager
             _quartzFlightJobManager = quartzFlightJobManager;
             _portManager = portManager;
             _telemetryDeviceClient = telemetryDeviceClient;
+            _missionServiceClient = missionServiceClient;
             _icdDirectory = icdDirectory;
         }
 
@@ -132,6 +136,7 @@ namespace Simulation.Services.UAVManager
             context.Service.MissionCompleted += async () =>
             {
                 await _quartzFlightJobManager.DeleteUAVFlightPathJob(uav.TailId);
+                await _missionServiceClient.NotifyMissionCompletedAsync(uav.TailId);
                 uav.CurrentMissionId = string.Empty;
                 context.Service.Dispose();
                 RemoveUAV(uav);

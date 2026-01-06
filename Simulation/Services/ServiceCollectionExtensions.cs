@@ -9,6 +9,7 @@ using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
 using Simulation.Services.TelemetryDeviceClient;
+using Simulation.Services.MissionServiceClient;
 using Simulation.Services.UAVManager;
 
 namespace Simulation.Services
@@ -38,6 +39,19 @@ namespace Simulation.Services
                     client =>
                     {
                         client.BaseAddress = new Uri(telemetryDeviceBaseUrl);
+                    }
+                );
+
+            string missionServiceBaseUrl = configuration[
+                $"{SimulationConstants.Config.MISSION_SERVICE_SECTION}:BaseUrl"
+            ];
+
+            services
+                .AddHttpClient(
+                    SimulationConstants.HttpClients.MISSION_SERVICE_HTTP_CLIENT,
+                    client =>
+                    {
+                        client.BaseAddress = new Uri(missionServiceBaseUrl);
                     }
                 );
 
@@ -74,6 +88,7 @@ namespace Simulation.Services
             services.AddSingleton<IUAVManager, UAVManager.UAVManager>();
             services.AddSingleton<IPortManager, PortManager.PortManager>();
             services.AddSingleton<ITelemetryDeviceClient, TelemetryDeviceClient.TelemetryDeviceClient>();
+            services.AddSingleton<IMissionServiceClient, MissionServiceClient.MissionServiceClient>();
             return services;
         }
         public static IServiceCollection AddSharedConfiguration(this IServiceCollection services, IConfiguration config)
