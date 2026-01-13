@@ -100,10 +100,15 @@ namespace Simulation.Controllers
         [HttpGet("run")]
         public async Task<IActionResult> Run()
         {
-            Location destination = new Location(40.6460, -73.77850, 10.0);
-            SimulateDto request = new SimulateDto(tailId: 1, destination, missionId: "test-mission-1");
-
-            return await CalculateFlightPath(request);
+            Location startLocation = new Location(32.8000, 34.9900, 500.0);
+            Location destination = new Location(31.8300, 34.9700, 1000.0);
+            SimulateDto request = new SimulateDto(tailId: 2, destination, missionId: "armed-mission-converge");
+            Searcher uav = new Searcher(tailId: 2, startLocation: startLocation);
+            uav.TelemetryData[TelemetryFields.YawDeg] = 180.0;
+            bool success = await _uavManager.StartMission(uav, destination, "armed-mission-converge");
+            return success
+                ? Ok("UAV 2 started successfully (same as run-multi)")
+                : BadRequest("Mission failed to start");
         }
 
         [HttpGet("run-multi")]

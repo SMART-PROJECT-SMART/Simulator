@@ -14,8 +14,6 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
         private readonly RollCalculator _rollCalculator;
         private readonly AxisSmoothingHelper _smoothingHelper;
 
-        private double _lastRoll = 0.0;
-        private double _lastPitch = 0.0;
 
         public OrientationCalculator()
         {
@@ -36,9 +34,6 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
             double smoothedPitch = CalculateAndSmoothPitch(telemetry, current, destination, deltaSec);
             double smoothedYaw = CalculateAndSmoothYaw(telemetry, current, destination, deltaSec);
             double smoothedRoll = CalculateAndSmoothRoll(telemetry, current, destination, deltaSec, smoothedYaw);
-
-            UpdateLastValues(smoothedYaw, smoothedPitch, smoothedRoll);
-
             return new AxisDegrees(smoothedYaw, smoothedPitch, smoothedRoll);
         }
 
@@ -50,12 +45,7 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
         )
         {
             double targetPitch = _pitchCalculator.CalculatePhysicsBasedPitch(telemetry, current, destination);
-            return _smoothingHelper.ApplyAxisSmoothing(
-                targetPitch,
-                _lastPitch,
-                SimulationConstants.FlightPath.MAX_PITCH_RATE_DEG_PER_SEC,
-                deltaSec
-            );
+            return targetPitch;
         }
 
         private double CalculateAndSmoothYaw(
@@ -87,19 +77,12 @@ namespace Simulation.Services.Flight_Path.Orientation_Calculator
                 newYaw, 
                 _yawCalculator.GetLastYaw()
             );
-            return _smoothingHelper.ApplyAxisSmoothing(
-                targetRoll,
-                _lastRoll,
-                SimulationConstants.FlightPath.MAX_ROLL_RATE_DEG_PER_SEC * SimulationConstants.FlightPath.ROLL_SMOOTHING_FACTOR,
-                deltaSec
-            );
+            return targetRoll;
         }
 
         private void UpdateLastValues(double yaw, double pitch, double roll)
         {
             _yawCalculator.UpdateLastYaw(yaw);
-            _lastPitch = pitch;
-            _lastRoll = roll;
         }
     }
 }
