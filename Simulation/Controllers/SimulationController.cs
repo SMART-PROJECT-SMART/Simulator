@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿    using Microsoft.AspNetCore.Mvc;
 using Core.Common.Enums;
 using Core.Services.ICDsDirectory;
 using Simulation.Common.Enums;
@@ -6,6 +6,7 @@ using Simulation.Dto.FlightPath;
 using Simulation.Models;
 using Simulation.Models.Channels;
 using Simulation.Models.UAVs.SurveillanceUAV;
+using Simulation.Models.UAVs.ArmedUav;
 using Simulation.Services.UAVManager;
 
 namespace Simulation.Controllers
@@ -108,18 +109,29 @@ namespace Simulation.Controllers
         [HttpGet("run-multi")]
         public async Task<IActionResult> RunMultipleUAVs()
         {
-            Location uav1Destination = new Location(40.6450, -73.7750, 120.0);
-            Location uav2Destination = new Location(40.6480, -73.7720, 150.0);
+            Location armedStart = new Location(32.8000, 34.9900, 500.0);
 
-            SimulateDto request1 = new SimulateDto(tailId: 1, uav1Destination, missionId: "test-mission-1");
-            SimulateDto request2 = new SimulateDto(tailId: 2, uav2Destination, missionId: "test-mission-2");
+            Location surveillanceStart = new Location(31.2500, 34.8000, 500.0);
 
-            Task<IActionResult> task1 = CalculateFlightPath(request1);
-            Task<IActionResult> task2 = CalculateFlightPath(request2);
+            Location armedDestination = new Location(31.8300, 34.9700, 1000.0);
 
-            await Task.WhenAll(task1, task2);
+            Location surveillanceDestination = new Location(31.8305, 34.9705, 1000.0);
 
-            return Ok("Both UAVs started successfully");
+            HeronTp armedUav = new HeronTp(tailId: 2, startLocation: armedStart);
+            armedUav.TelemetryData[TelemetryFields.YawDeg] = 180.0;
+
+            Searcher surveillanceUav = new Searcher(tailId: 3, startLocation: surveillanceStart);
+            surveillanceUav.TelemetryData[TelemetryFields.YawDeg] = 0.0;
+
+            Task<bool> armedMissionTask = _uavManager.StartMission(armedUav, armedDestination, "armed-mission-converge");
+            Task<bool> surveillanceMissionTask = _uavManager.StartMission(surveillanceUav, surveillanceDestination, "surveillance-mission-converge");
+
+            bool[] results = await Task.WhenAll(armedMissionTask, surveillanceMissionTask);
+
+            bool bothSuccessful = results[0] && results[1];
+            return bothSuccessful
+                ? Ok("Both UAVs started successfully and are converging.")
+                : BadRequest("One or more missions failed to start");
         }
     }
 }
