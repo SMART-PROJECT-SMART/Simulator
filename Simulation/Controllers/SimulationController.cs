@@ -1,4 +1,4 @@
-﻿    using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Core.Common.Enums;
 using Core.Services.ICDsDirectory;
 using Simulation.Common.Enums;
@@ -136,6 +136,31 @@ namespace Simulation.Controllers
             bool bothSuccessful = results[0] && results[1];
             return bothSuccessful
                 ? Ok("Both UAVs started successfully and are converging.")
+                : BadRequest("One or more missions failed to start");
+        }
+
+        [HttpGet("run-20")]
+        public async Task<IActionResult> RunTwentyUAVs()
+        {
+            Location destination = new Location(31.8300, 34.9700, 1000.0);
+            List<Task<bool>> tasks = new List<Task<bool>>();
+            double baseLat = 32.8000;
+            double baseLon = 34.9900;
+            double latStep = -0.05;
+            double lonStep = -0.01;
+            for (int i = 4; i <= 24; i++)
+            {
+                double startLat = baseLat + (i - 4) * latStep;
+                double startLon = baseLon + (i - 4) * lonStep;
+                Location startLocation = new Location(startLat, startLon, 500.0);
+                Searcher uav = new Searcher(tailId: i, startLocation: startLocation);
+                uav.TelemetryData[TelemetryFields.YawDeg] = 180.0;
+                tasks.Add(_uavManager.StartMission(uav, destination, $"multi-mission-{i}"));
+            }
+            bool[] results = await Task.WhenAll(tasks);
+            bool allSuccessful = results.All(x => x);
+            return allSuccessful
+                ? Ok("All 20 UAVs started successfully and are converging.")
                 : BadRequest("One or more missions failed to start");
         }
     }
