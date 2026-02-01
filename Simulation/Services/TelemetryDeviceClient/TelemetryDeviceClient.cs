@@ -1,3 +1,4 @@
+using Core.Models;
 using Simulation.Common.constants;
 using Simulation.Dto.TelemetryDevice;
 using Simulation.Models;

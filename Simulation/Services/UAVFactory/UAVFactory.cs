@@ -1,3 +1,4 @@
+using Core.Models;
 using Core.Common.Enums;
 using Simulation.Dto.DeviceManager;
 using Simulation.Models;

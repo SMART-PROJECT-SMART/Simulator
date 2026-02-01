@@ -14,6 +14,7 @@ using Simulation.Services.UAVManager;
 using Simulation.Services.DeviceManagerClient;
 using Simulation.Services.UAVStorage;
 using Simulation.Services.UAVChangeHandlers;
+using Simulation.Services.UAVFactory;
 
 namespace Simulation.Services
 {
@@ -120,6 +121,7 @@ namespace Simulation.Services
             services.AddSingleton<IUAVStorageService>(sp => sp.GetRequiredService<UAVStorageService>());
             services.AddHostedService(sp => sp.GetRequiredService<UAVStorageService>());
             services.AddSingleton<IUAVChangeHandlerFactory, UAVChangeHandlerFactory>();
+            services.AddSingleton<IUAVFactory, UAVFactory.UAVFactory>();
             return services;
         }
     }
