@@ -39,6 +39,7 @@ namespace Simulation.Models.UAVs.ArmedUav
             TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
                 .HeronTP_Constants
                 .ThrustAfterInfluence;
+            TelemetryData[TelemetryFields.PlatformType] = (double)PlatformType.HeronTP;
 
             WeaponAmmo[WeaponType.Hellfire] = (int)
                 SimulationConstants.HeronTP_Constants.HellfireAmmo;

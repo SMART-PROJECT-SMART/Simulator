@@ -53,6 +53,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
                 .Hermes450_Constants
                 .ThrustAfterInfluence;
+            TelemetryData[TelemetryFields.PlatformType] = (double)PlatformType.Hermes450;
 
             SensorStatus[SensorType.ElectroOptical] = true;
             SensorStatus[SensorType.InfraredImaging] = true;

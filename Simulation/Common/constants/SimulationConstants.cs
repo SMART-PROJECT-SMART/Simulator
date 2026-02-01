@@ -285,12 +285,14 @@
             public const string JSON_SEARCH_PATTERN = "*.json";
             public const string TELEMETRY_DEVICE_SECTION = "TelemetryDevice";
             public const string MISSION_SERVICE_SECTION = "MissionService";
+            public const string DEVICE_MANAGER_SECTION = "DeviceManager";
         }
 
         public static class HttpClients
         {
             public const string TELEMETRY_DEVICE_HTTP_CLIENT = "TelemetryDeviceHttpClient";
             public const string MISSION_SERVICE_HTTP_CLIENT = "MissionServiceHttpClient";
+            public const string DEVICE_MANAGER_HTTP_CLIENT = "DeviceManagerHttpClient";
         }
 
         public static class TelemetryDeviceApiEndpoints
@@ -301,6 +303,12 @@
         public static class MissionServiceApiEndpoints
         {
             public const string MISSION_COMPLETED = "mission-completed";
+        }
+
+        public static class DeviceManagerApiEndpoints
+        {
+            public const string GET_ALL_UAVS = "api/uav";
+            public const string GET_UAV_BY_TAIL_ID = "api/uav/{0}";
         }
     }
 }

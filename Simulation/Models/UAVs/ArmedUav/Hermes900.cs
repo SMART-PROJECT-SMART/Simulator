@@ -39,6 +39,7 @@ namespace Simulation.Models.UAVs.ArmedUav
             TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
                 .Hermes900_Constants
                 .ThrustAfterInfluence;
+            TelemetryData[TelemetryFields.PlatformType] = (double)PlatformType.Hermes900;
 
             WeaponAmmo[WeaponType.Hellfire] = (int)
                 SimulationConstants.Hermes900_Constants.HellfireAmmo;
