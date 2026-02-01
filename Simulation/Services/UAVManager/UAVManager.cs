@@ -18,6 +18,7 @@ using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
 using Simulation.Services.TelemetryDeviceClient;
 using Simulation.Services.MissionServiceClient;
+using Simulation.Services.DeviceManagerClient;
 
 namespace Simulation.Services.UAVManager
 {
@@ -33,6 +34,7 @@ namespace Simulation.Services.UAVManager
         private readonly ITelemetryDeviceClient _telemetryDeviceClient;
         private readonly IMissionServiceClient _missionServiceClient;
         private readonly IICDDirectory _icdDirectory;
+        private readonly IDeviceManagerClient _deviceManagerClient;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
@@ -43,7 +45,8 @@ namespace Simulation.Services.UAVManager
             IPortManager portManager,
             ITelemetryDeviceClient telemetryDeviceClient,
             IMissionServiceClient missionServiceClient,
-            IICDDirectory icdDirectory
+            IICDDirectory icdDirectory,
+            IDeviceManagerClient deviceManagerClient
         )
         {
             _uavMissionContexts = new ConcurrentDictionary<int, UAVMissionContext>();
@@ -56,6 +59,7 @@ namespace Simulation.Services.UAVManager
             _telemetryDeviceClient = telemetryDeviceClient;
             _missionServiceClient = missionServiceClient;
             _icdDirectory = icdDirectory;
+            _deviceManagerClient = deviceManagerClient;
         }
 
         public void AddUAV(UAV uav)
@@ -138,6 +142,7 @@ namespace Simulation.Services.UAVManager
             {
                 await _quartzFlightJobManager.DeleteUAVFlightPathJob(uav.TailId);
                 await _missionServiceClient.NotifyMissionCompletedAsync(uav.TailId);
+                await _deviceManagerClient.ReleaseSleeveByTailIdAsync(uav.TailId);
                 uav.CurrentMissionId = string.Empty;
                 context.Service.Dispose();
                 RemoveUAV(uav);
@@ -149,13 +154,25 @@ namespace Simulation.Services.UAVManager
         {
             IEnumerable<ICD> icds = _icdDirectory.GetAllICDs();
             int channelCount = icds.Count();
-            IEnumerable<int> allocatedPorts = _portManager.AllocatePorts(channelCount);
+
+            IEnumerable<int> sleevePortsEnumerable = await _deviceManagerClient.GetAvailableSleeveForUAVAsync(uav.TailId);
+            List<int> sleevePorts = sleevePortsEnumerable.ToList();
+
+            if (!sleevePorts.Any())
+            {
+                throw new InvalidOperationException($"No available sleeve found for UAV {uav.TailId}");
+            }
 
             uav.Channels = new List<Channel>();
             int portIndex = 0;
             foreach (ICD icd in icds)
             {
-                int portNumber = allocatedPorts.ElementAt(portIndex);
+                if (portIndex >= sleevePorts.Count)
+                {
+                    break;
+                }
+
+                int portNumber = sleevePorts[portIndex];
                 Channel channel = new Channel(uav.TailId, portNumber, icd);
                 uav.Channels.Add(channel);
                 _portManager.AssignPort(channel, portNumber);
@@ -165,7 +182,7 @@ namespace Simulation.Services.UAVManager
             Location fixedLocation = new Location(0.0, 0.0, 0.0);
             bool telemetryDeviceCreated = await _telemetryDeviceClient.CreateTelemetryDeviceAsync(
                 uav.TailId,
-                allocatedPorts,
+                sleevePorts,
                 fixedLocation
             );
 
@@ -215,6 +232,7 @@ namespace Simulation.Services.UAVManager
             if (!_uavMissionContexts.TryGetValue(tailId, out var uavData))
                 return false;
             var jobDeleted = await _quartzFlightJobManager.DeleteUAVFlightPathJob(tailId);
+            await _deviceManagerClient.ReleaseSleeveByTailIdAsync(tailId);
 
             uavData.UAV.CurrentMissionId = string.Empty;
             uavData.Service.Dispose();
@@ -229,6 +247,7 @@ namespace Simulation.Services.UAVManager
 
             foreach (var kvp in _uavMissionContexts)
             {
+                await _deviceManagerClient.ReleaseSleeveByTailIdAsync(kvp.Key);
                 kvp.Value.UAV.CurrentMissionId = string.Empty;
                 kvp.Value.Service.Dispose();
             }

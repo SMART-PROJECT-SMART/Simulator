@@ -309,6 +309,8 @@
         {
             public const string GET_ALL_UAVS = "api/uav";
             public const string GET_UAV_BY_TAIL_ID = "api/uav/{0}";
+            public const string GET_AVAILABLE_SLEEVE_FOR_UAV = "api/sleeve/available-for-uav/{0}";
+            public const string RELEASE_SLEEVE_BY_TAIL_ID = "api/sleeve/release/{0}";
         }
     }
 }

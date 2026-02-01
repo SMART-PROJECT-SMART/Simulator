@@ -23,5 +23,25 @@ namespace Simulation.Services.DeviceManagerClient
 
             return await response.Content.ReadFromJsonAsync<IEnumerable<DeviceManagerUAVDto>>(cancellationToken);
         }
+
+        public async Task<IEnumerable<int>> GetAvailableSleeveForUAVAsync(int tailId, CancellationToken cancellationToken = default)
+        {
+            string endpoint = string.Format(SimulationConstants.DeviceManagerApiEndpoints.GET_AVAILABLE_SLEEVE_FOR_UAV, tailId);
+            HttpResponseMessage response = await _httpClient.GetAsync(endpoint, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return Enumerable.Empty<int>();
+            }
+
+            return await response.Content.ReadFromJsonAsync<IEnumerable<int>>(cancellationToken);
+        }
+
+        public async Task<bool> ReleaseSleeveByTailIdAsync(int tailId, CancellationToken cancellationToken = default)
+        {
+            string endpoint = string.Format(SimulationConstants.DeviceManagerApiEndpoints.RELEASE_SLEEVE_BY_TAIL_ID, tailId);
+            HttpResponseMessage response = await _httpClient.PostAsync(endpoint, null, cancellationToken);
+            return response.IsSuccessStatusCode;
+        }
     }
 }
