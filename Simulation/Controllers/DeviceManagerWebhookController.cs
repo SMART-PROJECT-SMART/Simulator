@@ -8,9 +8,9 @@ namespace Simulation.Controllers
     [ApiController]
     public class DeviceManagerWebhookController : ControllerBase
     {
-        private readonly UAVChangeHandlerFactory _handlerFactory;
+        private readonly IUAVChangeHandlerFactory _handlerFactory;
 
-        public DeviceManagerWebhookController(UAVChangeHandlerFactory handlerFactory)
+        public DeviceManagerWebhookController(IUAVChangeHandlerFactory handlerFactory)
         {
             _handlerFactory = handlerFactory;
         }

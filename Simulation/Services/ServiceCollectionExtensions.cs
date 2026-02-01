@@ -11,6 +11,9 @@ using Simulation.Services.Quartz;
 using Simulation.Services.TelemetryDeviceClient;
 using Simulation.Services.MissionServiceClient;
 using Simulation.Services.UAVManager;
+using Simulation.Services.DeviceManagerClient;
+using Simulation.Services.UAVStorage;
+using Simulation.Services.UAVChangeHandlers;
 
 namespace Simulation.Services
 {
@@ -55,6 +58,19 @@ namespace Simulation.Services
                     }
                 );
 
+            string deviceManagerBaseUrl = configuration[
+                $"{SimulationConstants.Config.DEVICE_MANAGER_SECTION}:BaseUrl"
+            ];
+
+            services
+                .AddHttpClient(
+                    SimulationConstants.HttpClients.DEVICE_MANAGER_HTTP_CLIENT,
+                    client =>
+                    {
+                        client.BaseAddress = new Uri(deviceManagerBaseUrl);
+                    }
+                );
+
             return services;
         }
         public static IServiceCollection AddFlightPathCalculators(this IServiceCollection services)
@@ -94,6 +110,16 @@ namespace Simulation.Services
         public static IServiceCollection AddSharedConfiguration(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<ICDSettings>(config.GetSection(SimulationConstants.Config.ICD_DIRECTORY));
+            return services;
+        }
+
+        public static IServiceCollection AddDeviceManagerServices(this IServiceCollection services)
+        {
+            services.AddSingleton<IDeviceManagerClient, DeviceManagerClient.DeviceManagerClient>();
+            services.AddSingleton<UAVStorageService>();
+            services.AddSingleton<IUAVStorageService>(sp => sp.GetRequiredService<UAVStorageService>());
+            services.AddHostedService(sp => sp.GetRequiredService<UAVStorageService>());
+            services.AddSingleton<IUAVChangeHandlerFactory, UAVChangeHandlerFactory>();
             return services;
         }
     }

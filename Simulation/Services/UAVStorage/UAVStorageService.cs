@@ -4,7 +4,7 @@ using Simulation.Services.DeviceManagerClient;
 
 namespace Simulation.Services.UAVStorage
 {
-    public class UAVStorageService : IUAVStorageService
+    public class UAVStorageService : IUAVStorageService, IHostedService
     {
         private readonly ConcurrentDictionary<int, DeviceManagerUAVDto> _uavs;
         private readonly IDeviceManagerClient _deviceManagerClient;
@@ -44,6 +44,16 @@ namespace Simulation.Services.UAVStorage
         public IEnumerable<DeviceManagerUAVDto> GetAllUAVs()
         {
             return _uavs.Values;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return InitializeAsync(cancellationToken);
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

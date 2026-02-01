@@ -4,7 +4,7 @@ using Simulation.Services.UAVStorage;
 
 namespace Simulation.Services.UAVChangeHandlers
 {
-    public class UAVChangeHandlerFactory
+    public class UAVChangeHandlerFactory : IUAVChangeHandlerFactory
     {
         private readonly IUAVStorageService _uavStorageService;
         private readonly IDeviceManagerClient _deviceManagerClient;
