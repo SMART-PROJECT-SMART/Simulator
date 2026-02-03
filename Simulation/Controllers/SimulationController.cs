@@ -110,6 +110,12 @@ namespace Simulation.Controllers
                 }
             );
         }
+        [HttpGet("all-uav")]
+        public IActionResult GetAllUAVs()
+        {
+            IEnumerable<int> allUAVsTailIds = _uavStorageService.GetAllUAVs().Select(dto => dto.TailId);
+            return Ok(allUAVsTailIds);
+        }
 
         [HttpGet("run")]
         public async Task<IActionResult> Run()
