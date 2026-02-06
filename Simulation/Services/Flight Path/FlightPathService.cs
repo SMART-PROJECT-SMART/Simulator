@@ -13,7 +13,6 @@ namespace Simulation.Services.Flight_Path;
 
 public class FlightPathService : IDisposable
 {
-    private readonly ILogger<FlightPathService> _logger;
     private UAV _uav;
     private Location _destination;
     private double _cruiseAltitude;
@@ -33,14 +32,12 @@ public class FlightPathService : IDisposable
     public FlightPathService(
         IMotionCalculator motionCalculator,
         ISpeedController speedController,
-        IOrientationCalculator orientationCalculator,
-        ILogger<FlightPathService> logger
+        IOrientationCalculator orientationCalculator
     )
     {
         _motionCalculator = motionCalculator;
         _speedController = speedController;
         _orientationCalculator = orientationCalculator;
-        _logger = logger;
     }
 
     public void Initialize(UAV uav, Location destination)
@@ -60,13 +57,6 @@ public class FlightPathService : IDisposable
             spd
         );
         _previousLocation = new Location(lat, lon, alt);
-        _logger.LogInformation(
-            "Starting position ({Lat:F6}, {Lon:F6}, {Alt:F1}), Speed {Spd:F1} km/h",
-            lat,
-            lon,
-            alt,
-            spd
-        );
     }
 
     public void StartFlightPath()
@@ -81,15 +71,6 @@ public class FlightPathService : IDisposable
 
     public void SwitchDestination(Location newDestination)
     {
-        _logger.LogInformation(
-            "Location switched from ({Lat:F6}, {Lon:F6}, {Alt:F1}) to ({NewLat:F6}, {NewLon:F6}, {NewAlt:F1})",
-            _destination.Latitude,
-            _destination.Longitude,
-            _destination.Altitude,
-            newDestination.Latitude,
-            newDestination.Longitude,
-            newDestination.Altitude
-        );
         _destination = newDestination;
     }
 
@@ -117,12 +98,6 @@ public class FlightPathService : IDisposable
         {
             _uav.Land();
             _missionCompleted = true;
-            _logger.LogInformation(
-                "MISSION COMPLETED at ({Lat:F6},{Lon:F6},{Alt:F1}), rem=0",
-                currentLoc.Latitude,
-                currentLoc.Longitude,
-                currentLoc.Altitude
-            );
             MissionCompleted?.Invoke();
             return;
         }
@@ -159,20 +134,6 @@ public class FlightPathService : IDisposable
         if (MissionAborted(telemetry))
         {
             _missionCompleted = true;
-
-            string abortReason = DetermineAbortReason(telemetry);
-            _logger.LogWarning(
-                "MISSION ABORTED - UAV {UavId} | {Reason} | Final Position: ({Lat:F6}, {Lon:F6}) | Altitude: {Alt:F1}m | Fuel: {Fuel:F3}kg | Signal: {Signal:F1}dBm | Engine Temp: {Engine:F1}°C | Flight Time: {Time:F1}s",
-                _uav.TailId,
-                abortReason,
-                currentLoc.Latitude,
-                currentLoc.Longitude,
-                currentLoc.Altitude,
-                telemetry[TelemetryFields.FuelAmount],
-                telemetry[TelemetryFields.SignalStrength],
-                telemetry[TelemetryFields.EngineDegrees],
-                telemetry[TelemetryFields.FlightTimeSec]
-            );
             MissionCompleted?.Invoke();
             return;
         }
@@ -205,31 +166,11 @@ public class FlightPathService : IDisposable
         _uav.UpdateRpm();
 
         TelemetryUpdated?.Invoke(telemetry);
-        _logger.LogInformation(
-            "UAV {UavId} | Lat {Lat:F6} | Lon {Lon:F6} | Alt {Alt:F1}m | Spd {Spd:F1}km/h | Yaw {Yaw:F1}° | Pitch {Pitch:F1}° | Roll {Roll:F1}° | Rem {Rem:F1}m | Fuel {Fuel:F3}kg | Destination {lat},{lon},{alt}",
-            _uav.TailId,
-            nextLoc.Latitude,
-            nextLoc.Longitude,
-            nextLoc.Altitude,
-            newSpeed,
-            axis.Yaw,
-            axis.Pitch,
-            axis.Roll,
-            remainingMeters,
-            _uav.TelemetryData[TelemetryFields.FuelAmount],
-            _destination.Latitude,
-            _destination.Longitude,
-            _destination.Altitude
-        );
         LocationUpdated?.Invoke(nextLoc);
     }
 
     public bool MissionAborted(Dictionary<TelemetryFields, double> telemetryData)
     {
-        _logger.LogInformation(
-            "signal strength {st}",
-            telemetryData[TelemetryFields.SignalStrength]
-        );
         return telemetryData[TelemetryFields.FuelAmount] <= 0.0
             || telemetryData[TelemetryFields.SignalStrength]
                 < SimulationConstants.TelemetryData.NO_SIGNAL

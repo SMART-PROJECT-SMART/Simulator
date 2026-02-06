@@ -65,28 +65,16 @@ namespace Simulation.Services.UAVManager
 
         public void AddUAV(UAV uav)
         {
-            var flightService = new FlightPathService(
+            FlightPathService flightService = new FlightPathService(
                 _motionCalculator,
                 _speedController,
-                _orientationCalculator,
-                _logger
+                _orientationCalculator
             );
 
             flightService.TelemetryUpdated += (telemetry) =>
                 SendTelemetryToChannels(uav.TailId, telemetry);
 
             _uavMissionContexts.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
-
-            if (uav.Channels != null && uav.Channels.Any())
-            {
-                foreach (var channel in uav.Channels)
-                {
-                    if (!_portManager.IsUsed(channel.PortNumber))
-                    {
-                        _portManager.AssignPort(channel, channel.PortNumber);
-                    }
-                }
-            }
         }
 
         public void RemoveUAV(int tailId)
@@ -165,7 +153,6 @@ namespace Simulation.Services.UAVManager
 
             if (!sleevePorts.Any())
             {
-                _logger.LogWarning("No available sleeve found for UAV {TailId}", uav.TailId);
                 return false;
             }
 
@@ -194,7 +181,6 @@ namespace Simulation.Services.UAVManager
 
             if (!telemetryDeviceCreated)
             {
-                _logger.LogError("Failed to create telemetry device for UAV {TailId}", uav.TailId);
                 return false;
             }
 
@@ -278,7 +264,7 @@ namespace Simulation.Services.UAVManager
             Dictionary<TelemetryFields, double> telemetry
         )
         {
-            foreach (var channel in _uavMissionContexts[tailId].UAV.Channels)
+            foreach (Channel channel in _uavMissionContexts[tailId].UAV.Channels)
             {
                 BitArray compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(
                     telemetry,
