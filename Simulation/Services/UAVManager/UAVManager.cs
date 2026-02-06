@@ -19,6 +19,7 @@ using Simulation.Services.Quartz;
 using Simulation.Services.TelemetryDeviceClient;
 using Simulation.Services.MissionServiceClient;
 using Simulation.Services.DeviceManagerClient;
+using Simulation.Dto.DeviceManager;
 
 namespace Simulation.Services.UAVManager
 {
@@ -116,7 +117,11 @@ namespace Simulation.Services.UAVManager
 
             if (uav.Channels == null || !uav.Channels.Any())
             {
-                await SetupUAVChannelsAndTelemetryDeviceAsync(uav);
+                bool setupSuccess = await SetupUAVChannelsAndTelemetryDeviceAsync(uav);
+                if (!setupSuccess)
+                {
+                    return false;
+                }
             }
 
             if (!_uavMissionContexts.ContainsKey(uav.TailId))
@@ -150,7 +155,7 @@ namespace Simulation.Services.UAVManager
             return true;
         }
 
-        private async Task SetupUAVChannelsAndTelemetryDeviceAsync(UAV uav)
+        private async Task<bool> SetupUAVChannelsAndTelemetryDeviceAsync(UAV uav)
         {
             IEnumerable<ICD> icds = _icdDirectory.GetAllICDs();
             int channelCount = icds.Count();
@@ -160,7 +165,8 @@ namespace Simulation.Services.UAVManager
 
             if (!sleevePorts.Any())
             {
-                throw new InvalidOperationException($"No available sleeve found for UAV {uav.TailId}");
+                _logger.LogWarning("No available sleeve found for UAV {TailId}", uav.TailId);
+                return false;
             }
 
             uav.Channels = new List<Channel>();
@@ -188,10 +194,11 @@ namespace Simulation.Services.UAVManager
 
             if (!telemetryDeviceCreated)
             {
-                throw new InvalidOperationException(
-                    $"Failed to create telemetry device for UAV {uav.TailId}"
-                );
+                _logger.LogError("Failed to create telemetry device for UAV {TailId}", uav.TailId);
+                return false;
             }
+
+            return true;
         }
 
         private void RemoveUAV(UAV uav)
@@ -279,6 +286,24 @@ namespace Simulation.Services.UAVManager
                 );
                 channel.SendICDByteArray(compressed);
             }
+        }
+
+        public Task<IEnumerable<DeviceManagerUAVDto>> GetAllUAVs()
+        {
+            IEnumerable<DeviceManagerUAVDto> uavDtos = _uavMissionContexts.Values.Select(context =>
+            {
+                UAV uav = context.UAV;
+                return new DeviceManagerUAVDto(
+                    uav.TailId,
+                    (PlatformType)(int)uav.TelemetryData[TelemetryFields.PlatformType],
+                    new Location(
+                        uav.TelemetryData[TelemetryFields.Latitude],
+                        uav.TelemetryData[TelemetryFields.Longitude],
+                        uav.TelemetryData[TelemetryFields.Altitude]
+                    )
+                );
+            });
+            return Task.FromResult(uavDtos);
         }
     }
 }

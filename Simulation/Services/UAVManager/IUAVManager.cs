@@ -1,5 +1,6 @@
 using Core.Models;
-﻿using Simulation.Models;
+using Simulation.Dto.DeviceManager;
+using Simulation.Models;
 using Simulation.Models.UAVs;
 
 namespace Simulation.Services.UAVManager
@@ -20,5 +21,6 @@ namespace Simulation.Services.UAVManager
         public int ActiveUAVCount { get; }
         public IEnumerable<int> GetActiveTailIds { get; }
         public Task<int> GetActiveJobCount();
+        public Task<IEnumerable<DeviceManagerUAVDto>> GetAllUAVs();
     }
 }
