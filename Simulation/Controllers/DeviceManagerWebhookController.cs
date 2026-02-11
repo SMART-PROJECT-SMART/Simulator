@@ -19,7 +19,7 @@ namespace Simulation.Controllers
         public async Task<ActionResult> UAVChanged([FromBody] UAVChangedNotificationDto notification, CancellationToken cancellationToken)
         {
             IUAVChangeHandler handler = _handlerFactory.CreateHandler(notification.Operation);
-            await handler.HandleUAVChangeAsync(notification.TailId, cancellationToken);
+            await handler.HandleUAVChangeAsync(notification.TailId, notification.NewTailId, cancellationToken);
             return Ok();
         }
     }

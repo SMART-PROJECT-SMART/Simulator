@@ -15,7 +15,7 @@ namespace Simulation.Services.UAVChangeHandlers
             _deviceManagerClient = deviceManagerClient;
         }
 
-        public async Task HandleUAVChangeAsync(int tailId, CancellationToken cancellationToken = default)
+        public async Task HandleUAVChangeAsync(int tailId, int? newTailId = null, CancellationToken cancellationToken = default)
         {
             IEnumerable<DeviceManagerUAVDto> allUAVs = await _deviceManagerClient.GetAllUAVsAsync(cancellationToken);
             DeviceManagerUAVDto uav = allUAVs.FirstOrDefault(u => u.TailId == tailId);

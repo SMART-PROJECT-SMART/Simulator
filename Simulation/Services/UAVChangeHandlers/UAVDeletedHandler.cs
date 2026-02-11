@@ -11,7 +11,7 @@ namespace Simulation.Services.UAVChangeHandlers
             _uavStorageService = uavStorageService;
         }
 
-        public Task HandleUAVChangeAsync(int tailId, CancellationToken cancellationToken = default)
+        public Task HandleUAVChangeAsync(int tailId, int? newTailId = null, CancellationToken cancellationToken = default)
         {
             _uavStorageService.RemoveUAV(tailId);
             return Task.CompletedTask;
