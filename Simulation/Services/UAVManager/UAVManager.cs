@@ -85,6 +85,23 @@ namespace Simulation.Services.UAVManager
             }
         }
 
+        public void UpdateTailId(int oldTailId, int newTailId)
+        {
+            if (!_uavMissionContexts.TryRemove(oldTailId, out UAVMissionContext context))
+            {
+                return;
+            }
+
+            context.UAV.TailId = newTailId;
+
+            foreach (Channel channel in context.UAV.Channels)
+            {
+                channel.TailId = newTailId;
+            }
+
+            _uavMissionContexts.TryAdd(newTailId, context);
+        }
+
         public UAVMissionContext GetUAVContext(int tailId)
         {
             return _uavMissionContexts[tailId];
