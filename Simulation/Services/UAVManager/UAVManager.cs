@@ -102,6 +102,22 @@ namespace Simulation.Services.UAVManager
             _uavMissionContexts.TryAdd(newTailId, context);
         }
 
+        public void UpdateChannelPorts(int tailId, IEnumerable<int> newPorts)
+        {
+            if (!_uavMissionContexts.TryGetValue(tailId, out UAVMissionContext context))
+            {
+                return;
+            }
+
+            List<Channel> channels = context.UAV.Channels;
+            List<int> portList = newPorts.ToList();
+
+            for (int i = 0; i < channels.Count && i < portList.Count; i++)
+            {
+                _portManager.SwitchPorts(channels[i].PortNumber, portList[i]);
+            }
+        }
+
         public UAVMissionContext GetUAVContext(int tailId)
         {
             return _uavMissionContexts[tailId];

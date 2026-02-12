@@ -10,6 +10,7 @@ namespace Simulation.Services.UAVManager
         public void AddUAV(UAV uav);
         public void RemoveUAV(int tailId);
         public void UpdateTailId(int oldTailId, int newTailId);
+        public void UpdateChannelPorts(int tailId, IEnumerable<int> newPorts);
         public UAVMissionContext? GetUAVContext(int tailId);
         public bool SwitchDestination(int tailId, Location newDestination);
 
