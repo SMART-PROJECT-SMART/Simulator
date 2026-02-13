@@ -64,7 +64,8 @@ namespace Simulation.Services.UAVManager
             FlightPathService flightService = new FlightPathService(
                 _motionCalculator,
                 _speedController,
-                _orientationCalculator
+                _orientationCalculator,
+                _logger
             );
 
             flightService.TelemetryUpdated += (telemetry) =>

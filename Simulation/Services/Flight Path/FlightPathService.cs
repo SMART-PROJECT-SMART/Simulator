@@ -1,5 +1,6 @@
 using Core.Models;
 ﻿using Core.Common.Enums;
+using Microsoft.Extensions.Logging;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
@@ -19,6 +20,7 @@ public class FlightPathService : IDisposable
     private readonly IMotionCalculator _motionCalculator;
     private readonly ISpeedController _speedController;
     private readonly IOrientationCalculator _orientationCalculator;
+    private readonly ILogger<FlightPathService> _logger;
 
     private bool _isRunning;
     private bool _missionCompleted;
@@ -32,12 +34,14 @@ public class FlightPathService : IDisposable
     public FlightPathService(
         IMotionCalculator motionCalculator,
         ISpeedController speedController,
-        IOrientationCalculator orientationCalculator
+        IOrientationCalculator orientationCalculator,
+        ILogger<FlightPathService> logger
     )
     {
         _motionCalculator = motionCalculator;
         _speedController = speedController;
         _orientationCalculator = orientationCalculator;
+        _logger = logger;
     }
 
     public void Initialize(UAV uav, Location destination)
@@ -164,6 +168,16 @@ public class FlightPathService : IDisposable
         _previousLocation = currentLoc;
         telemetry[TelemetryFields.FlightTimeSec] += SimulationConstants.FlightPath.DELTA_SECONDS;
         _uav.UpdateRpm();
+
+        _logger.LogInformation(
+            "TailId: {TailId} | Location: ({Lat:F6}, {Lon:F6}, {Alt:F2}) | Pitch: {Pitch:F2}, Yaw: {Yaw:F2}, Roll: {Roll:F2}",
+            _uav.TailId,
+            nextLoc.Latitude,
+            nextLoc.Longitude,
+            nextLoc.Altitude,
+            telemetry[TelemetryFields.PitchDeg],
+            telemetry[TelemetryFields.YawDeg],
+            telemetry[TelemetryFields.RollDeg]);
 
         TelemetryUpdated?.Invoke(telemetry);
         LocationUpdated?.Invoke(nextLoc);
