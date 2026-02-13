@@ -16,7 +16,6 @@ using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.Helpers;
 using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
-using Simulation.Services.TelemetryDeviceClient;
 using Simulation.Services.MissionServiceClient;
 using Simulation.Services.DeviceManagerClient;
 using Simulation.Dto.DeviceManager;
@@ -32,7 +31,6 @@ namespace Simulation.Services.UAVManager
         private readonly ILogger<FlightPathService> _logger;
         private readonly IQuartzFlightJobManager _quartzFlightJobManager;
         private readonly IPortManager _portManager;
-        private readonly ITelemetryDeviceClient _telemetryDeviceClient;
         private readonly IMissionServiceClient _missionServiceClient;
         private readonly IICDDirectory _icdDirectory;
         private readonly IDeviceManagerClient _deviceManagerClient;
@@ -44,7 +42,6 @@ namespace Simulation.Services.UAVManager
             ILogger<FlightPathService> logger,
             IQuartzFlightJobManager quartzFlightJobManager,
             IPortManager portManager,
-            ITelemetryDeviceClient telemetryDeviceClient,
             IMissionServiceClient missionServiceClient,
             IICDDirectory icdDirectory,
             IDeviceManagerClient deviceManagerClient
@@ -57,7 +54,6 @@ namespace Simulation.Services.UAVManager
             _logger = logger;
             _quartzFlightJobManager = quartzFlightJobManager;
             _portManager = portManager;
-            _telemetryDeviceClient = telemetryDeviceClient;
             _missionServiceClient = missionServiceClient;
             _icdDirectory = icdDirectory;
             _deviceManagerClient = deviceManagerClient;
@@ -138,7 +134,7 @@ namespace Simulation.Services.UAVManager
 
             if (uav.Channels == null || !uav.Channels.Any())
             {
-                bool setupSuccess = await SetupUAVChannelsAndTelemetryDeviceAsync(uav);
+                bool setupSuccess = await SetupUAVChannelsAsync(uav);
                 if (!setupSuccess)
                 {
                     return false;
@@ -176,10 +172,9 @@ namespace Simulation.Services.UAVManager
             return true;
         }
 
-        private async Task<bool> SetupUAVChannelsAndTelemetryDeviceAsync(UAV uav)
+        private async Task<bool> SetupUAVChannelsAsync(UAV uav)
         {
             IEnumerable<ICD> icds = _icdDirectory.GetAllICDs();
-            int channelCount = icds.Count();
 
             IEnumerable<int> sleevePortsEnumerable = await _deviceManagerClient.GetAvailableSleeveForUAVAsync(uav.TailId);
             List<int> sleevePorts = sleevePortsEnumerable.ToList();
@@ -203,18 +198,6 @@ namespace Simulation.Services.UAVManager
                 uav.Channels.Add(channel);
                 _portManager.AssignPort(channel, portNumber);
                 portIndex++;
-            }
-
-            Location fixedLocation = new Location(0.0, 0.0, 0.0);
-            bool telemetryDeviceCreated = await _telemetryDeviceClient.CreateTelemetryDeviceAsync(
-                uav.TailId,
-                sleevePorts,
-                fixedLocation
-            );
-
-            if (!telemetryDeviceCreated)
-            {
-                return false;
             }
 
             return true;
