@@ -1,12 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
 using Core.Common.Enums;
+using Core.Models;
 using Core.Services.ICDsDirectory;
+using Microsoft.AspNetCore.Mvc;
 using Simulation.Common.Enums;
+using Simulation.Dto.DeviceManager;
 using Simulation.Dto.FlightPath;
 using Simulation.Models;
 using Simulation.Models.Channels;
+using Simulation.Models.UAVs;
+using Simulation.Models.UAVs.ArmedUav;
 using Simulation.Models.UAVs.SurveillanceUAV;
+using Simulation.Services.UAVFactory;
 using Simulation.Services.UAVManager;
+using Simulation.Services.UAVStorage;
 
 namespace Simulation.Controllers
 {
@@ -16,18 +22,35 @@ namespace Simulation.Controllers
     {
         private readonly IUAVManager _uavManager;
         private readonly IICDDirectory _ICDDirectory;
+        private readonly IUAVStorageService _uavStorageService;
+        private readonly IUAVFactory _uavFactory;
 
-        public SimulationController(IUAVManager uavManager, IICDDirectory _icdDirectory)
+        public SimulationController(
+            IUAVManager uavManager,
+            IICDDirectory _icdDirectory,
+            IUAVStorageService uavStorageService,
+            IUAVFactory uavFactory
+        )
         {
             _uavManager = uavManager;
             _ICDDirectory = _icdDirectory;
+            _uavStorageService = uavStorageService;
+            _uavFactory = uavFactory;
         }
 
         [HttpPost("simulate")]
         public async Task<IActionResult> CalculateFlightPath([FromBody] SimulateDto dto)
         {
-            _uavManager.AddUAV(dto.UAV);
-            var success = await _uavManager.StartMission(dto.UAV, dto.Destination, dto.MissionId);
+            DeviceManagerUAVDto uavDto = _uavStorageService.GetUAV(dto.TailId);
+
+            if (uavDto == null)
+            {
+                return NotFound($"UAV with TailId {dto.TailId} does not exist");
+            }
+
+            UAV uav = _uavFactory.CreateUAV(uavDto, uavDto.BaseLocation);
+
+            bool success = await _uavManager.StartMission(uav, dto.Destination, dto.MissionId);
             return success
                 ? Ok("Mission started successfully")
                 : BadRequest("Mission failed to start");
@@ -93,59 +116,134 @@ namespace Simulation.Controllers
             );
         }
 
+        [HttpGet("all-uav")]
+        public IActionResult GetAllUAVs()
+        {
+            IEnumerable<int> allUAVsTailIds = _uavStorageService
+                .GetAllUAVs()
+                .Select(dto => dto.TailId);
+            return Ok(allUAVsTailIds);
+        }
+
         [HttpGet("run")]
         public async Task<IActionResult> Run()
         {
-            var startLocation = new Location(40.6413, -73.7781, 100.0);
-            var uav = new Searcher(tailId: 1, startLocation: startLocation);
-            uav.Channels = new List<Channel>();
-            int portNumber = 8000;
-            foreach (var icd in _ICDDirectory.GetAllICDs())
-            {
-                uav.Channels.Add(new Channel(uav.TailId, portNumber, icd));
-                portNumber++;
-            }
-            uav.TelemetryData[TelemetryFields.YawDeg] = 270.0;
-            var destination = new Location(40.6460, -73.77850, 10.0);
-            var request = new SimulateDto(uav, destination);
+            int tailId = 2;
+            DeviceManagerUAVDto uavDto = _uavStorageService.GetUAV(tailId);
 
-            return await CalculateFlightPath(request);
+            if (uavDto == null)
+            {
+                return NotFound($"UAV with TailId {tailId} does not exist");
+            }
+
+            Location destination = new Location(31.8300, 34.9700, 1000.0);
+            UAV uav = _uavFactory.CreateUAV(uavDto, uavDto.BaseLocation);
+            bool success = await _uavManager.StartMission(
+                uav,
+                destination,
+                "armed-mission-converge"
+            );
+            return success
+                ? Ok("UAV 2 started successfully")
+                : BadRequest("Mission failed to start");
         }
 
         [HttpGet("run-multi")]
         public async Task<IActionResult> RunMultipleUAVs()
         {
-            var uav1StartLocation = new Location(40.6413, -73.7781, 10.0);
-            var uav1 = new Searcher(tailId: 1, startLocation: uav1StartLocation);
-            uav1.Channels = new List<Channel>();
-            uav1.TelemetryData[TelemetryFields.YawDeg] = 270.0;
-            var uav1Destination = new Location(40.6450, -73.7750, 120.0);
+            int armedTailId = 2;
+            int surveillanceTailId = 3;
 
-            var uav2StartLocation = new Location(40.6400, -73.7800, 15.0);
-            var uav2 = new Searcher(tailId: 2, startLocation: uav2StartLocation);
-            uav2.Channels = new List<Channel>();
-            uav2.TelemetryData[TelemetryFields.YawDeg] = 90.0;
-            var uav2Destination = new Location(40.6480, -73.7720, 150.0);
+            DeviceManagerUAVDto armedUavDto = _uavStorageService.GetUAV(armedTailId);
+            DeviceManagerUAVDto surveillanceUavDto = _uavStorageService.GetUAV(surveillanceTailId);
 
-            int portNumber = 8000;
-            foreach (var icd in _ICDDirectory.GetAllICDs())
+            if (armedUavDto == null)
             {
-                uav1.Channels.Add(new Channel(uav1.TailId, portNumber, icd));
-                uav2.Channels.Add(
-                    new Channel(uav1.TailId, portNumber + _ICDDirectory.GetAllICDs().Count, icd)
-                );
-                portNumber++;
+                return NotFound($"UAV with TailId {armedTailId} does not exist");
             }
 
-            var request1 = new SimulateDto(uav1, uav1Destination);
-            var request2 = new SimulateDto(uav2, uav2Destination);
+            if (surveillanceUavDto == null)
+            {
+                return NotFound($"UAV with TailId {surveillanceTailId} does not exist");
+            }
 
-            var task1 = CalculateFlightPath(request1);
-            var task2 = CalculateFlightPath(request2);
+            Location armedDestination = new Location(31.8300, 34.9700, 1000.0);
+            Location surveillanceDestination = new Location(31.8305, 34.9705, 1000.0);
 
-            await Task.WhenAll(task1, task2);
+            UAV armedUav = _uavFactory.CreateUAV(armedUavDto, armedUavDto.BaseLocation);
+            UAV surveillanceUav = _uavFactory.CreateUAV(
+                surveillanceUavDto,
+                surveillanceUavDto.BaseLocation
+            );
 
-            return Ok("Both UAVs started successfully");
+            Task<bool> armedMissionTask = _uavManager.StartMission(
+                armedUav,
+                armedDestination,
+                "armed-mission-converge"
+            );
+            Task<bool> surveillanceMissionTask = _uavManager.StartMission(
+                surveillanceUav,
+                surveillanceDestination,
+                "surveillance-mission-converge"
+            );
+
+            bool[] results = await Task.WhenAll(armedMissionTask, surveillanceMissionTask);
+
+            bool bothSuccessful = results[0] && results[1];
+            return bothSuccessful
+                ? Ok("Both UAVs started successfully and are converging.")
+                : BadRequest("One or more missions failed to start");
+        }
+
+        [HttpGet("run-20")]
+        public async Task<IActionResult> RunTwentyUAVs()
+        {
+            Location destination = new Location(31.8300, 34.9700, 1000.0);
+            List<Task<bool>> tasks = new List<Task<bool>>();
+
+            for (int i = 4; i <= 24; i++)
+            {
+                DeviceManagerUAVDto uavDto = _uavStorageService.GetUAV(i);
+
+                if (uavDto == null)
+                {
+                    return NotFound($"UAV with TailId {i} does not exist");
+                }
+
+                UAV uav = _uavFactory.CreateUAV(uavDto, uavDto.BaseLocation);
+                tasks.Add(_uavManager.StartMission(uav, destination, $"multi-mission-{i}"));
+            }
+
+            bool[] results = await Task.WhenAll(tasks);
+            bool allSuccessful = results.All(x => x);
+            return allSuccessful
+                ? Ok("All 20 UAVs started successfully and are converging.")
+                : BadRequest("One or more missions failed to start");
+        }
+
+        [HttpGet("show")]
+        public async Task<IActionResult> Show()
+        {
+            int tailId = 2;
+            DeviceManagerUAVDto uavDto = _uavStorageService.GetUAV(tailId);
+
+            if (uavDto == null)
+            {
+                return NotFound($"UAV with TailId {tailId} does not exist");
+            }
+
+            Location predeterminedStart = new Location(31.80, 34.75, 0.0);
+            Location predeterminedDestination = new Location(32.10, 34.90, 0.0);
+
+            UAV uav = _uavFactory.CreateUAV(uavDto, predeterminedStart);
+            bool success = await _uavManager.StartMission(
+                uav,
+                predeterminedDestination,
+                "show-demo"
+            );
+            return success
+                ? Ok("Show started - long high flight from predetermined start to destination")
+                : BadRequest("Show mission failed to start");
         }
     }
 }

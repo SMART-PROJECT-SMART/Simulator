@@ -283,6 +283,34 @@
         {
             public const string ICD_DIRECTORY = "ICD";
             public const string JSON_SEARCH_PATTERN = "*.json";
+            public const string TELEMETRY_DEVICE_SECTION = "TelemetryDevice";
+            public const string MISSION_SERVICE_SECTION = "MissionService";
+            public const string DEVICE_MANAGER_SECTION = "DeviceManager";
+        }
+
+        public static class HttpClients
+        {
+            public const string TELEMETRY_DEVICE_HTTP_CLIENT = "TelemetryDeviceHttpClient";
+            public const string MISSION_SERVICE_HTTP_CLIENT = "MissionServiceHttpClient";
+            public const string DEVICE_MANAGER_HTTP_CLIENT = "DeviceManagerHttpClient";
+        }
+
+        public static class TelemetryDeviceApiEndpoints
+        {
+            public const string ADD_TELEMETRY_DEVICE = "api/TelemetryDevice/add-telemetry-device";
+        }
+
+        public static class MissionServiceApiEndpoints
+        {
+            public const string MISSION_COMPLETED = "mission-completed";
+        }
+
+        public static class DeviceManagerApiEndpoints
+        {
+            public const string GET_ALL_UAVS = "api/uav";
+            public const string GET_UAV_BY_TAIL_ID = "api/uav/{0}";
+            public const string GET_AVAILABLE_SLEEVE_FOR_UAV = "api/sleeve/available-for-uav/{0}";
+            public const string RELEASE_SLEEVE_BY_TAIL_ID = "api/sleeve/release/{0}";
         }
     }
 }

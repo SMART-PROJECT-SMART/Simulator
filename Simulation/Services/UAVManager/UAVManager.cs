@@ -1,9 +1,13 @@
+using Core.Models;
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using Core.Common.Enums;
+using Core.Models.ICDModels;
+using Core.Services.ICDsDirectory;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
 using Simulation.Models;
+using Simulation.Models.Channels;
 using Simulation.Models.UAVs;
 using Simulation.Services.Flight_Path;
 using Simulation.Services.Flight_Path.Motion_Calculator;
@@ -12,6 +16,9 @@ using Simulation.Services.Flight_Path.Speed_Controller;
 using Simulation.Services.Helpers;
 using Simulation.Services.PortManager;
 using Simulation.Services.Quartz;
+using Simulation.Services.MissionServiceClient;
+using Simulation.Services.DeviceManagerClient;
+using Simulation.Dto.DeviceManager;
 
 namespace Simulation.Services.UAVManager
 {
@@ -24,6 +31,9 @@ namespace Simulation.Services.UAVManager
         private readonly ILogger<FlightPathService> _logger;
         private readonly IQuartzFlightJobManager _quartzFlightJobManager;
         private readonly IPortManager _portManager;
+        private readonly IMissionServiceClient _missionServiceClient;
+        private readonly IICDDirectory _icdDirectory;
+        private readonly IDeviceManagerClient _deviceManagerClient;
 
         public UAVManager(
             IMotionCalculator motionCalculator,
@@ -31,7 +41,10 @@ namespace Simulation.Services.UAVManager
             IOrientationCalculator orientationCalculator,
             ILogger<FlightPathService> logger,
             IQuartzFlightJobManager quartzFlightJobManager,
-            IPortManager portManager
+            IPortManager portManager,
+            IMissionServiceClient missionServiceClient,
+            IICDDirectory icdDirectory,
+            IDeviceManagerClient deviceManagerClient
         )
         {
             _uavMissionContexts = new ConcurrentDictionary<int, UAVMissionContext>();
@@ -41,11 +54,14 @@ namespace Simulation.Services.UAVManager
             _logger = logger;
             _quartzFlightJobManager = quartzFlightJobManager;
             _portManager = portManager;
+            _missionServiceClient = missionServiceClient;
+            _icdDirectory = icdDirectory;
+            _deviceManagerClient = deviceManagerClient;
         }
 
         public void AddUAV(UAV uav)
         {
-            var flightService = new FlightPathService(
+            FlightPathService flightService = new FlightPathService(
                 _motionCalculator,
                 _speedController,
                 _orientationCalculator,
@@ -56,10 +72,6 @@ namespace Simulation.Services.UAVManager
                 SendTelemetryToChannels(uav.TailId, telemetry);
 
             _uavMissionContexts.TryAdd(uav.TailId, new UAVMissionContext(uav, flightService));
-            foreach (var channel in uav.Channels)
-            {
-                _portManager.AssignPort(channel, channel.PortNumber);
-            }
         }
 
         public void RemoveUAV(int tailId)
@@ -67,6 +79,39 @@ namespace Simulation.Services.UAVManager
             if (_uavMissionContexts.TryRemove(tailId, out var uavData))
             {
                 uavData.Service.Dispose();
+            }
+        }
+
+        public void UpdateTailId(int oldTailId, int newTailId)
+        {
+            if (!_uavMissionContexts.TryRemove(oldTailId, out UAVMissionContext context))
+            {
+                return;
+            }
+
+            context.UAV.TailId = newTailId;
+
+            foreach (Channel channel in context.UAV.Channels)
+            {
+                channel.TailId = newTailId;
+            }
+
+            _uavMissionContexts.TryAdd(newTailId, context);
+        }
+
+        public void UpdateChannelPorts(int tailId, IEnumerable<int> newPorts)
+        {
+            if (!_uavMissionContexts.TryGetValue(tailId, out UAVMissionContext context))
+            {
+                return;
+            }
+
+            List<Channel> channels = context.UAV.Channels;
+            List<int> portList = newPorts.ToList();
+
+            for (int i = 0; i < channels.Count && i < portList.Count; i++)
+            {
+                _portManager.SwitchPorts(channels[i].PortNumber, portList[i]);
             }
         }
 
@@ -87,6 +132,16 @@ namespace Simulation.Services.UAVManager
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
         {
             uav.CurrentMissionId = missionId;
+
+            if (uav.Channels == null || !uav.Channels.Any())
+            {
+                bool setupSuccess = await SetupUAVChannelsAsync(uav);
+                if (!setupSuccess)
+                {
+                    return false;
+                }
+            }
+
             if (!_uavMissionContexts.ContainsKey(uav.TailId))
             {
                 AddUAV(uav);
@@ -103,17 +158,49 @@ namespace Simulation.Services.UAVManager
 
             if (!jobScheduled)
             {
-                _logger.LogError("Failed to schedule flight path job for UAV {TailId}", uav.TailId);
                 return false;
             }
 
             context.Service.MissionCompleted += async () =>
             {
                 await _quartzFlightJobManager.DeleteUAVFlightPathJob(uav.TailId);
+                await _missionServiceClient.NotifyMissionCompletedAsync(uav.TailId);
+                await _deviceManagerClient.ReleaseSleeveByTailIdAsync(uav.TailId);
                 uav.CurrentMissionId = string.Empty;
                 context.Service.Dispose();
                 RemoveUAV(uav);
             };
+            return true;
+        }
+
+        private async Task<bool> SetupUAVChannelsAsync(UAV uav)
+        {
+            IEnumerable<ICD> icds = _icdDirectory.GetAllICDs();
+
+            IEnumerable<int> sleevePortsEnumerable = await _deviceManagerClient.GetAvailableSleeveForUAVAsync(uav.TailId);
+            List<int> sleevePorts = sleevePortsEnumerable.ToList();
+
+            if (!sleevePorts.Any())
+            {
+                return false;
+            }
+
+            uav.Channels = new List<Channel>();
+            int portIndex = 0;
+            foreach (ICD icd in icds)
+            {
+                if (portIndex >= sleevePorts.Count)
+                {
+                    break;
+                }
+
+                int portNumber = sleevePorts[portIndex];
+                Channel channel = new Channel(uav.TailId, portNumber, icd);
+                uav.Channels.Add(channel);
+                _portManager.AssignPort(channel, portNumber);
+                portIndex++;
+            }
+
             return true;
         }
 
@@ -155,6 +242,7 @@ namespace Simulation.Services.UAVManager
             if (!_uavMissionContexts.TryGetValue(tailId, out var uavData))
                 return false;
             var jobDeleted = await _quartzFlightJobManager.DeleteUAVFlightPathJob(tailId);
+            await _deviceManagerClient.ReleaseSleeveByTailIdAsync(tailId);
 
             uavData.UAV.CurrentMissionId = string.Empty;
             uavData.Service.Dispose();
@@ -169,6 +257,7 @@ namespace Simulation.Services.UAVManager
 
             foreach (var kvp in _uavMissionContexts)
             {
+                await _deviceManagerClient.ReleaseSleeveByTailIdAsync(kvp.Key);
                 kvp.Value.UAV.CurrentMissionId = string.Empty;
                 kvp.Value.Service.Dispose();
             }
@@ -192,7 +281,7 @@ namespace Simulation.Services.UAVManager
             Dictionary<TelemetryFields, double> telemetry
         )
         {
-            foreach (var channel in _uavMissionContexts[tailId].UAV.Channels)
+            foreach (Channel channel in _uavMissionContexts[tailId].UAV.Channels)
             {
                 BitArray compressed = TelemetryCompressionHelper.CompressTelemetryDataByICD(
                     telemetry,
@@ -200,6 +289,24 @@ namespace Simulation.Services.UAVManager
                 );
                 channel.SendICDByteArray(compressed);
             }
+        }
+
+        public Task<IEnumerable<DeviceManagerUAVDto>> GetAllUAVs()
+        {
+            IEnumerable<DeviceManagerUAVDto> uavDtos = _uavMissionContexts.Values.Select(context =>
+            {
+                UAV uav = context.UAV;
+                return new DeviceManagerUAVDto(
+                    uav.TailId,
+                    (PlatformType)(int)uav.TelemetryData[TelemetryFields.PlatformType],
+                    new Location(
+                        uav.TelemetryData[TelemetryFields.Latitude],
+                        uav.TelemetryData[TelemetryFields.Longitude],
+                        uav.TelemetryData[TelemetryFields.Altitude]
+                    )
+                );
+            });
+            return Task.FromResult(uavDtos);
         }
     }
 }

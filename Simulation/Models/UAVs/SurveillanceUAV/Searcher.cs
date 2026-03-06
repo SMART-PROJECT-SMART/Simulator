@@ -1,3 +1,4 @@
+using Core.Models;
 ﻿using Core.Common.Enums;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
@@ -53,6 +54,7 @@ namespace Simulation.Models.UAVs.SurveillanceUAV
             TelemetryData[TelemetryFields.ThrustAfterInfluence] = SimulationConstants
                 .Searcher_Constants
                 .ThrustAfterInfluence;
+            TelemetryData[TelemetryFields.PlatformType] = (double)PlatformType.Searcher;
 
             SensorStatus[SensorType.ElectroOptical] = true;
             SensorStatus[SensorType.InfraredImaging] = true;

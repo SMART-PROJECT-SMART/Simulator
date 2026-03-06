@@ -1,3 +1,4 @@
+using Core.Models;
 ﻿using Simulation.Models;
 
 namespace Simulation.Ro.FlightPath

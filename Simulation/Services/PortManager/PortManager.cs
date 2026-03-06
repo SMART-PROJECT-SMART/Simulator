@@ -1,3 +1,4 @@
+using Simulation.Common.constants;
 using Simulation.Models.Channels;
 
 namespace Simulation.Services.PortManager
@@ -55,6 +56,44 @@ namespace Simulation.Services.PortManager
         private void SwitchPortNumbers(Channel channel1, Channel channel2)
         {
             (channel1.PortNumber, channel2.PortNumber) = (channel2.PortNumber, channel1.PortNumber);
+        }
+
+        public IEnumerable<int> AllocatePorts(int count)
+        {
+            int totalAvailablePorts =
+                SimulationConstants.Networking.MAX_PORT_NUMBER
+                - SimulationConstants.Networking.STARTING_PORT_NUMBER
+                + 1;
+            int availablePorts = totalAvailablePorts - _portChannels.Count;
+
+            if (count > availablePorts)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot allocate {count} ports. Only {availablePorts} ports available."
+                );
+            }
+
+            List<int> allocatedPorts = new List<int>(count);
+
+            for (
+                int portNumber = SimulationConstants.Networking.STARTING_PORT_NUMBER;
+                ShouldContinueAllocating(portNumber, allocatedPorts.Count, count);
+                portNumber++
+            )
+            {
+                if (!_portChannels.ContainsKey(portNumber))
+                {
+                    allocatedPorts.Add(portNumber);
+                }
+            }
+
+            return allocatedPorts;
+        }
+
+        private bool ShouldContinueAllocating(int portNumber, int allocatedCount, int requiredCount)
+        {
+            return portNumber <= SimulationConstants.Networking.MAX_PORT_NUMBER
+                && allocatedCount < requiredCount;
         }
     }
 }
