@@ -1,18 +1,18 @@
-using Core.Models;
-﻿using Microsoft.AspNetCore.Mvc;
 using Core.Common.Enums;
+using Core.Models;
 using Core.Services.ICDsDirectory;
+using Microsoft.AspNetCore.Mvc;
 using Simulation.Common.Enums;
-using Simulation.Dto.FlightPath;
 using Simulation.Dto.DeviceManager;
+using Simulation.Dto.FlightPath;
 using Simulation.Models;
 using Simulation.Models.Channels;
 using Simulation.Models.UAVs;
-using Simulation.Models.UAVs.SurveillanceUAV;
 using Simulation.Models.UAVs.ArmedUav;
+using Simulation.Models.UAVs.SurveillanceUAV;
+using Simulation.Services.UAVFactory;
 using Simulation.Services.UAVManager;
 using Simulation.Services.UAVStorage;
-using Simulation.Services.UAVFactory;
 
 namespace Simulation.Controllers
 {
@@ -25,7 +25,12 @@ namespace Simulation.Controllers
         private readonly IUAVStorageService _uavStorageService;
         private readonly IUAVFactory _uavFactory;
 
-        public SimulationController(IUAVManager uavManager, IICDDirectory _icdDirectory, IUAVStorageService uavStorageService, IUAVFactory uavFactory)
+        public SimulationController(
+            IUAVManager uavManager,
+            IICDDirectory _icdDirectory,
+            IUAVStorageService uavStorageService,
+            IUAVFactory uavFactory
+        )
         {
             _uavManager = uavManager;
             _ICDDirectory = _icdDirectory;
@@ -110,10 +115,13 @@ namespace Simulation.Controllers
                 }
             );
         }
+
         [HttpGet("all-uav")]
         public IActionResult GetAllUAVs()
         {
-            IEnumerable<int> allUAVsTailIds = _uavStorageService.GetAllUAVs().Select(dto => dto.TailId);
+            IEnumerable<int> allUAVsTailIds = _uavStorageService
+                .GetAllUAVs()
+                .Select(dto => dto.TailId);
             return Ok(allUAVsTailIds);
         }
 
@@ -130,7 +138,11 @@ namespace Simulation.Controllers
 
             Location destination = new Location(31.8300, 34.9700, 1000.0);
             UAV uav = _uavFactory.CreateUAV(uavDto, uavDto.BaseLocation);
-            bool success = await _uavManager.StartMission(uav, destination, "armed-mission-converge");
+            bool success = await _uavManager.StartMission(
+                uav,
+                destination,
+                "armed-mission-converge"
+            );
             return success
                 ? Ok("UAV 2 started successfully")
                 : BadRequest("Mission failed to start");
@@ -159,10 +171,21 @@ namespace Simulation.Controllers
             Location surveillanceDestination = new Location(31.8305, 34.9705, 1000.0);
 
             UAV armedUav = _uavFactory.CreateUAV(armedUavDto, armedUavDto.BaseLocation);
-            UAV surveillanceUav = _uavFactory.CreateUAV(surveillanceUavDto, surveillanceUavDto.BaseLocation);
+            UAV surveillanceUav = _uavFactory.CreateUAV(
+                surveillanceUavDto,
+                surveillanceUavDto.BaseLocation
+            );
 
-            Task<bool> armedMissionTask = _uavManager.StartMission(armedUav, armedDestination, "armed-mission-converge");
-            Task<bool> surveillanceMissionTask = _uavManager.StartMission(surveillanceUav, surveillanceDestination, "surveillance-mission-converge");
+            Task<bool> armedMissionTask = _uavManager.StartMission(
+                armedUav,
+                armedDestination,
+                "armed-mission-converge"
+            );
+            Task<bool> surveillanceMissionTask = _uavManager.StartMission(
+                surveillanceUav,
+                surveillanceDestination,
+                "surveillance-mission-converge"
+            );
 
             bool[] results = await Task.WhenAll(armedMissionTask, surveillanceMissionTask);
 
@@ -196,6 +219,31 @@ namespace Simulation.Controllers
             return allSuccessful
                 ? Ok("All 20 UAVs started successfully and are converging.")
                 : BadRequest("One or more missions failed to start");
+        }
+
+        [HttpGet("show")]
+        public async Task<IActionResult> Show()
+        {
+            int tailId = 2;
+            DeviceManagerUAVDto uavDto = _uavStorageService.GetUAV(tailId);
+
+            if (uavDto == null)
+            {
+                return NotFound($"UAV with TailId {tailId} does not exist");
+            }
+
+            Location predeterminedStart = new Location(31.80, 34.75, 0.0);
+            Location predeterminedDestination = new Location(32.10, 34.90, 0.0);
+
+            UAV uav = _uavFactory.CreateUAV(uavDto, predeterminedStart);
+            bool success = await _uavManager.StartMission(
+                uav,
+                predeterminedDestination,
+                "show-demo"
+            );
+            return success
+                ? Ok("Show started - long high flight from predetermined start to destination")
+                : BadRequest("Show mission failed to start");
         }
     }
 }
