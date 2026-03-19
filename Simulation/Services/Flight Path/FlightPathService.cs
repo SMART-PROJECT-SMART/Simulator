@@ -1,5 +1,6 @@
 using Core.Models;
 ﻿using Core.Common.Enums;
+using Core.Common.Helpers;
 using Microsoft.Extensions.Logging;
 using Simulation.Common.constants;
 using Simulation.Common.Enums;
@@ -178,6 +179,8 @@ public class FlightPathService : IDisposable
             telemetry[TelemetryFields.PitchDeg],
             telemetry[TelemetryFields.YawDeg],
             telemetry[TelemetryFields.RollDeg]);
+
+        telemetry[TelemetryFields.MissionId] = MissionIdHashUtility.ToHash(_uav.CurrentMissionId);
 
         TelemetryUpdated?.Invoke(telemetry);
         LocationUpdated?.Invoke(nextLoc);

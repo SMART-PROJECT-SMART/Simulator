@@ -42,6 +42,7 @@ namespace Simulation.Models.UAVs
                 [TelemetryFields.RollDeg] = 0.0,
                 [TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_DOWN,
                 [TelemetryFields.NearestSleeveId] = 0,
+                [TelemetryFields.MissionId] = 0,
             };
         }
 
