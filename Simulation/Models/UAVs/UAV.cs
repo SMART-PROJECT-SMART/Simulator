@@ -35,12 +35,16 @@ namespace Simulation.Models.UAVs
                 [TelemetryFields.Longitude] = startLocation.Longitude,
                 [TelemetryFields.Altitude] = startLocation.Altitude,
                 [TelemetryFields.FuelAmount] = fuelAmount,
+                [TelemetryFields.AmmoPercentage] = 0.0,
                 [TelemetryFields.ThrottlePercent] = 0.0,
                 [TelemetryFields.CurrentSpeedKmph] = 0.0,
                 [TelemetryFields.YawDeg] = 0.0,
                 [TelemetryFields.PitchDeg] = 0.0,
                 [TelemetryFields.RollDeg] = 0.0,
                 [TelemetryFields.LandingGearStatus] = SimulationConstants.TelemetryData.WHEELS_DOWN,
+                [TelemetryFields.FlightTimeSec] = 0.0,
+                [TelemetryFields.SignalStrength] = 0.0,
+                [TelemetryFields.EngineDegrees] = 0.0,
                 [TelemetryFields.NearestSleeveId] = 0,
                 [TelemetryFields.MissionId] = 0,
             };
@@ -56,9 +60,6 @@ namespace Simulation.Models.UAVs
             double remainingFuel = TelemetryData[TelemetryFields.FuelAmount];
             remainingFuel = Math.Max(remainingFuel - burnedInKg, 0.0);
             TelemetryData[TelemetryFields.FuelAmount] = remainingFuel;
-            TelemetryData[TelemetryFields.FlightTimeSec] = 0;
-            TelemetryData[TelemetryFields.SignalStrength] = 0;
-            TelemetryData[TelemetryFields.EngineDegrees] = 0;
         }
 
         public Location GetLocation()

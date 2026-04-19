@@ -42,10 +42,9 @@ namespace Simulation.Models.UAVs.ArmedUav
                 .ThrustAfterInfluence;
             TelemetryData[TelemetryFields.PlatformType] = (double)PlatformType.HeronTP;
 
-            WeaponAmmo[WeaponType.Hellfire] = (int)
-                SimulationConstants.HeronTP_Constants.HellfireAmmo;
-            WeaponAmmo[WeaponType.Griffin] = (int)SimulationConstants.HeronTP_Constants.GriffinAmmo;
-            WeaponAmmo[WeaponType.JDAM] = (int)SimulationConstants.HeronTP_Constants.JDAMAmmo;
+            SetWeaponAmmo(WeaponType.Hellfire, (int)SimulationConstants.HeronTP_Constants.HellfireAmmo);
+            SetWeaponAmmo(WeaponType.Griffin, (int)SimulationConstants.HeronTP_Constants.GriffinAmmo);
+            SetWeaponAmmo(WeaponType.JDAM, (int)SimulationConstants.HeronTP_Constants.JDAMAmmo);
         }
 
         private static Dictionary<UAVProperties, double> BuildProperties()

@@ -101,7 +101,8 @@ namespace Simulation.Services.UAVManager
 
         public void UpdateChannelPorts(int tailId, IEnumerable<int> newPorts)
         {
-            if (!_uavMissionContexts.TryGetValue(tailId, out UAVMissionContext context))
+            bool hasContext = _uavMissionContexts.TryGetValue(tailId, out UAVMissionContext context);
+            if (!hasContext)
             {
                 return;
             }

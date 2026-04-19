@@ -1,4 +1,4 @@
-﻿namespace Simulation.Common.constants
+namespace Simulation.Common.constants
 {
     public static class SimulationConstants
     {
@@ -161,7 +161,7 @@
             public const double ALTITUDE_HOLD_GAIN = 8.0;
             public const double MISSION_COMPLETION_RADIUS_M = 1.5;
             public const double ALTITUDE_HOLD_TIME_TO_TARGET_SEC = 0.5;
-            public const int OVERHEAT = 300;
+            public const int OVERHEAT = 36000;
             public const double YAW_SMOOTHING_FACTOR = 0.8;
             public const double ROLL_SMOOTHING_FACTOR = 0.7;
             public const double MAX_PITCH_RATE_DEG_PER_SEC = 5.0;
@@ -195,6 +195,8 @@
             public const double WHEELS_UP = 0;
             public const double WHEELS_DOWN = 1;
             public const double NO_SIGNAL = -120.5;
+            public const double EMPTY_PERCENTAGE = 0.0;
+            public const double FULL_PERCENTAGE = 100.0;
             public const int BYTES_PER_FIELD = 8;
         }
 
