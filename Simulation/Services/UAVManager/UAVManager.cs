@@ -34,6 +34,7 @@ namespace Simulation.Services.UAVManager
         private readonly IMissionServiceClient _missionServiceClient;
         private readonly IICDDirectory _icdDirectory;
         private readonly IDeviceManagerClient _deviceManagerClient;
+        private readonly object _channelPortsUpdateLock = new();
 
         public UAVManager(
             IMotionCalculator motionCalculator,
@@ -101,6 +102,24 @@ namespace Simulation.Services.UAVManager
 
         public void UpdateChannelPorts(int tailId, IEnumerable<int> newPorts)
         {
+            lock (_channelPortsUpdateLock)
+            {
+                UpdateChannelPortsUnsafe(tailId, newPorts);
+            }
+        }
+
+        public void UpdateChannelPortsBatch(IEnumerable<UAVPortsBatchChangeEntryDto> changes)
+        {
+            lock (_channelPortsUpdateLock)
+            {
+                IReadOnlyList<(int SourcePort, int TargetPort)> operations =
+                    BuildBatchPortSwitchOperations(changes);
+                ApplyPortSwitchOperations(operations);
+            }
+        }
+
+        private void UpdateChannelPortsUnsafe(int tailId, IEnumerable<int> newPorts)
+        {
             bool hasContext = _uavMissionContexts.TryGetValue(tailId, out UAVMissionContext context);
             if (!hasContext)
             {
@@ -113,6 +132,116 @@ namespace Simulation.Services.UAVManager
             for (int i = 0; i < channels.Count && i < portList.Count; i++)
             {
                 _portManager.SwitchPorts(channels[i].PortNumber, portList[i]);
+            }
+        }
+
+        private IReadOnlyList<(int SourcePort, int TargetPort)> BuildBatchPortSwitchOperations(
+            IEnumerable<UAVPortsBatchChangeEntryDto> changes
+        )
+        {
+            List<(int SourcePort, int TargetPort)> operations = [];
+            HashSet<int> targetPorts = [];
+            HashSet<int> sourcePorts = [];
+
+            foreach (UAVPortsBatchChangeEntryDto change in changes)
+            {
+                UAVMissionContext context = ResolveUavContext(change.TailId);
+                List<Channel> channels = context.UAV.Channels;
+                List<int> newPorts = (change.NewPorts ?? []).ToList();
+                ValidatePortCount(change.TailId, channels.Count, newPorts.Count);
+
+                for (int i = 0; i < channels.Count; i++)
+                {
+                    int sourcePort = channels[i].PortNumber;
+                    int targetPort = newPorts[i];
+                    ValidatePortRange(change.TailId, targetPort);
+                    EnsureUniqueTargetPort(targetPort, targetPorts);
+                    EnsureUniqueSourcePort(sourcePort, sourcePorts);
+                    EnsureSourcePortExists(sourcePort);
+                    operations.Add((sourcePort, targetPort));
+                }
+            }
+
+            return operations;
+        }
+
+        private void ApplyPortSwitchOperations(
+            IReadOnlyList<(int SourcePort, int TargetPort)> operations
+        )
+        {
+            foreach ((int sourcePort, int targetPort) in operations)
+            {
+                _portManager.SwitchPorts(sourcePort, targetPort);
+            }
+        }
+
+        private UAVMissionContext ResolveUavContext(int tailId)
+        {
+            if (!_uavMissionContexts.TryGetValue(tailId, out UAVMissionContext context))
+            {
+                throw new InvalidOperationException(
+                    string.Format(SimulationConstants.Remap.MISSING_UAV_CONTEXT_ERROR, tailId)
+                );
+            }
+
+            return context;
+        }
+
+        private void ValidatePortCount(int tailId, int expectedPortCount, int actualPortCount)
+        {
+            if (actualPortCount != expectedPortCount)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        SimulationConstants.Remap.INVALID_PORT_COUNT_ERROR,
+                        tailId,
+                        expectedPortCount,
+                        actualPortCount
+                    )
+                );
+            }
+        }
+
+        private void ValidatePortRange(int tailId, int portNumber)
+        {
+            if (
+                portNumber < SimulationConstants.Networking.STARTING_PORT_NUMBER
+                || portNumber > SimulationConstants.Networking.MAX_PORT_NUMBER
+            )
+            {
+                throw new InvalidOperationException(
+                    string.Format(SimulationConstants.Remap.PORT_OUT_OF_RANGE_ERROR, tailId, portNumber)
+                );
+            }
+        }
+
+        private void EnsureUniqueTargetPort(int portNumber, HashSet<int> targetPorts)
+        {
+            if (!targetPorts.Add(portNumber))
+            {
+                throw new InvalidOperationException(
+                    string.Format(SimulationConstants.Remap.DUPLICATE_TARGET_PORT_ERROR, portNumber)
+                );
+            }
+        }
+
+        private void EnsureUniqueSourcePort(int portNumber, HashSet<int> sourcePorts)
+        {
+            if (!sourcePorts.Add(portNumber))
+            {
+                throw new InvalidOperationException(
+                    string.Format(SimulationConstants.Remap.DUPLICATE_SOURCE_PORT_ERROR, portNumber)
+                );
+            }
+        }
+
+        private void EnsureSourcePortExists(int sourcePort)
+        {
+            if (!_portManager.IsUsed(sourcePort))
+            {
+                throw new InvalidOperationException(
+                    string.Format(SimulationConstants.Remap.MISSING_SOURCE_PORT_ERROR, sourcePort)
+                );
             }
         }
 

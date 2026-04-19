@@ -281,6 +281,22 @@ namespace Simulation.Common.constants
             public const int PORT_INCREMENT = 1;
         }
 
+        public static class Remap
+        {
+            public const string MISSING_UAV_CONTEXT_ERROR =
+                "Cannot apply batch port update for unknown tail id {0}.";
+            public const string INVALID_PORT_COUNT_ERROR =
+                "Cannot apply batch port update for tail id {0}: expected {1} ports but got {2}.";
+            public const string PORT_OUT_OF_RANGE_ERROR =
+                "Cannot apply batch port update for tail id {0}: port {1} is out of range.";
+            public const string DUPLICATE_TARGET_PORT_ERROR =
+                "Cannot apply batch port update: target port {0} appears more than once.";
+            public const string DUPLICATE_SOURCE_PORT_ERROR =
+                "Cannot apply batch port update: source port {0} appears more than once.";
+            public const string MISSING_SOURCE_PORT_ERROR =
+                "Cannot apply batch port update: source port {0} is not assigned.";
+        }
+
         public static class Config
         {
             public const string ICD_DIRECTORY = "ICD";

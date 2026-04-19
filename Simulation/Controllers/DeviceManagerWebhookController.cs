@@ -32,5 +32,21 @@ namespace Simulation.Controllers
             _uavManager.UpdateChannelPorts(notification.TailId, notification.NewPorts);
             return Ok();
         }
+
+        [HttpPost("uavs-ports-changed-batch")]
+        public ActionResult UAVPortsChangedBatch(
+            [FromBody] UAVPortsChangedBatchNotificationDto notification
+        )
+        {
+            try
+            {
+                _uavManager.UpdateChannelPortsBatch(notification.Changes);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok();
+        }
     }
 }
