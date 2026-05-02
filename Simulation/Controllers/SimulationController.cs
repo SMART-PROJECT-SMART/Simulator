@@ -48,12 +48,18 @@ namespace Simulation.Controllers
                 return NotFound($"UAV with TailId {dto.TailId} does not exist");
             }
 
+            bool isReassignment = _uavManager.GetActiveTailIds.Contains(dto.TailId);
             UAV uav = _uavFactory.CreateUAV(uavDto, uavDto.BaseLocation);
 
             bool success = await _uavManager.StartMission(uav, dto.Destination, dto.MissionId);
-            return success
-                ? Ok("Mission started successfully")
-                : BadRequest("Mission failed to start");
+            if (!success)
+            {
+                return BadRequest("Mission failed to start");
+            }
+
+            return isReassignment
+                ? Ok("Mission reassigned successfully")
+                : Ok("Mission started successfully");
         }
 
         [HttpPost("switch")]

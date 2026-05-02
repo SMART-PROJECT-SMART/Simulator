@@ -2,6 +2,7 @@ using Core.Models;
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using Core.Common.Enums;
+using Core.Common.Helpers;
 using Core.Models.ICDModels;
 using Core.Services.ICDsDirectory;
 using Simulation.Common.constants;
@@ -261,6 +262,16 @@ namespace Simulation.Services.UAVManager
 
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
         {
+            if (_uavMissionContexts.TryGetValue(uav.TailId, out UAVMissionContext? existingContext))
+            {
+                UAV existingUav = existingContext.UAV;
+                existingUav.CurrentMissionId = missionId;
+                existingUav.TelemetryData[TelemetryFields.MissionId] = MissionIdHashUtility.ToHash(missionId);
+                existingContext.Service.SwitchDestination(destination);
+                existingContext.Service.StartFlightPath();
+                return true;
+            }
+
             uav.CurrentMissionId = missionId;
 
             if (uav.Channels == null || !uav.Channels.Any())
@@ -272,11 +283,7 @@ namespace Simulation.Services.UAVManager
                 }
             }
 
-            if (!_uavMissionContexts.ContainsKey(uav.TailId))
-            {
-                AddUAV(uav);
-            }
-
+            AddUAV(uav);
             UAVMissionContext context = _uavMissionContexts[uav.TailId];
             context.Service.Initialize(uav, destination);
             context.Service.StartFlightPath();
