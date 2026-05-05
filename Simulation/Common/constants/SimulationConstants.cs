@@ -36,7 +36,7 @@ namespace Simulation.Common.constants
             public const double MaxDeceleration = 2.0;
             public const double MaxCruiseSpeedKmph = 220;
             public const double CruiseAltitude = 135.0;
-            public const double FuelTankCapacity = 450.0;
+            public const double FuelTankCapacity = 600.0;
             public const double FuelConsumption = 2.0e-4;
             public const double Mass = 4650.0;
             public const double FrontalSurface = 8.2;
