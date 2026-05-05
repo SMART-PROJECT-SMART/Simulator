@@ -28,8 +28,15 @@ namespace Simulation.Services.Helpers
                 {
                     bool isNegative = telemetryValue < 0;
                     signBits[fieldIndex] = isNegative;
-
-                    valueInBits = ConvertToMeaningfulBits(Math.Abs(telemetryValue), bitLength);
+                    if (telemetryParameter.Name == TelemetryFields.FuelAmount
+                        || telemetryParameter.Name == TelemetryFields.AmmoPercentage)
+                    {
+                        valueInBits = ConvertPercentToLinearBits(telemetryValue, bitLength);
+                    }
+                    else
+                    {
+                        valueInBits = ConvertToMeaningfulBits(Math.Abs(telemetryValue), bitLength);
+                    }
                 }
                 else
                 {
@@ -76,6 +83,18 @@ namespace Simulation.Services.Helpers
             );
 
             return ((ulong)storedExponent << significandBits) | storedSignificand;
+        }
+
+        private static ulong ConvertPercentToLinearBits(double value, int bitLength)
+        {
+            double clampedPercent = Math.Clamp(
+                value,
+                SimulationConstants.TelemetryData.EMPTY_PERCENTAGE,
+                SimulationConstants.TelemetryData.FULL_PERCENTAGE
+            );
+            ulong maxEncoded = (1UL << bitLength) - 1;
+            double normalized = clampedPercent / SimulationConstants.TelemetryData.FULL_PERCENTAGE;
+            return (ulong)Math.Round(normalized * maxEncoded);
         }
 
 

@@ -320,7 +320,7 @@ namespace Simulation.Common.constants
 
         public static class MissionServiceApiEndpoints
         {
-            public const string MISSION_COMPLETED = "mission-completed";
+            public const string MISSION_COMPLETED = "api/mission-status/mission-completed";
         }
 
         public static class DeviceManagerApiEndpoints

@@ -28,13 +28,17 @@ namespace Simulation.Models.UAVs
 
             CurrentMissionId = string.Empty;
             Channels = channels;
+            double fuelTankCapacity = Properties[UAVProperties.FuelTankCapacity];
+            double fuelAmountPercentage = fuelTankCapacity <= 0.0
+                ? SimulationConstants.TelemetryData.EMPTY_PERCENTAGE
+                : fuelAmount * SimulationConstants.TelemetryData.FULL_PERCENTAGE / fuelTankCapacity;
 
             TelemetryData = new Dictionary<TelemetryFields, double>
             {
                 [TelemetryFields.Latitude] = startLocation.Latitude,
                 [TelemetryFields.Longitude] = startLocation.Longitude,
                 [TelemetryFields.Altitude] = startLocation.Altitude,
-                [TelemetryFields.FuelAmount] = fuelAmount,
+                [TelemetryFields.FuelAmount] = fuelAmountPercentage,
                 [TelemetryFields.AmmoPercentage] = 0.0,
                 [TelemetryFields.ThrottlePercent] = 0.0,
                 [TelemetryFields.CurrentSpeedKmph] = 0.0,
@@ -56,10 +60,18 @@ namespace Simulation.Models.UAVs
             double thrust = Properties[UAVProperties.ThrustMax] * (throttlePct / 100.0);
 
             double burnedInKg = thrust * Properties[UAVProperties.FuelConsumption] * deltaSec;
+            double fuelTankCapacity = Properties[UAVProperties.FuelTankCapacity];
+            if (fuelTankCapacity <= 0.0)
+            {
+                TelemetryData[TelemetryFields.FuelAmount] = SimulationConstants.TelemetryData.EMPTY_PERCENTAGE;
+                return;
+            }
 
-            double remainingFuel = TelemetryData[TelemetryFields.FuelAmount];
-            remainingFuel = Math.Max(remainingFuel - burnedInKg, 0.0);
-            TelemetryData[TelemetryFields.FuelAmount] = remainingFuel;
+            double remainingFuelPercentage = TelemetryData[TelemetryFields.FuelAmount];
+            double remainingFuelKg = remainingFuelPercentage * fuelTankCapacity / SimulationConstants.TelemetryData.FULL_PERCENTAGE;
+            remainingFuelKg = Math.Max(remainingFuelKg - burnedInKg, 0.0);
+            double nextFuelPercentage = remainingFuelKg * SimulationConstants.TelemetryData.FULL_PERCENTAGE / fuelTankCapacity;
+            TelemetryData[TelemetryFields.FuelAmount] = nextFuelPercentage;
         }
 
         public Location GetLocation()
