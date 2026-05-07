@@ -157,8 +157,8 @@ public class FlightPathService : IDisposable
             currentLoc,
             _destination,
             SimulationConstants.FlightPath.DELTA_SECONDS,
-            _uav.Properties[UAVProperties.MaxAcceleration],
-            _uav.Properties[UAVProperties.MaxAcceleration]
+            _uav.Properties[UAVProperties.WingsSurface],
+            _uav.Properties[UAVProperties.FrontalSurface]
         );
         telemetry[TelemetryFields.Latitude] = nextLoc.Latitude;
         telemetry[TelemetryFields.Longitude] = nextLoc.Longitude;
