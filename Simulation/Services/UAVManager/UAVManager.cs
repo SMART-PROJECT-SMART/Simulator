@@ -25,6 +25,7 @@ namespace Simulation.Services.UAVManager
 {
     public class UAVManager : IUAVManager
     {
+        private readonly ConcurrentDictionary<int, SemaphoreSlim> _tailMissionStartLocks = new();
         private readonly ConcurrentDictionary<int, UAVMissionContext> _uavMissionContexts;
         private readonly IMotionCalculator _motionCalculator;
         private readonly ISpeedController _speedController;
@@ -262,52 +263,78 @@ namespace Simulation.Services.UAVManager
 
         public async Task<bool> StartMission(UAV uav, Location destination, string missionId)
         {
-            if (_uavMissionContexts.TryGetValue(uav.TailId, out UAVMissionContext? existingContext))
+            SemaphoreSlim tailMissionStartLock = _tailMissionStartLocks.GetOrAdd(
+                uav.TailId,
+                _ => new SemaphoreSlim(1, 1)
+            );
+            await tailMissionStartLock.WaitAsync();
+            try
             {
-                UAV existingUav = existingContext.UAV;
-                existingUav.CurrentMissionId = missionId;
-                existingUav.TelemetryData[TelemetryFields.MissionId] = MissionIdHashUtility.ToHash(missionId);
-                existingContext.Service.SwitchDestination(destination);
-                existingContext.Service.StartFlightPath();
-                return true;
-            }
-
-            uav.CurrentMissionId = missionId;
-
-            if (uav.Channels == null || !uav.Channels.Any())
-            {
-                bool setupSuccess = await SetupUAVChannelsAsync(uav);
-                if (!setupSuccess)
+                if (_uavMissionContexts.TryGetValue(uav.TailId, out UAVMissionContext? existingContext))
                 {
+                    UAV existingUav = existingContext.UAV;
+                    existingUav.CurrentMissionId = missionId;
+                    existingUav.TelemetryData[TelemetryFields.MissionId] = MissionIdHashUtility.ToHash(
+                        missionId
+                    );
+                    existingContext.Service.SwitchDestination(destination);
+                    existingContext.Service.StartFlightPath();
+                    return true;
+                }
+
+                uav.CurrentMissionId = missionId;
+
+                if (uav.Channels == null || !uav.Channels.Any())
+                {
+                    bool setupSuccess = await SetupUAVChannelsAsync(uav);
+                    if (!setupSuccess)
+                    {
+                        return false;
+                    }
+                }
+
+                AddUAV(uav);
+                bool hasContext = _uavMissionContexts.TryGetValue(uav.TailId, out UAVMissionContext context);
+                if (!hasContext)
+                {
+                    ResetFailedMissionStart(uav, null);
                     return false;
                 }
+                context.Service.Initialize(uav, destination);
+                context.Service.StartFlightPath();
+
+                var jobScheduled = await _quartzFlightJobManager.ScheduleUAVFlightPathJob(
+                    uav.TailId,
+                    (int)SimulationConstants.FlightPath.DELTA_SECONDS
+                );
+
+                if (!jobScheduled)
+                {
+                    ResetFailedMissionStart(uav, context);
+                    return false;
+                }
+
+                context.Service.MissionCompleted += async () =>
+                {
+                    await _quartzFlightJobManager.DeleteUAVFlightPathJob(uav.TailId);
+                    await _missionServiceClient.NotifyMissionCompletedAsync(uav.TailId);
+                    await _deviceManagerClient.ReleaseSleeveByTailIdAsync(uav.TailId);
+                    uav.CurrentMissionId = string.Empty;
+                    context.Service.Dispose();
+                    RemoveUAV(uav);
+                };
+                return true;
             }
-
-            AddUAV(uav);
-            UAVMissionContext context = _uavMissionContexts[uav.TailId];
-            context.Service.Initialize(uav, destination);
-            context.Service.StartFlightPath();
-
-            var jobScheduled = await _quartzFlightJobManager.ScheduleUAVFlightPathJob(
-                uav.TailId,
-                (int)SimulationConstants.FlightPath.DELTA_SECONDS
-            );
-
-            if (!jobScheduled)
+            finally
             {
-                return false;
+                tailMissionStartLock.Release();
             }
+        }
 
-            context.Service.MissionCompleted += async () =>
-            {
-                await _quartzFlightJobManager.DeleteUAVFlightPathJob(uav.TailId);
-                await _missionServiceClient.NotifyMissionCompletedAsync(uav.TailId);
-                await _deviceManagerClient.ReleaseSleeveByTailIdAsync(uav.TailId);
-                uav.CurrentMissionId = string.Empty;
-                context.Service.Dispose();
-                RemoveUAV(uav);
-            };
-            return true;
+        private void ResetFailedMissionStart(UAV uav, UAVMissionContext? context)
+        {
+            context?.Service.Dispose();
+            RemoveUAV(uav);
         }
 
         private async Task<bool> SetupUAVChannelsAsync(UAV uav)
